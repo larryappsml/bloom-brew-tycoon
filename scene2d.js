@@ -37,7 +37,7 @@
     }
     text(text,x,y,color='#68725c',size=9) {const c=this.ctx;c.fillStyle=color;c.font=`600 ${size}px system-ui`;c.textAlign='center';c.fillText(text,x,y);}
     draw(s,t,dt) {
-      const c=this.ctx,B=window.Bloom,l=id=>B.level(s,id),p=B.params(s);
+      const c=this.ctx,B=window.Bloom,l=id=>B.level(s,id),p=B.params(s),clocks=[];
       c.clearRect(0,0,360,270);
       const gradient=c.createLinearGradient(0,0,0,270);gradient.addColorStop(0,'#e4e8dc');gradient.addColorStop(1,'#f2e6d1');c.fillStyle=gradient;c.fillRect(0,0,360,270);
       c.save();c.translate(180,135);c.scale(.68,.68);c.translate(-180,-135);
@@ -48,6 +48,10 @@
       if(zones.wellness){this.box(7,0,3.4,7,5,'#d4e4da');for(const id of ['pressotherapy','massage'])for(let i=0;i<Math.min(2,l(id));i++){const x=7.35+i*1.45,y=id==='pressotherapy'?1:4.3;this.box(x,y,1,1.8,12,id==='pressotherapy'?'#92bfa8':'#d4aca0');this.tile(x+.1,y+.1,.8,.35,15,'#fff0d4');const t=(s.treatments||[]).find(t=>t.service===id&&t.slot===i&&t.stage==='active');if(t){const [px,py]=this.point(x+.5,y+.65,16);this.ellipse(px,py,4,4,colors[t.kind]);c.fillStyle='#54765e';c.fillRect(px-3,py+3,6,12);if(id==='pressotherapy'){c.fillStyle='#a1d4be';c.fillRect(px-6,py+12,5,10);c.fillRect(px+1,py+12,5,10);}}}}
       if(zones.yoga){this.box(0,-3.4,3.7,3.4,5,'#e5cab9');for(let i=0;i<Math.min(6,l('yoga')*2);i++)this.tile(.3+(i%3)*1.1,-2.9+Math.floor(i/3)*1.5,.7,1.1,7,'#c797a1');}
       if(zones.studio)this.box(3.7,-3.4,3.3,3.4,5,'#c7dfcf');
+      for(const treatment of s.treatments||[]){if(treatment.stage!=='active')continue;let x,y;
+        if(treatment.service==='yoga'){x=.65+(treatment.slot%3)*1.1;y=-2.6+Math.floor(treatment.slot/3)*1.5;this.person(x,y,treatment.kind,false,t);}else{x=7.85+treatment.slot*1.45;y=treatment.service==='pressotherapy'?1.6:4.9;}
+        const [px,py]=this.point(x,y,36);clocks.push({x:px,y:py,remaining:treatment.remaining,duration:treatment.duration||B.serviceConfig(s,treatment.service).duration,kind:treatment.service});
+      }
       this.ellipse(180,241,155,27,'#b09b7a20');
       // A continuous 2.5D floor and two back walls; no external image assets.
       this.box(0,0,7,7,5,'#d8bd97','#b99a76');
@@ -69,6 +73,9 @@
       if(s.queue.some(o=>o.remaining!==null)) {for(let i=0;i<3;i++)this.ellipse(mx+(i-1)*4,my-9-((t*9+i*5)%13),1.5,3,'#fff9edaa');}
       if(l('pastries'))this.box(2.15,1.04,.8,.45,31,'#d9e1d1','#b99573');
       if(l('matcha')){this.box(3.45,.55,.4,.5,18,'#a2b49a','#6b8970');this.text('🍵',...this.point(3.65,.8,22),'#668660',10);}
+      if(l('brewBar'))for(let i=0;i<Math.min(3,l('brewBar'));i++)this.box(.5+i*.42,.35,.3,.25,23,'#f6e8cf','#a28b5d');
+      if(l('bakeryOven')){this.box(3.2,.15,.7,.7,27,'#627a6d','#435b54');for(let i=0;i<Math.min(3,l('bakeryOven'));i++)this.text('—',...this.point(3.6,.8,9+i*6),'#e4b570',9);}
+      if(l('cafeLounge'))this.box(-2.5,5.8,2,.6,15,'#d8a098','#b57e6f');
       this.plant(.35,.4,1.2);this.plant(.3,6.3,1.3);
       const tables=1+Math.min(l('seats'),3);
       for(let i=0;i<tables;i++) {
@@ -87,11 +94,14 @@
           if(s.classRemaining>0&&i<s.classSeats) {
             const [px,py]=this.point(x+.3,y+.65,10);const bend=this.reduced?0:Math.sin(t*1.8+i)*3;
             this.ellipse(px,py-3,3.4,3.8,colors[i%4]);c.strokeStyle=i%2?'#b3857a':'#768c9d';c.lineWidth=4;c.beginPath();c.moveTo(px,py);c.lineTo(px+4+bend,py+6);c.lineTo(px+10,py+8);c.stroke();
+            clocks.push({x:px,y:py-25,remaining:s.classRemaining,duration:s.classDuration||p.classTime,kind:'pilates'});
           }
         }
         this.plant(6.7,.5,.9);this.plant(6.7,6.2,.9);
         if(l('coach'))this.person(6.5,1.4,2,true,t);
         if(l('spa'))this.box(4.1,.4,1.2,.45,18,'#b7c6a4','#93a07f');
+        for(let i=0;i<Math.min(3,l('pilatesKit'));i++)this.box(6.5,2+i*.65,.3,.4,10,'#d7a28d','#9a8469');
+        for(let i=0;i<Math.min(3,l('studioMirror'));i++)this.box(4+i*.8,.2,.65,.08,44,'#b3cdcd','#bda384');
       } else {
         this.text('Respira. Tu próxima aventura',252,180,'#8f917d',8);this.text('Estudio desde 850 €',252,195,'#828774',9);
       }
@@ -99,7 +109,7 @@
       if(!p.baristas&&s.queue.some(o=>o.remaining!==null))this.person(1.8,.8,0,true,t);
       const targets=new Map();
       s.queue.forEach((o,i)=>targets.set(o.id,{x:2.7+(i%2)*.55,y:2.5+Math.floor(i/2)*.65,kind:o.kind,order:o}));
-      s.seated.forEach((o,i)=>targets.set(o.id,{x:1.1+(i%2)*1.7,y:4.4+(Math.floor(i/2)%2)*1.8,kind:o.kind}));
+      s.seated.forEach((o,i)=>targets.set(o.id,{x:1.1+(i%2)*1.7,y:4.4+(Math.floor(i/2)%2)*1.8,kind:o.kind,guest:o}));
       for(const [id,target] of targets)if(!this.people.has(id))this.people.set(id,{x:3.8,y:7.7,...{kind:target.kind}});
       for(const [id,person] of this.people) {
         const target=targets.get(id)||{x:3.8,y:8.3};const factor=this.reduced?1:Math.min(1,dt*2.4);
@@ -109,15 +119,18 @@
       [...this.people.entries()].sort((a,b)=>(a[1].x+a[1].y)-(b[1].x+b[1].y)).forEach(([id,person])=>{
         this.person(person.x,person.y,person.kind,false,t);const o=targets.get(id)?.order;
         if(o){const [px,py]=this.point(person.x,person.y,36);this.ellipse(px,py,9,7,'#fffaf0');this.text(B.PRODUCTS.find(p=>p.id===o.product).icon,px,py+3,'#536a4b',9);}
+        const guest=targets.get(id)?.guest,activity=o?.remaining!==null&&o?.remaining!==undefined?o:guest;
+        if(activity){const [px,py]=this.point(person.x,person.y,55);clocks.push({x:px,y:py,remaining:activity.remaining,duration:activity.duration||(guest?18:B.orderDuration(s,o.product)),kind:guest?'consume':'prepare'});}
       });
       if(l('second')) {this.text(`${1+Math.min(l('second'),2)} LOCALES · TU COMUNIDAD CRECE`,180,262,'#667a5f',8);}
+      for(const clock of clocks)window.BloomClocks.drawClock(c,clock.x,clock.y,clock.remaining,clock.duration,clock.kind,11);
       c.restore();
     }
     frame(now) {
       requestAnimationFrame(this.frame);
       if(document.hidden||!this.canvas.closest('.view.active')){this.last=now;return;}
       if(now-this.last<(this.reduced?200:33))return;
-      const dt=Math.min(.1,(now-this.last)/1000||.033);this.last=now;this.time+=dt;
+      const dt=Math.min(1,(now-this.last)/1000||.033);this.last=now;this.time+=dt;
       this.draw(this.getState(),this.time,dt);
     }
   }

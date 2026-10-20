@@ -1,8 +1,21 @@
 # Bloom & Brew Tycoon 🌿☕🧘
 
-**v1.4.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
+**v1.5.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
 
 **[Jugar](https://larryappsml.github.io/bloom-brew-tycoon/)**
+
+La v1.5 añade modelos con bordes suaves y veta de madera, suelos con juntas, marcos y apliques, menús de pizarra, estantes, toallas, accesorios de trabajo y doce mejoras nuevas. Las salas tienen una identidad propia y sus inversiones añaden piezas visibles. Todo el arte se genera localmente; no se descargan texturas ni modelos externos.
+
+Los mini relojes sobre cada cliente muestran segundos restantes y un círculo que se llena: preparación del pedido (ámbar), consumo de café o repostería (verde), pilates (lila) y tratamientos/yoga (colores de su servicio). El café se cobra al entregar el pedido; el reloj de consumo marca la estancia, sin duplicar la venta. Las clases y tratamientos se cobran al terminar. Los tiempos se fijan al iniciar cada actividad: mejorar un equipo no reinicia un reloj en marcha. Los relojes acompañan al personaje al mover o acercar el mapa, siguen avanzando con los menús abiertos y también existen en el modo Canvas.
+
+| Sala | Nuevas inversiones de v1.5 |
+| --- | --- |
+| Cafetería | Barra de filtrados con drippers, horno de obrador y rincón de lectura con sofá y libros |
+| Pilates | Accesorios de fuerza, espejos con barras y ambiente con altavoces e iluminación |
+| Yoga | Cojines y mantas, jardín zen con bambú y rincón de infusiones |
+| Wellness | Central de compresión, piedras calientes y textiles premium |
+
+Estas mejoras tienen dos o tres niveles, requisitos de sala y el multiplicador de coste 1,65. Mejoran tiempos o márgenes con límites; piedras calientes e infusiones también añaden costes de materiales. El catálogo completo tiene 38 mejoras, con filtro propio para Yoga.
 
 ## Cómo jugar
 
@@ -69,6 +82,8 @@ También puedes ejecutar directamente `node --test tests/*.test.cjs`, `node scri
 | `layout.js` | Zonas, superficie, capacidad física, posiciones de equipos y rutas por puertas; compartido entre simulación y mapa |
 | `scene.js` | Carga del renderizador 3D y recuperación con Canvas 2D si WebGL no está disponible |
 | `scene3d.mjs` | Modelos y animaciones 3D, cámara ortográfica y selección de zonas con raycasting |
+| `decor3d.mjs` | Detalles arquitectónicos, accesorios y modelos de las nuevas inversiones por sala |
+| `clocks.js` | Círculos de progreso compartidos entre 3D y Canvas; capa sin captura de gestos |
 | `scene2d.js` | Alternativa gráfica 2D para dispositivos sin WebGL |
 | `vendor/` | Three.js 0.180.0 y licencia MIT, servidos desde la misma subruta |
 | `game.js` | Interfaz, navegación, audio, guardado y ciclo de vida |

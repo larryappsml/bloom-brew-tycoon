@@ -1,14 +1,16 @@
 import * as THREE from './vendor/three.module.min.mjs';
 import './layout.js';
+import './clocks.js';
+import {dressWorld} from './decor3d.mjs';
 const Layout=globalThis.BloomLayout;
 
 // Original low-poly art. Shared materials/geometries keep the scene inexpensive.
 const palette={cream:0xfff2d7,sage:0x6fbc99,dark:0x24564d,mint:0xb7dec4,wood:0xba8054,oak:0xe9b77a,gold:0xf4c45f,rose:0xe9a998,sky:0xb1deea,white:0xfffdf2,ink:0x344b55};
 const mats=new Map(),geometries=new Map();
-function material(color){if(!mats.has(color))mats.set(color,new THREE.MeshStandardMaterial({color,roughness:.82,metalness:0}));return mats.get(color);}
+function material(color){if(!mats.has(color)){const options={color,roughness:.8,metalness:0};if(color===palette.wood||color===palette.oak){const data=new Uint8Array(64*64*4);for(let y=0;y<64;y++)for(let x=0;x<64;x++){const i=(y*64+x)*4,v=239+Math.round(Math.sin(x*.75+Math.sin(y*.15)) * 7)+(x*13+y*7)%7;data[i]=data[i+1]=data[i+2]=v;data[i+3]=255;}const map=new THREE.DataTexture(data,64,64);map.wrapS=map.wrapT=THREE.RepeatWrapping;map.repeat.set(2,2);map.colorSpace=THREE.SRGBColorSpace;map.needsUpdate=true;options.map=map;}mats.set(color,new THREE.MeshStandardMaterial(options));}return mats.get(color);}
 function geometry(key,create){if(!geometries.has(key))geometries.set(key,create());return geometries.get(key);}
 function mesh(parent,geo,color,x,y,z,sx=1,sy=1,sz=1){const obj=new THREE.Mesh(geo,material(color));obj.position.set(x,y,z);obj.scale.set(sx,sy,sz);obj.castShadow=true;obj.receiveShadow=true;parent.add(obj);return obj;}
-function box(parent,x,y,z,w,h,d,color){return mesh(parent,geometry('box',()=>new THREE.BoxGeometry(1,1,1)),color,x,y,z,w,h,d);}
+function box(parent,x,y,z,w,h,d,color){return mesh(parent,geometry('softbox',()=>{const shape=new THREE.Shape(),a=.46,r=.08;shape.moveTo(-a+r,-a);shape.lineTo(a-r,-a);shape.quadraticCurveTo(a,-a,a,-a+r);shape.lineTo(a,a-r);shape.quadraticCurveTo(a,a,a-r,a);shape.lineTo(-a+r,a);shape.quadraticCurveTo(-a,a,-a,a-r);shape.lineTo(-a,-a+r);shape.quadraticCurveTo(-a,-a,-a+r,-a);const geo=new THREE.ExtrudeGeometry(shape,{depth:.92,steps:1,bevelEnabled:true,bevelSegments:1,bevelSize:.04,bevelThickness:.04,curveSegments:2});geo.translate(0,0,-.46);return geo;}),color,x,y,z,w,h,d);}
 function cylinder(parent,x,y,z,r,h,color,segments=12){return mesh(parent,geometry('cyl'+segments,()=>new THREE.CylinderGeometry(1,1,1,segments)),color,x,y,z,r,h,r);}
 function ball(parent,x,y,z,r,color,sx=1,sy=1,sz=1){return mesh(parent,geometry('sphere',()=>new THREE.SphereGeometry(1,12,8)),color,x,y,z,r*sx,r*sy,r*sz);}
 function group(parent,x=0,y=0,z=0,zone){const g=new THREE.Group();g.position.set(x,y,z);if(zone)g.userData.zone=zone;parent.add(g);return g;}
@@ -35,6 +37,17 @@ function counter(parent,levels){const g=group(parent,-3.1,0,-2.9,'machine');box(
   return {g,steamPosition:new THREE.Vector3(-4.6,2.8,-2.5)};
 }
 function reformer(parent,x,z,premium){const g=group(parent,x,0,z,premium?'reformer':'mat');if(premium){box(g,0,.31,0,.91,.18,1.94,palette.oak);for(const a of [-.37,.37])for(const b of [-.77,.77])box(g,a,.13,b,.08,.27,.08,palette.dark);box(g,0,.48,.05,.73,.2,1.23,0x779f95);box(g,0,.56,-.65,.6,.17,.3,0xd3b6a7);for(const a of [-.37,.37])box(g,a,.67,.79,.035,.7,.04,0x6a807b);box(g,0,1,.79,.78,.045,.045,palette.dark);}else box(g,0,.055,0,.88,.1,1.94,0xc396a5);return g;}
+
+// Merge only rigid pieces inside a joint. Arms and legs retain their own transforms.
+function batchCharacterPart(parent,key){const pieces=parent.children.filter(o=>o.isMesh);if(!pieces.length)return;
+  const combined=geometry('person:'+key,()=>{const positions=[],normals=[],colors=[],vector=new THREE.Vector3(),normalMatrix=new THREE.Matrix3();
+    for(const piece of pieces){piece.updateMatrix();normalMatrix.getNormalMatrix(piece.matrix);const part=piece.geometry.index?piece.geometry.toNonIndexed():piece.geometry.clone(),p=part.getAttribute('position'),n=part.getAttribute('normal'),color=piece.material.color;
+      for(let i=0;i<p.count;i++){vector.fromBufferAttribute(p,i).applyMatrix4(piece.matrix);positions.push(vector.x,vector.y,vector.z);vector.fromBufferAttribute(n,i).applyNormalMatrix(normalMatrix);normals.push(vector.x,vector.y,vector.z);colors.push(color.r,color.g,color.b);}part.dispose();}
+    const result=new THREE.BufferGeometry();result.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));result.setAttribute('normal',new THREE.Float32BufferAttribute(normals,3));result.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));result.computeBoundingSphere();return result;
+  });
+  if(!mats.has('people'))mats.set('people',new THREE.MeshStandardMaterial({vertexColors:true,roughness:.82}));
+  pieces.forEach(p=>parent.remove(p));const merged=new THREE.Mesh(combined,mats.get('people'));merged.castShadow=true;merged.receiveShadow=true;parent.add(merged);
+}
 export function buildWorld(state){
   const root=new THREE.Group(),levels=state.levels||{},p=windowParams(state),studio=!!levels.mat,zones=Layout.zones(state),footprint=Layout.footprint(state);
   root.name='Bloom & Brew world';const targets={};
@@ -82,7 +95,8 @@ export function buildWorld(state){
   const entrance=group(root,-.4,0,5.95);for(const x of [-1.85,1.85])box(entrance,x,1.1,0,.13,2.2,.13,palette.dark);box(entrance,0,2.32,0,4.2,.22,.8,palette.sage);for(let i=0;i<8;i++)box(entrance,-1.84+i*.52,2.44,0,.48,.06,.83,i%2?palette.cream:palette.sage);label(entrance,'CAFÉ · WELLNESS',0,2.12,.18,3.3,'#fff9e4','#356c56');
   if(levels.terrace){for(const x of (levels.terrace>1?[-10,-4.8,3.8,10]:[-4.8,3.8])){table(root,x,7.1);cylinder(root,x,1.55,7.1,.035,3.1,palette.wood);mesh(root,geometry('parasol',()=>new THREE.ConeGeometry(1.35,.45,8)),palette.cream,x,3.1,7.1);}plant(root,-6.4,7.25,.8);}
   if(levels.second)label(root,`${1+Math.min(2,levels.second)} LOCALES · EMPIRE`,4.8,3.2,4,3.8,'#76551c','#fff0b4');
-  return {root,targets,students,tablePositions,tableCount,bar,studio,serviceSpots,footprint};
+  const detailFeatures=dressWorld(root,state,{box,cylinder,ball,group,plant,label,cup,geometry,mesh,palette});
+  return {root,targets,students,tablePositions,tableCount,bar,studio,serviceSpots,footprint,detailFeatures};
 }
 function buildExpansions(root,s){const z=Layout.zones(s),l=id=>Math.min(s.levels?.[id]||0,6),spots=[];
   function room(x,back,w,d,color,title,zone){const g=group(root,x,0,back+d/2,zone);box(g,0,-.25,0,w,.55,d,0xa4b39c);box(g,0,.04,0,w-.1,.1,d-.1,color);box(g,0,1.15,-d/2,w,2.4,.15,palette.cream);if(zone==='wellnessWing'){box(g,-w/2,1.15,-3.3,.15,2.4,5.1,palette.cream);box(g,-w/2,1.15,4.7,.15,2.4,2.1,palette.cream);}else box(g,-w/2,1.15,0,.15,2.4,d,palette.cream);label(g,title,0,2.7,-d/2+.3,w*.73);return g;}
@@ -109,9 +123,11 @@ function windowParams(s){return {capacity:2+Math.min(s.levels?.mat||0,4)*2+Math.
 export function character(kind=0,staff=false){
   const g=new THREE.Group(),skin=[0xf1c39c,0xc59069,0x8b5b42,0xe7b895][kind%4],shirt=staff?palette.sage:[0xe6a496,0x8badc9,0xd9bd75,0xaa9fc8][kind%4];
   const body=group(g,0,.47,0);cylinder(body,0,.25,0,.2,.48,shirt);ball(body,0,.66,0,.22,skin,1,1.12,.95);ball(body,0,.79,-.035,.224,0x594333,1,.55,1);if(kind%2)ball(body,0,.72,-.2,.14,0x594333);
+  if(staff){box(body,0,.2,.215,.18,.12,.025,palette.oak);ball(body,-.09,.4,.22,.025,palette.gold);ball(body,.09,.4,.22,.025,palette.gold);}else{box(body,0,.28,.2,.02,.3,.025,0xffffff);if(kind%2)box(body,-.22,.02,0,.18,.2,.22,palette.oak);}
   const legs=[],arms=[];
   for(const side of [-1,1]){const leg=group(g,side*.105,.43,0);box(leg,0,-.17,0,.13,.34,.14,0x43596a);box(leg,0,-.34,.04,.15,.09,.23,palette.white);legs.push(leg);const arm=group(body,side*.25,.43,0);cylinder(arm,0,-.14,0,.065,.3,shirt,8);ball(arm,0,-.31,0,.07,skin);arms.push(arm);}
   for(const side of [-1,1])ball(body,side*.075,.68,.205,.019,palette.ink);if(staff){box(body,0,.2,.19,.27,.35,.025,palette.cream);box(body,0,.43,.2,.15,.04,.025,palette.cream);}
+  batchCharacterPart(body,`body:${kind%4}:${staff}`);legs.forEach(leg=>batchCharacterPart(leg,'leg'));arms.forEach(arm=>batchCharacterPart(arm,`arm:${kind%4}:${staff}`));
   return {root:g,body,legs,arms};
 }
 function disposeGroup(root){root.traverse(o=>{if(o.isSprite){o.material.map?.dispose();o.material.dispose();}if(o.isInstancedMesh)o.dispose();});root.removeFromParent();}
@@ -128,6 +144,16 @@ export function batchStaticWorld(root){
 export function hitZone(hit){
   if(hit.object.isInstancedMesh)return hit.object.userData.zones?.[hit.instanceId];
   let obj=hit.object;while(obj&&!obj.userData.zone)obj=obj.parent;return obj?.userData.zone;
+}
+
+export function walkPath(position,route,budget){
+  let heading=0;
+  while(route.length&&budget>0){const point=route[0],dx=point.x-position.x,dz=point.z-position.z,distance=Math.hypot(dx,dz);
+    if(distance<.001){position.x=point.x;position.z=point.z;route.shift();continue;}
+    heading=Math.atan2(dx,dz);const step=Math.min(budget,distance);position.x+=dx/distance*step;position.z+=dz/distance*step;budget-=step;
+    if(step>=distance-.001){position.x=point.x;position.z=point.z;route.shift();}else break;
+  }
+  return {moving:route.length>0,heading};
 }
 
 export class Venue3D {
@@ -154,7 +180,7 @@ export class Venue3D {
     canvas.addEventListener('pointerdown',this.onDown);canvas.addEventListener('pointermove',this.onMove);canvas.addEventListener('pointerup',this.onPointer);canvas.addEventListener('pointercancel',this.onCancel);canvas.addEventListener('wheel',this.onWheel,{passive:false});
     this.resize=()=>{const r=canvas.getBoundingClientRect(),width=Math.max(240,r.width),height=Math.max(260,r.height),aspect=width/height;this.renderer.setSize(width,height,false);const vertical=11,horizontal=vertical*aspect;this.fitZoom=Math.min(1,horizontal*2/this.worldWidth());this.camera.left=-horizontal;this.camera.right=horizontal;this.camera.top=vertical;this.camera.bottom=-vertical;this.camera.updateProjectionMatrix();};
     this.observer=new ResizeObserver(this.resize);this.observer.observe(canvas);this.resize();
-    this.rebuild();this.frame=this.frame.bind(this);requestAnimationFrame(this.frame);
+    this.rebuild();this.clockLayer=new globalThis.BloomClocks.ClockLayer(canvas);this.clockVector=new THREE.Vector3();this.frame=this.frame.bind(this);requestAnimationFrame(this.frame);
     canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();canvas.dataset.renderer='recovering';});canvas.addEventListener('webglcontextrestored',()=>{canvas.dataset.renderer='3d';});canvas.dataset.renderer='3d';
   }
   worldWidth(){const f=this.world?.footprint;return f?(f.right-f.left)*.83+(14-f.back)*.57+6:30;}
@@ -169,23 +195,23 @@ export class Venue3D {
     if(this.ring){this.ring.geometry.dispose();this.ring.material.dispose();this.ring.removeFromParent();this.ring=null;}
     if(this.selected)this.select(this.selected);
   }
-  select(id){this.selected=id;if(this.ring){this.ring.geometry.dispose();this.ring.material.dispose();this.ring.removeFromParent();}const locations={machine:[-3.1,-2.9,3],pastries:[-1.4,-2.9,1.4],matcha:[-5,-3,1.5],seats:[-3.3,1.5,3],mat:[3.7,-.2,3.8],reformer:[3.7,-.2,3.8],barista:[-3.2,-4.2,2],coach:[5.9,-3.7,1.4],terrace:[0,7.1,2.5],classes:[3.7,2.5,3],spa:[6,-1,1.5],manager:[-3.2,-4.2,2],second:[0,6,2]};const [x,z,r]=locations[id]||({cafeWing:[-10.7,0,3],wellnessWing:[10.7,0,3],yogaWing:[-3.9,-9.4,3],pressotherapy:[10.6,-2.7,2.5],pressureCare:[10.6,-2.7,2.5],massage:[10.6,2.6,2.5],massageCare:[10.6,2.6,2.5],recoveryComfort:[10.7,0,3],therapist:[9.8,1.5,2],yoga:[-3.9,-9.4,3],yogaCare:[-3.9,-9.4,3],cafeDecor:[-4,4.5,2],roaster:[-6,-4.9,1.4]}[id])||locations.machine;this.ring=new THREE.Mesh(new THREE.RingGeometry(r-.055,r,64),new THREE.MeshBasicMaterial({color:0xffdf75,side:THREE.DoubleSide,transparent:true,opacity:.9}));this.ring.rotation.x=-Math.PI/2;this.ring.position.set(x,.13,z);this.scene.add(this.ring);}
+  select(id){this.selected=id;if(this.ring){this.ring.geometry.dispose();this.ring.material.dispose();this.ring.removeFromParent();}const locations={machine:[-3.1,-2.9,3],pastries:[-1.4,-2.9,1.4],matcha:[-5,-3,1.5],seats:[-3.3,1.5,3],mat:[3.7,-.2,3.8],reformer:[3.7,-.2,3.8],barista:[-3.2,-4.2,2],coach:[5.9,-3.7,1.4],terrace:[0,7.1,2.5],classes:[3.7,2.5,3],spa:[6,-1,1.5],manager:[-3.2,-4.2,2],second:[0,6,2]};const [x,z,r]=locations[id]||({brewBar:[-3.7,-5.02,1.4],bakeryOven:[-.7,-4.95,1],cafeLounge:[-10.7,5.05,2.2],pilatesKit:[6.65,-4.75,1],studioMirror:[3.4,this.world.footprint.zones.studio?-12.2:-5.5,2],studioAudio:[3.4,this.world.footprint.zones.studio?-12.2:-5.5,2],yogaBolsters:[-3.9,-9.4,3],zenGarden:[-6.55,-7.25,1],yogaTea:[-3.65,-11.95,1.3],pressurePump:[13.4,-3.9,1.4],massageStones:[10.6,1.6,2.5],wellnessLinen:[13.5,.1,1.2],cafeWing:[-10.7,0,3],wellnessWing:[10.7,0,3],yogaWing:[-3.9,-9.4,3],pressotherapy:[10.6,-2.7,2.5],pressureCare:[10.6,-2.7,2.5],massage:[10.6,2.6,2.5],massageCare:[10.6,2.6,2.5],recoveryComfort:[10.7,0,3],therapist:[9.8,1.5,2],yoga:[-3.9,-9.4,3],yogaCare:[-3.9,-9.4,3],cafeDecor:[-4,4.5,2],roaster:[-6,-4.9,1.4]}[id])||locations.machine;this.ring=new THREE.Mesh(new THREE.RingGeometry(r-.055,r,64),new THREE.MeshBasicMaterial({color:0xffdf75,side:THREE.DoubleSide,transparent:true,opacity:.9}));this.ring.rotation.x=-Math.PI/2;this.ring.position.set(x,.13,z);this.scene.add(this.ring);}
   focus(zone){if(zone==='cafe'){this.target.set(-3,.1,-.3);this.zoom=.95;}else if(['pressotherapy','massage','yoga'].includes(zone)){const spot=Layout.serviceSlots(this.getState(),zone)[0];if(spot){this.target.set(spot.x,.1,spot.z);this.zoom=.85;}}else if(zone==='pilates'){this.target.set(3.7,.1,-.1);this.zoom=1.05;}else{const f=this.world.footprint;this.target.set((f.left+f.right)/2,.1,(f.back+12)/2);this.zoom=this.fitZoom;} }
   changeZoom(delta){this.zoom=THREE.MathUtils.clamp(this.zoom+delta,.22,1.7);}
   updatePeople(s,dt){const targets=new Map();
     s.queue.forEach((o,i)=>targets.set(o.id,{x:-3.8+(i%3)*.7,z:-1.45+Math.floor(i/3)*.62,order:o,kind:o.kind}));
-    s.seated.forEach(o=>{const [x,z]=this.world.tablePositions[o.id%this.world.tableCount];targets.set(o.id,{x:x+.98,z,kind:o.kind,seated:true});});
+    s.seated.forEach(o=>{const [x,z]=this.world.tablePositions[o.id%this.world.tableCount];targets.set(o.id,{x:x+.98,z,kind:o.kind,seated:true,guest:o});});
     for(const t of s.treatments||[]){const spot=Layout.serviceSlots(s,t.service)[t.slot];if(spot)targets.set(t.id,{...spot,kind:t.kind,treatment:t});}
-    for(const [id,target]of targets)if(!this.people.has(id)){const p=character(target.kind);p.root.position.set(id%2?-11:11,0,9.25);p.cup=cup(p.body,.19,.22,.3);p.cup.visible=false;p.boots=[];
-      for(const leg of p.legs){const boot=group(leg);boot.name='Bota de presoterapia';for(let j=0;j<4;j++){const cuff=cylinder(boot,0,-.05-j*.09,.01,.115,.075,j%2?0x89cad5:0x355d72,10);cuff.name='Cámara de compresión';}box(boot,0,-.34,.08,.22,.13,.31,0x355d72);boot.visible=false;p.boots.push(boot);}
+    for(const [id,target]of targets)if(!this.people.has(id)){const p=character(target.kind);p.root.position.set(id%2?-11:11,0,9.25);p.cup=cup(p.body,.19,.22,.3);batchCharacterPart(p.cup,'cup');p.cup.visible=false;p.snack=group(p.body,.2,.22,.3);cylinder(p.snack,0,0,0,.15,.025,palette.cream);ball(p.snack,0,.065,0,.11,0xe3a04c,1,.5,.65);batchCharacterPart(p.snack,'snack');p.snack.visible=false;p.boots=[];
+      for(const leg of p.legs){const boot=group(leg);boot.name='Bota de presoterapia';for(let j=0;j<4;j++){const cuff=cylinder(boot,0,-.05-j*.09,.01,.115,.075,j%2?0x89cad5:0x355d72,10);cuff.name='Cámara de compresión';}box(boot,0,-.34,.08,.22,.13,.31,0x355d72);batchCharacterPart(boot,'boot');boot.visible=false;p.boots.push(boot);}
       this.people.set(id,p);this.scene.add(p.root);
     }
     for(const [id,p]of this.people){const target=targets.get(id),current=p.root.position,destination=target||{x:id%2?17:-17,z:9.25};
+      p.activity=target;
       const key=target?`${target.x}/${target.z}`:'leaving';if(p.destinationKey!==key){p.destinationKey=key;p.route=Layout.route(current,destination,current.z>6.2, !target);}
       p.root.rotation.x=0;current.y=0;
-      while(p.route.length&&Math.hypot(p.route[0].x-current.x,p.route[0].z-current.z)<.1)p.route.shift();
-      const goal=p.route[0],moving=!!goal;
-      if(goal){const dx=goal.x-current.x,dz=goal.z-current.z,dist=Math.hypot(dx,dz),amount=Math.min(dist,dt*3.5);current.x+=dx/dist*amount;current.z+=dz/dist*amount;p.root.rotation.y=Math.atan2(dx,dz);}
+      const {moving,heading}=walkPath(current,p.route,dt*3.5);
+      if(moving)p.root.rotation.y=heading;
       else{p.root.rotation.y=target?.seated?-Math.PI/2:Math.PI;if(target){current.x=target.x;current.z=target.z;}}
       const gait=this.reduced?0:Math.sin(this.time*11+id)*.5*(moving?1:.08);p.legs[0].rotation.x=gait;p.legs[1].rotation.x=-gait;p.arms[0].rotation.x=-gait*.7;p.arms[1].rotation.x=gait*.7;
       p.body.position.y=.47+(moving&&!this.reduced?Math.abs(Math.sin(this.time*11+id))*.025:0);
@@ -193,17 +219,27 @@ export class Venue3D {
       p.boots.forEach(boot=>{boot.visible=pressure;boot.scale.x=1+(this.reduced?0:Math.sin(this.time*2)*.045);});
       if(treating){if(target.service==='yoga'){p.arms[0].rotation.z=-1.25;p.arms[1].rotation.z=1.25;p.legs[0].rotation.x=.25;}else{p.root.rotation.set(-Math.PI/2,0,0);current.y=.73;current.z=target.z+.55;p.legs.forEach(leg=>leg.rotation.x=0);p.arms.forEach(arm=>arm.rotation.x=0);}}
       else p.arms.forEach(arm=>arm.rotation.z=0);
-      p.cup.visible=!!target?.seated&&!moving;if(p.cup.visible)p.arms[1].rotation.x=-.85;
+      p.snack.visible=!!target?.seated&&!moving&&target.guest.product==='breakfast';p.cup.visible=!!target?.seated&&!moving&&!p.snack.visible;if(p.cup.visible||p.snack.visible)p.arms[1].rotation.x=-.85+(this.reduced?0:Math.sin(this.time*1.3+id)*.08);
       if(target?.order&&(!p.bubble||p.product!==target.order.product)){if(p.bubble)disposeGroup(p.bubble);p.product=target.order.product;const words={coffee:'☕',breakfast:'🥐',matcha:'🍵',smoothie:'🥤'};p.bubble=group(p.root);label(p.bubble,words[p.product]||'☕',0,1.65,0,.95,'#42604e','#fff9e9');}
       if(p.bubble)p.bubble.visible=!!target?.order&&(s.queue.slice(0,2).some(o=>o.id===id)||target.order.remaining!==null);
       if(!target?.order&&p.bubble){disposeGroup(p.bubble);p.bubble=null;}
       if(!target&&!moving){disposeGroup(p.root);this.people.delete(id);}
     }
   }
-  frame(now){if(this.stopped)return;requestAnimationFrame(this.frame);if(document.hidden||!this.canvas.closest('.view.active')||this.canvas.dataset.renderer==='recovering'){this.last=now;return;}if(now-this.last<(this.reduced?180:33))return;const dt=Math.min(.08,(now-this.last)/1000||.033);this.last=now;this.time+=dt;const s=this.getState();if(JSON.stringify(s.levels)!==this.fingerprint)this.rebuild();
+  drawClocks(s){const entries=[];
+    for(const p of this.people.values()){const t=p.activity,pos=p.root.position;if(!t)continue;
+      if(t.order?.remaining!==null&&t.order?.remaining!==undefined)entries.push({x:pos.x,y:1.95,z:pos.z,remaining:t.order.remaining,duration:t.order.duration||window.Bloom.orderDuration(s,t.order.product),kind:'prepare'});
+      else if(t.guest)entries.push({x:pos.x,y:1.95,z:pos.z,remaining:t.guest.remaining,duration:t.guest.duration||18,kind:'consume'});
+      else if(t.treatment?.stage==='active')entries.push({x:pos.x,y:pos.y+(t.service==='yoga'?1.95:1.0),z:pos.z-(t.service==='yoga'?0:.5),remaining:t.treatment.remaining,duration:t.treatment.duration||window.Bloom.serviceConfig(s,t.service).duration,kind:t.service});
+    }
+    this.students.forEach((p,i)=>{if(p.root.visible&&i<s.classSeats)entries.push({x:p.root.position.x,y:p.root.position.y+1,z:p.root.position.z-.4,remaining:s.classRemaining,duration:s.classDuration||window.Bloom.params(s).classTime,kind:'pilates'});});
+    this.clockLayer.draw(entries,entry=>this.clockVector.set(entry.x,entry.y,entry.z).project(this.camera),this.camera.zoom);
+  }
+  frame(now){if(this.stopped)return;requestAnimationFrame(this.frame);if(document.hidden||!this.canvas.closest('.view.active')||this.canvas.dataset.renderer==='recovering'){this.last=now;this.statsAt=now;this.statsFrames=0;return;}if(now-this.last<(this.reduced?180:33))return;const dt=Math.min(1,(now-this.last)/1000||.033);this.last=now;this.time+=dt;const s=this.getState();if(JSON.stringify(s.levels)!==this.fingerprint)this.rebuild();
     this.updatePeople(s,dt);const brewing=s.queue.some(o=>o.remaining!==null);this.manual.root.visible=!(s.levels.barista)&&brewing;this.steam.forEach((p,i)=>{p.visible=brewing;const phase=(this.time*.6+i*.2)%1;p.position.y=2.45+phase*.8;p.position.x=-4.6+Math.sin(this.time*2+i)*.08;p.scale.setScalar(.04+phase*.09);});this.staff.forEach((p,i)=>{p.arms[0].rotation.x=this.reduced?-.3:-.7+Math.sin(this.time*5+i)*.28;p.arms[1].rotation.x=-.4;});
     this.students.forEach((p,i)=>{p.root.visible=s.classRemaining>0&&i<s.classSeats;p.legs[0].rotation.x=this.reduced ? .3 : Math.sin(this.time*1.6+i)*.38;p.legs[1].rotation.x=-p.legs[0].rotation.x;});
-    const a=this.reduced?1:Math.min(1,dt*5);this.look.lerp(this.target,a);this.camera.position.set(this.look.x+18,this.look.y+22,this.look.z+26);this.camera.lookAt(this.look);this.camera.zoom+=(this.zoom-this.camera.zoom)*a;this.camera.updateProjectionMatrix();this.renderer.render(this.scene,this.camera);
+    const a=this.reduced?1:Math.min(1,dt*5);this.look.lerp(this.target,a);this.camera.position.set(this.look.x+18,this.look.y+22,this.look.z+26);this.camera.lookAt(this.look);this.camera.zoom+=(this.zoom-this.camera.zoom)*a;this.camera.updateProjectionMatrix();this.renderer.render(this.scene,this.camera);this.drawClocks?.(s);
+    this.statsFrames=(this.statsFrames||0)+1;if(this.renderer.info&&now-(this.statsAt||0)>=1000){this.canvas.dataset.fps=String(Math.round(this.statsFrames*1000/(now-(this.statsAt||0))));this.canvas.dataset.drawCalls=String(this.renderer.info.render.calls);this.canvas.dataset.triangles=String(this.renderer.info.render.triangles);this.statsFrames=0;this.statsAt=now;}
   }
-  destroy(){this.stopped=true;this.observer.disconnect();for(const [type,handler]of [['pointerdown',this.onDown],['pointermove',this.onMove],['pointerup',this.onPointer],['pointercancel',this.onCancel],['wheel',this.onWheel]])this.canvas.removeEventListener(type,handler);if(this.world)disposeGroup(this.world.root);for(const p of this.people.values())disposeGroup(p.root);this.renderer.dispose();}
+  destroy(){this.stopped=true;this.clockLayer?.destroy();this.observer.disconnect();for(const [type,handler]of [['pointerdown',this.onDown],['pointermove',this.onMove],['pointerup',this.onPointer],['pointercancel',this.onCancel],['wheel',this.onWheel]])this.canvas.removeEventListener(type,handler);if(this.world)disposeGroup(this.world.root);for(const p of this.people.values())disposeGroup(p.root);this.renderer.dispose();}
 }

@@ -1,5 +1,16 @@
 # Historial
 
+## v1.5.0 — 20 octubre 2026
+
+- Modelos con bordes suaves y madera con veta procedural. Suelos con juntas, marcos, molduras, apliques, pizarra, libros, estantes, toallas, accesorios y mobiliario de calle.
+- Más detalle en cafetería, pilates, yoga y wellness: reformers con raíles, espejos, accesorios de ejercicio, cojines, infusiones, tubos de compresión y carros de tratamiento.
+- Doce mejoras nuevas con cambios físicos por nivel, efectos económicos y requisitos. Catálogo de 38 inversiones y filtro de Yoga.
+- Relojes circulares con segundos sobre preparación, consumo, alumnos y tratamientos activos, incluidos en el renderizador Canvas.
+- Duración de cada actividad capturada al comenzar: las compras no reinician los relojes. Los indicadores siguen la cámara sin interceptar toques ni detener el juego bajo menús.
+- Clientes con detalles de ropa y repostería en la mano durante el consumo; conservación de las partidas v2 y de su contabilidad.
+- Pruebas de temporizadores, recetas y tiempos, equipamiento por niveles, compatibilidad, alternativa Canvas y presupuesto de dibujo estático.
+- Personajes agrupados en cinco piezas de dibujo sin perder articulaciones. Corrección del movimiento al reducir el navegador la frecuencia de renderizado, conservando la sincronización con los servicios.
+
 ## v1.4.0 — 20 octubre 2026
 
 - Ampliaciones físicas del salón de café, ala wellness, yoga y sala de grupos de pilates. Superficie de 72 a 184 m²; terrenos comprables y acceso Ampliar.

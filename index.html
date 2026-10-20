@@ -107,6 +107,7 @@
 </div>
 </div>
 <div class="card"><h3>🌿 Servicios del centro</h3><p class="service-intro">Los clientes llegan desde la calle. Cobra al terminar cada sesión.</p><div id="service-list"></div></div>
+<p class="clock-legend"><span>🟡 Preparando</span><span>🟢 Disfrutando</span><span>🟣 Clase o tratamiento</span></p>
 <div class="card">
 <div class="progress-head">
 <span id="goal-label">Próximo objetivo</span>
@@ -143,6 +144,7 @@
 <button class="tab active" data-filter="all">Todas</button>
 <button class="tab" data-filter="cafe">☕ Cafetería</button>
 <button class="tab" data-filter="pilates">🧘 Pilates</button>
+<button class="tab" data-filter="yoga">🌸 Yoga</button>
 <button class="tab" data-filter="team">👥 Equipo</button>
 <button class="tab" data-filter="zones">🏗️ Ampliaciones</button>
 <button class="tab" data-filter="wellness">🌿 Wellness</button>
@@ -232,7 +234,7 @@
 </p>
 <input type="file" id="import-file" accept="application/json" hidden>
 </div>
-<div class="footer-note">BLOOM & BREW TYCOON · VERSIÓN 1.4.0 · SIN ANUNCIOS NI COMPRAS</div>
+<div class="footer-note">BLOOM & BREW TYCOON · VERSIÓN 1.5.0 · SIN ANUNCIOS NI COMPRAS</div>
 </section>
 </main>
 <aside id="zone-panel" class="zone-panel" hidden aria-label="Mejorar zona del negocio">
@@ -255,6 +257,7 @@
 </div>
 </div>
 <script src="layout.js"></script>
+<script src="clocks.js"></script>
 <script src="core.js">
 </script>
 <script src="scene.js">

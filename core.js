@@ -29,10 +29,22 @@
     ['massageCare','Equipamiento de masaje','Calentador de toallas, aceites y mejor servicio','🕯️','wellness',920,3],
     ['recoveryComfort','Confort de la sala','Plantas, cuadros y detalles premium','🪴','wellness',650,3],
     ['therapist','Especialista wellness','Automatiza presoterapia y masajes','🧑‍⚕️','team',1250,2],
-    ['yoga','Esterillas de yoga','Dos plazas nuevas por nivel','🧘','pilates',900,3],
-    ['yogaCare','Accesorios de yoga','Bloques y accesorios para la sala','🕯️','pilates',560,3],
+    ['yoga','Esterillas de yoga','Dos plazas nuevas por nivel','🧘','yoga',900,3],
+    ['yogaCare','Accesorios de yoga','Bloques y accesorios para la sala','🕯️','yoga',560,3],
     ['cafeDecor','Ambientación del café','Plantas, lámparas y decoración por nivel','🌿','cafe',310,3],
-    ['roaster','Tostador y molinillo','Más calidad y una nueva estación de café','⚙️','cafe',720,2]
+    ['roaster','Tostador y molinillo','Más calidad y una nueva estación de café','⚙️','cafe',720,2],
+    ['brewBar','Barra de filtrados','Drippers y jarras · café más rápido y de mayor valor','🫖','cafe',480,3],
+    ['bakeryOven','Horno de obrador','Horno y bandejas · desayunos más rápidos y rentables','🥖','cafe',640,3],
+    ['cafeLounge','Rincón de lectura','Librería y sillones · mejora la calidad de la carta','📚','cafe',720,3],
+    ['pilatesKit','Accesorios de fuerza','Pesas, pelotas y aros para cada sesión','🏋️','pilates',450,3],
+    ['studioMirror','Espejos y barras','Amplía los espejos y reduce el tiempo de clase','🪞','pilates',680,3],
+    ['studioAudio','Ambiente del estudio','Altavoces e iluminación para clases premium','🎵','pilates',890,3],
+    ['yogaBolsters','Cojines y mantas','Bolsters, textiles y sesiones de mayor valor','🧶','yoga',380,3],
+    ['zenGarden','Jardín zen','Bambú, piedras y bonsáis en tu sala de yoga','🎋','yoga',760,3],
+    ['yogaTea','Rincón de infusiones','Tetera y tazas para el ritual después de yoga','🫖','yoga',950,2],
+    ['pressurePump','Central de compresión','Bombas y tubos · sesiones más rápidas','🦵','wellness',980,3],
+    ['massageStones','Piedras calientes','Calentador y bandejas para un masaje premium','🪨','wellness',1150,3],
+    ['wellnessLinen','Textiles premium','Toallas y mantas de calidad para los tratamientos','🧺','wellness',540,3]
   ].map(([id,name,desc,emoji,cat,base,max])=>({id,name,desc,emoji,cat,base,max}));
   const GOALS = [
     ['first','Tu primer turno','Sirve 10 pedidos',10,'served',45,'☕'],
@@ -86,8 +98,8 @@
     const arrival=Math.max(1.4,6.5-l('seats')*.22-l('terrace')*.7-l('matcha')*.12)*(1.15-s.reputation/300);
     const speed=1+l('machine')*.18+l('manager')*.15+l('roaster')*.06;
     const capacity=2+l('mat')*2+l('classes')*4;
-    const classPrice=12+l('reformer')*5+l('spa')*3;
-    return {seats,arrival,speed,baristas:l('barista'),capacity,classPrice,classTime:Math.max(25,45-l('coach')*4),quality:1+l('machine')*.12+l('pastries')*.05+l('matcha')*.04+l('cafeDecor')*.04+l('roaster')*.08,manager:l('manager'),branches:l('second'),area:Layout.footprint(s).area};
+    const classPrice=12+l('reformer')*5+l('spa')*3+l('pilatesKit')+l('studioAudio');
+    return {seats,arrival,speed,baristas:l('barista'),capacity,classPrice,classTime:Math.max(25,45-l('coach')*4-l('studioMirror')),quality:1+l('machine')*.12+l('pastries')*.05+l('matcha')*.04+l('cafeDecor')*.04+l('roaster')*.08+l('cafeLounge')*.025,manager:l('manager'),branches:l('second'),area:Layout.footprint(s).area};
   }
   const price=(s,u)=>Math.ceil(u.base*Math.pow(1.65,level(s,u.id)));
   function requirement(s,u) {
@@ -99,17 +111,26 @@
     if(u.id==='massageCare'&&!level(s,'massage'))return 'Instala una camilla de masaje';
     if(['yoga','yogaCare'].includes(u.id)&&!Layout.zones(s).yoga)return 'Construye la sala de yoga primero';
     if(u.id==='seats'&&level(s,'seats')>=3&&!Layout.zones(s).cafe)return 'Amplía la cafetería para añadir más mesas';
+    if(u.id==='brewBar'&&!level(s,'machine'))return 'Mejora la cafetera primero';
+    if(u.id==='bakeryOven'&&!level(s,'pastries'))return 'Instala una vitrina de repostería';
+    if(u.id==='cafeLounge'&&!Layout.zones(s).cafe)return 'Amplía la cafetería primero';
+    if(['pilatesKit','studioMirror','studioAudio'].includes(u.id)&&!level(s,'mat'))return 'Abre el estudio de pilates primero';
+    if(['yogaBolsters','yogaTea'].includes(u.id)&&!level(s,'yoga'))return 'Instala esterillas de yoga primero';
+    if(u.id==='zenGarden'&&!Layout.zones(s).yoga)return 'Construye la sala de yoga primero';
+    if(u.id==='pressurePump'&&!level(s,'pressotherapy'))return 'Instala una tumbona de presoterapia';
+    if(u.id==='massageStones'&&!level(s,'massage'))return 'Instala una camilla de masaje';
+    if(u.id==='wellnessLinen'&&!Layout.zones(s).wellness)return 'Construye el ala de recuperación primero';
     return '';
   }
   const unlocked=(s,u)=>!requirement(s,u);
   const SERVICES=[{id:'pressotherapy',name:'Presoterapia',icon:'🦵'},{id:'massage',name:'Masaje',icon:'💆'},{id:'yoga',name:'Yoga',icon:'🧘'}];
   function serviceConfig(s,id){const l=x=>Math.min(level(s,x),UPGRADES.find(u=>u.id===x).max),capacity=Layout.serviceSlots(s,id).length,comfort=l('recoveryComfort');
-    if(id==='pressotherapy')return {capacity,duration:36-l('pressureCare')*3-Math.max(0,l('therapist')-1)*2,price:28+l('pressureCare')*4+comfort*2,cost:6,automatic:l('therapist')>0,travel:18};
-    if(id==='massage')return {capacity,duration:42-l('massageCare')*3-Math.max(0,l('therapist')-1)*2,price:36+l('massageCare')*4+comfort*2,cost:8,automatic:l('therapist')>0,travel:18};
-    if(id==='yoga')return {capacity,duration:30-l('yogaCare')*2,price:14+l('yogaCare')*2,cost:2,automatic:l('coach')>0,travel:20};
+    if(id==='pressotherapy')return {capacity,duration:36-l('pressureCare')*3-Math.max(0,l('therapist')-1)*2-l('pressurePump')*2,price:28+l('pressureCare')*4+comfort*2+l('pressurePump')*2+l('wellnessLinen'),cost:6,automatic:l('therapist')>0,travel:18};
+    if(id==='massage')return {capacity,duration:42-l('massageCare')*3-Math.max(0,l('therapist')-1)*2,price:36+l('massageCare')*4+comfort*2+l('massageStones')*3+l('wellnessLinen'),cost:8+l('massageStones'),automatic:l('therapist')>0,travel:18};
+    if(id==='yoga')return {capacity,duration:30-l('yogaCare')*2-l('yogaBolsters'),price:14+l('yogaCare')*2+l('yogaBolsters')+l('zenGarden')+l('yogaTea')*2,cost:2+l('yogaTea')*.5,automatic:l('coach')>0,travel:20};
     return {capacity:0,duration:1,price:0,cost:0,automatic:false,travel:0};
   }
-  function startTreatment(s,id,rng=Math.random){if(!SERVICES.some(x=>x.id===id))return false;const p=serviceConfig(s,id);const taken=s.treatments.filter(t=>t.service===id).map(t=>t.slot);const slot=Array.from({length:p.capacity},(_,i)=>i).find(i=>!taken.includes(i));if(slot===undefined)return false;s.treatments.push({id:s.nextId++,service:id,slot,stage:'arrival',travel:p.travel,remaining:p.duration,kind:Math.min(3,Math.floor(rng()*4)),automatic:p.automatic});return true;}
+  function startTreatment(s,id,rng=Math.random){if(!SERVICES.some(x=>x.id===id))return false;const p=serviceConfig(s,id);const taken=s.treatments.filter(t=>t.service===id).map(t=>t.slot);const slot=Array.from({length:p.capacity},(_,i)=>i).find(i=>!taken.includes(i));if(slot===undefined)return false;s.treatments.push({id:s.nextId++,service:id,slot,stage:'arrival',travel:p.travel,remaining:p.duration,duration:p.duration,kind:Math.min(3,Math.floor(rng()*4)),automatic:p.automatic});return true;}
   function purchase(s,id) {
     const u=UPGRADES.find(u=>u.id===id);
     if(!u||!unlocked(s,u)||level(s,id)>=u.max)return false;
@@ -124,9 +145,11 @@
   function startOrder(s) {
     if(s.queue.some(o=>o.remaining!==null&&!o.worker))return false;
     const order=s.queue.find(o=>o.remaining===null); if(!order)return false;
-    order.remaining=PRODUCTS.find(p=>p.id===order.product).time/params(s).speed;
+    order.remaining=orderDuration(s,order.product);order.duration=order.remaining;
     order.worker=false; return true;
   }
+  function orderDuration(s,id){const product=PRODUCTS.find(p=>p.id===id);return product.time/params(s).speed/(1+(id==='coffee'?Math.min(3,level(s,'brewBar'))*.08:id==='breakfast'?Math.min(3,level(s,'bakeryOven'))*.1:0));}
+  function orderPrice(s,id){const product=PRODUCTS.find(p=>p.id===id);return product.price*params(s).quality+(id==='coffee'?Math.min(3,level(s,'brewBar'))*.35:id==='breakfast'?Math.min(3,level(s,'bakeryOven'))*.4:0);}
   const active=(s,now)=>now<s.boostUntil;
   function rush(s,now=Date.now()) {
     if(now<s.rushReady)return false;
@@ -137,7 +160,7 @@
     const p=params(s);
     s.classSeats=Math.max(1,Math.floor(p.capacity*(.55+s.reputation/250)));
     s.classSeats=Math.min(p.capacity,s.classSeats);
-    s.classRemaining=p.classTime; return true;
+    s.classRemaining=p.classTime;s.classDuration=p.classTime; return true;
   }
   function revenue(s,gross,cost) {s.earned+=gross;s.expenses+=cost;s.money+=gross-cost;}
   function daily(s,now) {
@@ -152,16 +175,16 @@
     for(const guest of s.seated)guest.remaining-=dt;
     s.seated=s.seated.filter(g=>g.remaining>0);
     let workers=s.queue.filter(o=>o.worker&&o.remaining!==null).length;
-    for(const o of s.queue)if(workers<p.baristas&&o.remaining===null) {o.remaining=PRODUCTS.find(x=>x.id===o.product).time/p.speed;o.worker=true;workers++;}
+    for(const o of s.queue)if(workers<p.baristas&&o.remaining===null) {o.remaining=orderDuration(s,o.product);o.duration=o.remaining;o.worker=true;workers++;}
     const pending=[];
     for(const o of s.queue) {
       o.wait+=dt;
       if(o.remaining!==null)o.remaining-=dt*(active(s,now)?1.5:1);
       if(o.remaining!==null&&o.remaining<=0&&s.seated.length<p.seats) {
-        const product=PRODUCTS.find(x=>x.id===o.product),gross=product.price*p.quality;
+        const product=PRODUCTS.find(x=>x.id===o.product),gross=orderPrice(s,o.product);
         const cost=(product.cost+(o.worker?.65:0))*(1-p.manager*.08);
         revenue(s,gross,cost);s.served++;s.happy++;s.daily.count++;s.reputation=clamp(s.reputation+.5,20,100);
-        s.seated.push({id:o.id,kind:o.kind,remaining:18,product:o.product});
+        s.seated.push({id:o.id,kind:o.kind,remaining:18,duration:18,product:o.product});
         events.push({type:'sale',net:gross-cost,product:product.name});
       } else if(o.remaining===null&&o.wait>o.patience) {s.lost++;s.reputation=clamp(s.reputation-1.5,20,100);events.push({type:'lost'});}
       else pending.push(o);
@@ -192,7 +215,7 @@
     return events;
   }
   function estimate(s) {
-    const p=params(s), products=menu(s),avg=products.reduce((a,x)=>a+x.price*p.quality-x.cost-.65,0)/products.length;
+    const p=params(s), products=menu(s),avg=products.reduce((a,x)=>a+orderPrice(s,x.id)-x.cost-.65,0)/products.length;
     const orders=p.baristas?Math.min(1/p.arrival,p.baristas*p.speed/4.5):0;
     const cafe=Math.max(0,avg*orders),pilates=level(s,'mat')&&level(s,'coach')?Math.floor(p.capacity*.85)*(p.classPrice-5)/p.classTime:0;
     const wellness=SERVICES.reduce((sum,service)=>{const c=serviceConfig(s,service.id);return sum+(c.automatic?c.capacity*(c.price-c.cost-(service.id==='yoga'?2:4))/(c.duration+c.travel+6):0);},0);
@@ -215,5 +238,5 @@
     daily(s,now);if(s.daily.claimed||s.daily.count<30)return 0;
     s.daily.claimed=true;s.money+=80;s.rewards+=80;return 80;
   }
-  return {VERSION,KEY,LEGACY_KEY,UPGRADES,GOALS,PRODUCTS,SERVICES,fresh,validate,params,level,price,requirement,unlocked,purchase,menu,spawn,startOrder,startClass,startTreatment,serviceConfig,rush,step,estimate,offline,value,claim,claimDaily};
+  return {VERSION,KEY,LEGACY_KEY,UPGRADES,GOALS,PRODUCTS,SERVICES,fresh,validate,params,level,price,requirement,unlocked,purchase,menu,spawn,startOrder,orderDuration,orderPrice,startClass,startTreatment,serviceConfig,rush,step,estimate,offline,value,claim,claimDaily};
 });

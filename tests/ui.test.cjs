@@ -10,7 +10,7 @@ function boot(initial={}) {
   for(const id of html.matchAll(/id="([^"]+)"/g)){const element=make();element.id=id[1];elements.set(id[1],element);}
   const views=['home','operations','shop','goals','reports'].map(id=>elements.get(id));
   const navButtons=views.map(view=>{const button=make();button.dataset.view=view.id;return button;});
-  const filters=['all','cafe','pilates','team','zones','wellness'].map(filter=>{const button=make();button.dataset.filter=filter;return button;});
+  const filters=['all','cafe','pilates','yoga','team','zones','wellness'].map(filter=>{const button=make();button.dataset.filter=filter;return button;});
   const document={getElementById(id){assert.ok(elements.has(id),'Missing UI element: '+id);return elements.get(id);},querySelectorAll(selector){return selector==='.view'?views:selector==='.nav-btn'?navButtons:selector==='#filter-tabs button'?filters:[];},createElement:make,addEventListener(name,fn){events[name]=fn;},hidden:false};
   const ctx={window:{Bloom:B,VenueScene:function(){},addEventListener(){},scrollTo(){}},document,localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},Date,Intl,console,URL,Blob,performance:{now:()=>now},setInterval(fn,ms){timers.push({fn,ms});},setTimeout(){},clearTimeout(){},navigator:{},location:{hostname:'127.0.0.1'},confirm:()=>true};
   vm.runInNewContext(fs.readFileSync('game.js','utf8'),ctx);
