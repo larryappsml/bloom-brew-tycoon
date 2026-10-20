@@ -86,3 +86,9 @@ test('expansion menu builds a room and manual wellness sessions run behind the p
   ui.advance(65);saved=JSON.parse(ui.store.get(B.KEY));assert.equal(saved.completedServices.pressotherapy,1);assert.equal(saved.treatments.length,0);
   assert.equal(ui.elements.get('shop').classList.contains('active'),true);assert.ok(!ui.elements.get('shop-list').innerHTML.includes('undefined'));
 });
+test('chapter and campaign menus allow real claims and keep challenges running behind other panels',()=>{
+  const s=B.fresh();s.levels={machine:1,barista:1};s.served=5;s.last=Date.now();const ui=boot({[B.KEY]:JSON.stringify(s)});ui.elements.get('journey-chip').onclick();assert.equal(ui.elements.get('goals').classList.contains('active'),true);assert.ok(ui.elements.get('journey-card').innerHTML.includes('Completar capítulo'));
+  const click=dataset=>ui.events.click({target:{closest:()=>({dataset})}});click({chapter:'aroma'});let saved=JSON.parse(ui.store.get(B.KEY));assert.deepEqual(saved.chapters,['aroma']);assert.equal(saved.money,55);
+  click({campaign:'coffee'});assert.ok(ui.elements.get('campaign-board').innerHTML.includes('Club del café'));ui.navButtons.find(b=>b.dataset.view==='shop').onclick();ui.advance(150);saved=JSON.parse(ui.store.get(B.KEY));assert.equal(saved.campaign.count,8);assert.ok(ui.elements.get('journey-chip').textContent.includes('Reto conseguido'));
+  click({campaignAction:'claim'});saved=JSON.parse(ui.store.get(B.KEY));assert.equal(saved.campaignWins,1);assert.equal(saved.campaign,null);assert.equal(saved.rewards,95);assert.ok(ui.elements.get('shop').classList.contains('active'));
+});

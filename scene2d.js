@@ -58,6 +58,8 @@
       this.poly([this.point(0,1,24),this.point(0,3.2,24),this.point(0,3.2,57),this.point(0,1,57)],'#a5bdb1','#c7b393');
       this.poly([this.point(4.6,0,22),this.point(6.5,0,22),this.point(6.5,0,54),this.point(4.6,0,54)],'#9db6aa','#c7b393');
       this.text('bloom & brew',180,25,'#51684e',13);
+      if(s.chapters?.length)this.text('🏆'.repeat(Math.min(6,s.chapters.length)),180,39,'#ad8239',10);
+      if(s.campaign&&s.campaign.remaining>0)this.text(s.campaign.id==='coffee'?'CLUB DEL CAFÉ':s.campaign.id==='brunch'?'BRUNCH EN BLOOM':'TARDE WELLNESS',180,251,'#54794f',9);
       this.text('CAFÉ',102,131,'#7f6349',8);this.text(l('mat')?'ESTUDIO':'FUTURO ESTUDIO',256,139,'#718263',8);
       for(const [x,y] of [[1.4,1.8],[3.1,1.8]]) {
         const [px,py]=this.point(x,y,57);c.strokeStyle='#9e8c6d';c.lineWidth=1;c.beginPath();c.moveTo(px,py-18);c.lineTo(px,py);c.stroke();

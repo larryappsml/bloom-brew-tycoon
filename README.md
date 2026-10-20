@@ -1,8 +1,14 @@
 # Bloom & Brew Tycoon 🌿☕🧘
 
-**v1.9.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
+**v1.10.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
 
 **[Jugar](https://larryappsml.github.io/bloom-brew-tycoon/)**
+
+La v1.10 añade una progresión por **seis capítulos**: primer café, equipo, variedad de carta, pilates, recuperación y centro completo. Cada capítulo combina dos o tres metas, reconoce el progreso de partidas anteriores y concede una recompensa única y un trofeo físico en la estantería. El siguiente capítulo se revela al completar el actual. Las recomendaciones de inversión priorizan lo que falta para avanzar. El acceso superior del mapa muestra el siguiente paso o el reto activo y abre Objetivos.
+
+En **Objetivos → Elige tu próximo reto**, puedes organizar **Club del café**, **Mesa de brunch** o **Tarde de bienestar**. Tienes cinco minutos de juego activo para entregar pedidos o terminar sesiones reales. Café y brunch orientan la mezcla de pedidos hacia las recetas correspondientes, sin saltarse el aforo ni generar ventas ficticias. Bienestar exige terminar clases o tratamientos; recibir al cliente no cuenta. Los requisitos impiden escoger actividades que todavía no has abierto.
+
+Hay un único reto activo. No cuesta dinero empezarlo y fallar o abandonarlo no quita saldo. Se conceden hasta **tres premios por día UTC**, cobrados expresamente; después de tres y seis victorias sube la cuota y la recompensa, con un límite de dos aumentos. Los retos no avanzan sin conexión ni durante la pausa por ocultar la app, pero continúan con los menús abiertos. Se guardan el tiempo y el progreso del reto. Al cobrar aparecen una breve celebración y, al organizar una campaña, banderines sobre la entrada. Los ocho hitos y el objetivo diario anteriores siguen disponibles.
 
 La v1.9 añade **lattes de autor, tartas artesanas y tostadas de aguacate**, con estaciones comprables, tres niveles y pedidos reales. Bandas de pilates, ritual sonoro de yoga y masaje aromático tienen dos niveles, requisitos y costes de materiales. El catálogo llega a 45 mejoras. Cada inversión incorpora objetos físicos al local: jarras, tartas por pisos, tostador y aguacates, bandas, cuencos y difusores.
 
@@ -96,6 +102,7 @@ También puedes ejecutar directamente `node --test tests/*.test.cjs`, `node scri
 
 | Archivo | Responsabilidad |
 | --- | --- |
+| `progression.js` | Capítulos, retos opcionales, requisitos, mezcla de demanda, validación y límites de premios |
 | `core.js` | Economía, pedidos, mejoras, clases, validación y offline; comprobable en Node |
 | `traffic.js` | Movimiento, separación entre visitantes, desvíos y reservas durante las salidas |
 | `layout.js` | Zonas, superficie, capacidad física, posiciones de equipos y rutas por puertas; compartido entre simulación y mapa |

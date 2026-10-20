@@ -52,7 +52,7 @@
 <span class="pill" id="level">NIVEL 1</span>
 </div>
 <div class="venue" id="venue">
-<div class="map-badge"><span class="live-dot"></span> BLOOM VILLAGE</div>
+<button class="map-badge journey-chip" id="journey-chip" aria-label="Ver capítulo y retos del negocio">🌱 Tu siguiente paso</button>
 <div class="map-controls"><button id="zoom-in" aria-label="Acercar local">+</button><button id="zoom-out" aria-label="Alejar local">−</button><button id="camera-reset" aria-label="Centrar todo el negocio">⌖</button></div>
 <canvas id="scene" width="720" height="800" role="img" aria-label="Local 3D interactivo: toca la barra, mesas o estudio para mejorar la zona">
 </canvas>
@@ -157,6 +157,8 @@
 <div class="section-head">
 <h2>Tu camino al éxito 🏆</h2>
 </div>
+<div class="card journey-card" id="journey-card"></div>
+<div class="card campaign-board" id="campaign-board"></div>
 <div class="banner">
 <b>Pequeños pasos, grandes logros</b>Completa hitos para conseguir recompensas y desbloquear nuevas oportunidades.</div>
 <div class="card daily">
@@ -235,7 +237,7 @@
 </p>
 <input type="file" id="import-file" accept="application/json" hidden>
 </div>
-<div class="footer-note">BLOOM & BREW TYCOON · VERSIÓN 1.9.0 · SIN ANUNCIOS NI COMPRAS</div>
+<div class="footer-note">BLOOM & BREW TYCOON · VERSIÓN 1.10.0 · SIN ANUNCIOS NI COMPRAS</div>
 </section>
 </main>
 <aside id="zone-panel" class="zone-panel" hidden aria-label="Mejorar zona del negocio">
@@ -259,6 +261,7 @@
 </div>
 <script src="layout.js"></script>
 <script src="traffic.js"></script>
+<script src="progression.js"></script>
 <script src="clocks.js"></script>
 <script src="core.js">
 </script>

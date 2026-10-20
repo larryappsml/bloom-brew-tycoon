@@ -15,10 +15,10 @@ test('characters have independent animated limbs and shared mesh resources',asyn
   const {character}=await scene();const a=character(0),b=character(1,true);assert.equal(a.legs.length,2);assert.equal(a.arms.length,2);a.legs[0].rotation.x=.5;assert.equal(b.legs[0].rotation.x,0);assert.ok(a.root.children.length>0);
 });
 test('3D animation keeps drawing behind menus and pauses only when hidden',async()=>{
-  const {Venue3D}=await scene();const savedDocument=global.document,savedRAF=global.requestAnimationFrame;
+  const {Venue3D,worldStamp}=await scene();const savedDocument=global.document,savedRAF=global.requestAnimationFrame;
   let renders=0,moves=0;global.document={hidden:false};global.requestAnimationFrame=()=>{};
   const s=B.fresh();const venue={canvas:{dataset:{renderer:'3d'},closest:()=>({})},last:0,time:0,reduced:true,
-    getState:()=>s,fingerprint:JSON.stringify(s.levels),updatePeople:()=>moves++,manual:{root:{}},steam:[],staff:[],students:[],
+    getState:()=>s,fingerprint:worldStamp(s),updatePeople:()=>moves++,manual:{root:{}},steam:[],staff:[],students:[],
     look:{x:0,y:0,z:0,lerp(){}},target:{},camera:{position:{set(){}},lookAt(){},zoom:1,updateProjectionMatrix(){}},zoom:1,renderer:{render(){renders++;}}};
   try{
     Venue3D.prototype.frame.call(venue,1000);assert.equal(renders,1);assert.equal(moves,1);assert.ok(venue.time>0);

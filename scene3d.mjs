@@ -173,6 +173,7 @@ export function walkPath(position,route,budget){
   return {moving:route.length>0,heading};
 }
 
+export const worldStamp=s=>JSON.stringify({levels:s.levels,chapters:s.chapters||[],campaign:s.campaign&&s.campaign.remaining>0?s.campaign.id:null});
 export class Venue3D {
   constructor(canvas,getState,onSelect=()=>{}){
     this.canvas=canvas;this.getState=getState;this.onSelect=onSelect;this.people=new Map();this.time=0;this.last=0;this.fingerprint='';this.target=new THREE.Vector3(0,.1,1.8);this.look=this.target.clone();this.zoom=.58;this.selected='';this.reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -201,7 +202,7 @@ export class Venue3D {
     canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();canvas.dataset.renderer='recovering';});canvas.addEventListener('webglcontextrestored',()=>{canvas.dataset.renderer='3d';});canvas.dataset.renderer='3d';
   }
   worldWidth(){const f=this.world?.footprint;return f?(f.right-f.left)*.83+(14-f.back)*.57+6:30;}
-  rebuild(){const s=this.getState(),previous=this.world?.footprint;if(this.world)disposeGroup(this.world.root);this.world=buildWorld(s);batchStaticWorld(this.world.root);this.scene.add(this.world.root);this.fingerprint=JSON.stringify(s.levels);this.staff=[];
+  rebuild(){const s=this.getState(),previous=this.world?.footprint;if(this.world)disposeGroup(this.world.root);this.world=buildWorld(s);batchStaticWorld(this.world.root);this.scene.add(this.world.root);this.fingerprint=worldStamp(s);this.staff=[];
     this.fitZoom=Math.min(1,(this.camera.right-this.camera.left)/this.worldWidth());if(previous&&previous.area!==this.world.footprint.area)this.focus('all');
     this.steam=[];for(let i=0;i<5;i++){const puff=ball(this.world.root,-4.6,2.7,-2.5,.08,palette.white);puff.castShadow=false;puff.receiveShadow=false;this.steam.push(puff);}
     for(let i=0;i<Math.min(3,s.levels.barista||0);i++){const staff=character(i,true);staff.root.position.set(-4.7+i*1.3,0,-4.2);this.world.root.add(staff.root);this.staff.push(staff);}
@@ -264,7 +265,7 @@ export class Venue3D {
     }
     this.clockLayer.draw(entries,entry=>this.clockVector.set(entry.x,entry.y,entry.z).project(this.camera),this.camera.zoom);
   }
-  frame(now){if(this.stopped)return;requestAnimationFrame(this.frame);if(document.hidden||!this.canvas.closest('.view.active')||this.canvas.dataset.renderer==='recovering'){this.last=now;this.statsAt=now;this.statsFrames=0;return;}if(now-this.last<(this.reduced?180:33))return;const dt=Math.min(1,(now-this.last)/1000||.033);this.last=now;this.time+=dt;const s=this.getState();if(JSON.stringify(s.levels)!==this.fingerprint)this.rebuild();
+  frame(now){if(this.stopped)return;requestAnimationFrame(this.frame);if(document.hidden||!this.canvas.closest('.view.active')||this.canvas.dataset.renderer==='recovering'){this.last=now;this.statsAt=now;this.statsFrames=0;return;}if(now-this.last<(this.reduced?180:33))return;const dt=Math.min(1,(now-this.last)/1000||.033);this.last=now;this.time+=dt;const s=this.getState();if(worldStamp(s)!==this.fingerprint)this.rebuild();
     this.updatePeople(s,dt);const brewing=s.queue.some(o=>o.remaining!==null);this.manual.root.visible=!(s.levels.barista)&&brewing;this.steam.forEach((p,i)=>{p.visible=brewing;const phase=(this.time*.6+i*.2)%1;p.position.y=2.45+phase*.8;p.position.x=-4.6+Math.sin(this.time*2+i)*.08;p.scale.setScalar(.04+phase*.09);});this.staff.forEach((p,i)=>{p.arms[0].rotation.x=this.reduced?-.3:-.7+Math.sin(this.time*5+i)*.28;p.arms[1].rotation.x=-.4;});
     const a=this.reduced?1:Math.min(1,dt*5);this.look.lerp(this.target,a);this.camera.position.set(this.look.x+18,this.look.y+22,this.look.z+26);this.camera.lookAt(this.look);this.camera.zoom+=(this.zoom-this.camera.zoom)*a;this.camera.updateProjectionMatrix();this.renderer.render(this.scene,this.camera);this.drawClocks?.(s);
     this.statsFrames=(this.statsFrames||0)+1;if(this.renderer.info&&now-(this.statsAt||0)>=1000){this.canvas.dataset.fps=String(Math.round(this.statsFrames*1000/(now-(this.statsAt||0))));this.canvas.dataset.drawCalls=String(this.renderer.info.render.calls);this.canvas.dataset.triangles=String(this.renderer.info.render.triangles);this.statsFrames=0;this.statsAt=now;}

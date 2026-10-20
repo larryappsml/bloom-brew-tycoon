@@ -1,8 +1,8 @@
 (function (root, factory) {
-  const api = factory(typeof module==='object'&&module.exports?require('./layout.js'):root.BloomLayout,typeof module==='object'&&module.exports?require('./traffic.js'):root.BloomTraffic);
+  const api = factory(typeof module==='object'&&module.exports?require('./layout.js'):root.BloomLayout,typeof module==='object'&&module.exports?require('./traffic.js'):root.BloomTraffic,typeof module==='object'&&module.exports?require('./progression.js'):root.BloomProgression);
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.Bloom = api;
-})(typeof globalThis === 'undefined' ? this : globalThis, function (Layout,Traffic) {
+})(typeof globalThis === 'undefined' ? this : globalThis, function (Layout,Traffic,Progression) {
   'use strict';
   const VERSION = 2;
   const KEY = 'bloom-brew-save-v2', LEGACY_KEY = 'bloom-brew-save-v1';
@@ -74,7 +74,7 @@
   ];
   const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
   const level=(s,id)=>s.levels[id]||0;
-  const fresh=(now=Date.now())=>({version:VERSION,money:20,earned:0,expenses:0,rewards:0,served:0,happy:0,lost:0,sessions:0,students:0,levels:{},claimed:[],last:now,seconds:0,reputation:75,tutorial:0,boostUntil:0,rushReady:0,classRemaining:0,classSeats:0,classPhase:'idle',classGuests:[],classBoardRemaining:0,classRecruitRemaining:0,classCooldown:0,departing:[],seatCursor:0,nextId:1,arrival:0.5,daily:{day:new Date(now).toISOString().slice(0,10),count:0,claimed:false},queue:[],seated:[],satellite:0,treatments:[],treatmentArrival:2,completedServices:{pressotherapy:0,massage:0,yoga:0},wellnessRevenue:0});
+  const fresh=(now=Date.now())=>({...Progression.fresh(now),version:VERSION,money:20,earned:0,expenses:0,rewards:0,served:0,happy:0,lost:0,sessions:0,students:0,levels:{},claimed:[],last:now,seconds:0,reputation:75,tutorial:0,boostUntil:0,rushReady:0,classRemaining:0,classSeats:0,classPhase:'idle',classGuests:[],classBoardRemaining:0,classRecruitRemaining:0,classCooldown:0,departing:[],seatCursor:0,nextId:1,arrival:0.5,daily:{day:new Date(now).toISOString().slice(0,10),count:0,claimed:false},queue:[],seated:[],satellite:0,treatments:[],treatmentArrival:2,completedServices:{pressotherapy:0,massage:0,yoga:0},wellnessRevenue:0});
   function validate(data, now=Date.now()) {
     if (!data || typeof data!=='object' || Array.isArray(data)) throw Error('Partida inválida');
     if (data.version!==undefined && data.version!==1 && data.version!==2) throw Error('Versión de partida incompatible');
@@ -100,6 +100,7 @@
     }
     // Orders and ongoing classes are transient; restoring them must never mint money.
     if(migrating) { s.boostUntil=0; s.rushReady=0; }
+    Progression.restore(data,s,now);
     return s;
   }
   function params(s) {
@@ -162,7 +163,7 @@
   function menu(s) {const unlock={breakfast:'pastries',matcha:'matcha',smoothie:'spa',latte:'latteBar',cake:'cakeDisplay',toast:'toastKitchen'};return PRODUCTS.filter(p=>p.id==='coffee'||level(s,unlock[p.id]));}
   function spawn(s,rng=Math.random) {
     const slots=Layout.queueSlots(),used=new Set(s.queue.map(o=>o.queueSlot)),slot=slots.find(p=>!used.has(p.index));if(!slot)return false;
-    const types=menu(s),product=types[Math.min(types.length-1,Math.floor(rng()*types.length))];
+    const types=menu(s),product=Progression.chooseProduct(s,types,rng);
     s.queue.push({...Traffic.create(s,slot,'cafe',rng),queueSlot:slot.index,product:product.id,wait:0,patience:28+rng()*12,remaining:null,worker:false});return true;
   }
   function startOrder(s) {
@@ -235,7 +236,7 @@
         const cost=(product.cost+(o.worker?.65:0))*(1-p.manager*.08);
         revenue(s,gross,cost);s.served++;s.happy++;s.daily.count++;s.reputation=clamp(s.reputation+.5,20,100);
         const duration=consumptionTime(o.product,o.kind,s);o.stage='walkingToSeat';o.seat=seat;o.remaining=duration;o.duration=duration;Traffic.send(o,Layout.insideRoute(seat),seat);s.seated.push(o);
-        events.push({type:'sale',net:gross-cost,product:product.name});
+        events.push({type:'sale',net:gross-cost,product:product.name,productId:product.id});
       } else if(o.remaining===null&&o.wait>o.patience){s.lost++;s.reputation=clamp(s.reputation-1.5,20,100);Traffic.exit(o);s.departing.push(o);events.push({type:'lost'});}
       else pending.push(o);
     }
@@ -265,6 +266,7 @@
     }
     s.treatments=ongoing;
     if(p.branches) {const gross=p.branches*dt*3,cost=gross*.65;revenue(s,gross,cost);s.satellite+=gross-cost;}
+    Progression.tick(s,dt,events,now);
     return events;
   }
   function estimate(s) {
@@ -293,5 +295,8 @@
     daily(s,now);if(s.daily.claimed||s.daily.count<30)return 0;
     s.daily.claimed=true;s.money+=80;s.rewards+=80;return 80;
   }
-  return {VERSION,KEY,LEGACY_KEY,UPGRADES,GOALS,PRODUCTS,SERVICES,fresh,validate,params,level,price,requirement,unlocked,purchase,menu,spawn,startOrder,orderDuration,orderPrice,consumptionTime,startClass,startTreatment,serviceConfig,serviceOccupancy,rush,step,estimate,offline,value,claim,claimDaily};
+  const journeyMetrics=s=>({served:s.served,sessions:s.sessions,wellness:s.completedServices.pressotherapy+s.completedServices.massage,yoga:s.completedServices.yoga,menu:menu(s).length,area:Layout.footprint(s).area});
+  const chapterStatus=s=>Progression.status(s,journeyMetrics(s));
+  const claimChapter=s=>Progression.claimChapter(s,journeyMetrics(s));
+  return {CHAPTERS:Progression.CHAPTERS,CAMPAIGNS:Progression.CAMPAIGNS,chapterStatus,claimChapter,campaignStatus:Progression.campaignStatus,campaignRequirement:Progression.requirement,startCampaign:Progression.startCampaign,claimCampaign:Progression.claimCampaign,cancelCampaign:Progression.cancelCampaign,VERSION,KEY,LEGACY_KEY,UPGRADES,GOALS,PRODUCTS,SERVICES,fresh,validate,params,level,price,requirement,unlocked,purchase,menu,spawn,startOrder,orderDuration,orderPrice,consumptionTime,startClass,startTreatment,serviceConfig,serviceOccupancy,rush,step,estimate,offline,value,claim,claimDaily};
 });

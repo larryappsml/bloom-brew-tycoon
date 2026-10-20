@@ -1,5 +1,15 @@
 # Historial
 
+## v1.10.0 — 20 octubre 2026
+
+- Seis capítulos encadenados con tareas combinadas, siguiente objetivo y recompensas únicas. El progreso anterior cuenta, sin reiniciar la partida.
+- Trofeos físicos por capítulo, banderines de campañas y una celebración breve al reclamar premios.
+- Tres retos opcionales de cinco minutos activos: café, brunch y bienestar. Mezcla de recetas orientada al reto y conteo de entregas/sesiones reales.
+- Cuotas y premios progresivos con dos aumentos máximos, tres premios diarios UTC, sin coste de entrada ni penalización económica por fallar.
+- Acceso compacto al siguiente paso desde el mapa, recomendaciones de inversión ligadas al capítulo y objetivos existentes conservados.
+- Guardado validado de capítulos y reto, pausa offline y continuidad tras importar o recargar. Nuevo módulo progression.js en la distribución offline.
+- Pruebas de recompensas únicas, límites diarios, demanda, servicios, expiración, compatibilidad, trofeos, caché e interfaz con menús abiertos.
+
 ## v1.9.0 — 20 octubre 2026
 
 - Iconos de producto o actividad en el centro de los círculos, sin cuenta atrás.

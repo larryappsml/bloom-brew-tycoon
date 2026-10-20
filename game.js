@@ -3,6 +3,7 @@
   const B=window.Bloom,$=id=>document.getElementById(id),fmt=n=>new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:n>=100?0:2}).format(n);
   let s=B.fresh(),filter='all',toastTimer,dirty=true,loadWarning='',readOnly=false,selectedZone=null,venueScene,serviceMarkup='';
   function toast(text){$('toast').textContent=text;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3200);}
+  function celebrate(){for(let i=0;i<12;i++){const star=document.createElement('span');star.className='celebration-star';star.textContent=i%3?'✦':'🌿';star.style.left=(12+i*6.5)+'%';star.style.top=(36+(i%4)*8)+'%';star.style.animationDelay=i*.025+'s';$('app').append(star);setTimeout(()=>star.remove(),2100);}}
   try {
     const current=localStorage.getItem(B.KEY),legacy=localStorage.getItem(B.LEGACY_KEY),raw=current||legacy;
     if(raw)s=B.validate(JSON.parse(raw));
@@ -34,7 +35,9 @@
   }
   function renderLists() {
     $('shop-title').textContent=filter==='team'?'Tu equipo':filter==='pilates'?'Tu estudio de pilates':filter==='yoga'?'Tu sala de yoga':filter==='cafe'?'Tu cafetería':filter==='zones'?'Amplía tu centro':filter==='wellness'?'Tu sala wellness':'Invierte y crece';
-    const available=B.UPGRADES.filter(u=>B.unlocked(s,u)&&B.level(s,u.id)<u.max).sort((a,b)=>B.price(s,a)-B.price(s,b));
+    const needed=new Set(B.chapterStatus(s).tasks.filter(t=>t.value<t.target).map(t=>t.key));
+    const relevant=u=>needed.has(u.id)||(needed.has('menu')&&['pastries','matcha','spa','latteBar','cakeDisplay','toastKitchen'].includes(u.id)&&!B.level(s,u.id));
+    const available=B.UPGRADES.filter(u=>B.unlocked(s,u)&&B.level(s,u.id)<u.max).sort((a,b)=>Number(relevant(b))-Number(relevant(a))||B.price(s,a)-B.price(s,b));
     $('featured').innerHTML=available.slice(0,2).map(row).join('')||'<p>Tu imperio está completo. ¡Disfruta del local!</p>';
     $('shop-list').innerHTML=B.UPGRADES.filter(u=>filter==='all'||u.cat===filter).map(row).join('');
     $('milestone-list').innerHTML=B.GOALS.map(g=>{
@@ -55,7 +58,20 @@
     selectedZone=id;$('zone-panel').hidden=false;$('app').classList.add('zone-open');venueScene?.select(id);renderZone();
   }
   function closeZone(){selectedZone=null;$('zone-panel').hidden=true;$('app').classList.remove('zone-open');}
+  let journeyMarkup='',campaignMarkup='';
+  function renderProgression(){
+    const c=B.chapterStatus(s),campaign=B.campaignStatus(s);
+    const journey=c.complete?'<span class="pill">6 / 6 CAPÍTULOS</span><h3>🏆 El centro del barrio</h3><p>Tu colección está completa. Sigue probando retos y nuevas inversiones.</p>':`<span class="pill">CAPÍTULO ${c.index+1} / ${B.CHAPTERS.length}</span><h3>${c.icon} ${c.name}</h3><ul class="chapter-tasks">${c.tasks.map(t=>`<li class="${t.value>=t.target?'done':''}"><span>${t.value>=t.target?'✓':'○'} ${t.label}</span><b>${Math.floor(t.value)}/${t.target}</b></li>`).join('')}</ul><p class="highlight">${fmt(c.reward)} + un trofeo visible en tu local</p><button class="claim" data-chapter="${c.id}" ${c.ready?'':'disabled'}>${c.ready?'Completar capítulo':'En progreso'}</button>${c.next?`<small>Después: ${c.next}</small>`:''}`;
+    if(journey!==journeyMarkup){$('journey-card').innerHTML=journey;journeyMarkup=journey;}
+    const chip=$('journey-chip');chip.textContent=campaign?`${campaign.icon} ${campaign.ready?'¡Reto conseguido!':campaign.expired?'Reto terminado':campaign.name+' · '+campaign.count+'/'+campaign.target}`:c.complete?'🏆 Tu centro florece':`${c.icon} ${c.ready?'¡Capítulo listo!':c.name}`;chip.classList.toggle('ready',!!(campaign?.ready||c.ready));
+    const won=s.campaignDaily.day===new Date().toISOString().slice(0,10)?s.campaignDaily.wins:0;
+    let board='<div class="section-head"><h3>Elige tu próximo reto</h3><span class="pill">'+won+'/3 PREMIOS HOY</span></div><p>Cinco minutos de juego activo. Cuenta solo nuevas ventas o sesiones. Sin penalización económica.</p>';
+    if(campaign){const seconds=Math.ceil(campaign.remaining);board+=`<div class="campaign-active"><b>${campaign.icon} ${campaign.name}</b><p>${campaign.count}/${campaign.target} ${campaign.id==='wellness'?'sesiones terminadas':'pedidos entregados'} · ${campaign.ready?'¡Objetivo conseguido!':campaign.expired?'Tiempo agotado':Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0')+' restantes'}</p><div class="bar"><i style="width:${Math.min(100,campaign.count/campaign.target*100)}%"></i></div><p class="highlight">Premio ${fmt(campaign.reward)}</p>${campaign.ready?'<button class="claim" data-campaign-action="claim">Cobrar recompensa</button>':`<button class="tab" data-campaign-action="watch">Volver al mapa</button><button class="tab" data-campaign-action="cancel">${campaign.expired?'Elegir otro reto':'Abandonar reto'}</button>`}</div>`;}
+    else board+=B.CAMPAIGNS.map(d=>{const reason=B.campaignRequirement(s,d.id),tier=Math.min(2,Math.floor(s.campaignWins/3));return `<div class="campaign-option"><div><b>${d.icon} ${d.name}</b><small>${reason||d.description}</small><em>${d.target+tier*2} ${d.id==='wellness'?'sesiones':'pedidos'} · premio ${fmt(d.reward+tier*20)}</em></div><button class="claim" data-campaign="${d.id}" ${reason||won>=3?'disabled':''}>${reason?'🔒':won>=3?'Mañana':'Elegir'}</button></div>`;}).join('');
+    if(board!==campaignMarkup){$('campaign-board').innerHTML=board;campaignMarkup=board;}
+  }
   function render() {
+    renderProgression();
     const p=B.params(s),estimate=B.estimate(s),serving=s.queue.find(o=>o.remaining!==null&&!o.worker),waiting=s.queue.find(o=>o.stage==='waiting'),pilates=B.level(s,'mat')>0,boost=Date.now()<s.boostUntil;
     $('money').textContent=fmt(s.money);$('income').textContent=fmt(estimate.total);$('rep').textContent='⭐ '+(s.reputation/20).toFixed(1);
     $('level').textContent='NIVEL '+(1+Math.floor(Math.sqrt(s.earned/120)));
@@ -109,7 +125,10 @@
   document.querySelectorAll('.nav-btn').forEach(x=>x.onclick=()=>nav(x.dataset.view));$('all-upgrades').onclick=()=>nav('shop');
   document.querySelectorAll('#filter-tabs button').forEach(x=>x.onclick=()=>{filter=x.dataset.filter;document.querySelectorAll('#filter-tabs button').forEach(y=>y.classList.toggle('active',x===y));dirty=true;render();});
   document.addEventListener('click',e=>{
-    const button=e.target.closest('[data-buy],[data-claim],[data-service],[data-focus]');if(!button)return;
+    const button=e.target.closest('[data-buy],[data-claim],[data-service],[data-focus],[data-chapter],[data-campaign],[data-campaign-action]');if(!button)return;
+    if(button.dataset.chapter){if(B.chapterStatus(s).id!==button.dataset.chapter)return;const reward=B.claimChapter(s);if(reward){toast('¡Capítulo completado! Trofeo nuevo · +'+fmt(reward));chime();celebrate();save();dirty=true;render();}return;}
+    if(button.dataset.campaign){if(B.startCampaign(s,button.dataset.campaign)){toast('Reto iniciado · cinco minutos de juego, sin riesgo para tu dinero');save();dirty=true;render();}return;}
+    if(button.dataset.campaignAction){if(button.dataset.campaignAction==='watch'){nav('home');return;}if(button.dataset.campaignAction==='claim'){const reward=B.claimCampaign(s);if(reward){toast('Reto conseguido · +'+fmt(reward));chime();celebrate();}}else B.cancelCampaign(s);save();dirty=true;render();return;}
     if(button.dataset.focus){nav('home');venueScene?.focus(button.dataset.focus);return;}
     if(button.dataset.service){if(B.startTreatment(s,button.dataset.service)){save();render();toast('Cliente en camino desde la calle');}return;}
     if(button.dataset.buy){if(B.purchase(s,button.dataset.buy)){toast('Tu local crece ✨');save();dirty=true;render();}return;}
@@ -144,7 +163,7 @@
   $('restore').onclick=()=>{
     try{const raw=localStorage.getItem(B.KEY+'-before-import')||localStorage.getItem(B.KEY+'-before-reset')||localStorage.getItem(B.KEY+'-backup')||localStorage.getItem(B.KEY+'-legacy-backup');if(!raw)throw Error();const candidate=B.validate(JSON.parse(raw));if(confirm('¿Restaurar la última copia de seguridad disponible?')){s=candidate;s.last=Date.now();readOnly=false;save();dirty=true;render();toast('Copia restaurada');}}catch{toast('No hay una copia de seguridad válida disponible');}
   };
-  function feedback(events){for(const event of events){if(['sale','class','service'].includes(event.type)){dirty=true;const f=document.createElement('div');f.className='floating';f.style.left=(event.type==='sale'?'35%':'65%');f.style.top='45%';f.textContent='+'+fmt(event.net);$('venue').append(f);setTimeout(()=>f.remove(),1000);if(event.type==='class')toast('Clase completada · beneficio '+fmt(event.net));if(event.type==='service'&&event.first)toast(B.SERVICES.find(x=>x.id===event.service).name+' completada · '+fmt(event.net)+' netos');}else if(event.type==='lost')dirty=true;}}
+  function feedback(events){for(const event of events){if(['sale','class','service'].includes(event.type)){dirty=true;const f=document.createElement('div');f.className='floating';f.style.left=(event.type==='sale'?'35%':'65%');f.style.top='45%';f.textContent='+'+fmt(event.net);$('venue').append(f);setTimeout(()=>f.remove(),1000);if(event.type==='class')toast('Clase completada · beneficio '+fmt(event.net));if(event.type==='service'&&event.first)toast(B.SERVICES.find(x=>x.id===event.service).name+' completada · '+fmt(event.net)+' netos');}else if(event.type==='campaignReady'){dirty=true;toast('¡'+event.name+' completado! Cobra el premio en Objetivos');}else if(event.type==='campaignExpired'){dirty=true;toast('Reto terminado · puedes volver a intentarlo sin perder dinero');}else if(event.type==='lost')dirty=true;}}
   let tick=performance.now(),renderAt=0,listsAt=0;
   setInterval(()=>{
     const now=performance.now();if(document.hidden){tick=now;return;}
@@ -170,6 +189,7 @@
   $('camera-reset').onclick=()=>venueScene?.focus('all');
   document.querySelectorAll('[data-camera]').forEach(button=>button.onclick=()=>{closeZone();venueScene?.focus(button.dataset.camera);document.querySelectorAll('[data-camera]').forEach(other=>other.classList.toggle('active',other===button));});
   $('cafe-zone').onclick=()=>selectZone('machine');$('studio-zone').onclick=()=>selectZone('mat');
+  $('journey-chip').onclick=()=>nav('goals');
   render();venueScene=new window.VenueScene($('scene'),()=>s,selectZone);
   if(loadWarning)setTimeout(()=>toast(loadWarning),500);else if(offline.net>0)setTimeout(()=>toast('Mientras descansabas · +'+fmt(offline.net)+' netos (máx. 4 h)'),600);
   save();
