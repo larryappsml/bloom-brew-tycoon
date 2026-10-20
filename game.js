@@ -1,6 +1,8 @@
 (() => {
   'use strict';
-  const B=window.Bloom,$=id=>document.getElementById(id),fmt=n=>new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:n>=100?0:2}).format(n);
+  const demo=/(?:[?&])demo=club(?:&|$)/.test(location.search||'');
+  const B=demo?{...window.Bloom,KEY:'bloom-brew-demo-v2',LEGACY_KEY:'bloom-brew-demo-v1',fresh:()=>window.Bloom.validate(window.BloomDemo)}:window.Bloom;
+  const $=id=>document.getElementById(id),fmt=n=>new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:n>=100?0:2}).format(n);
   let s=B.fresh(),filter='all',toastTimer,dirty=true,loadWarning='',readOnly=false,selectedZone=null,venueScene,serviceMarkup='';
   function toast(text){$('toast').textContent=text;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3200);}
   function celebrate(){for(let i=0;i<12;i++){const star=document.createElement('span');star.className='celebration-star';star.textContent=i%3?'✦':'🌿';star.style.left=(12+i*6.5)+'%';star.style.top=(36+(i%4)*8)+'%';star.style.animationDelay=i*.025+'s';$('app').append(star);setTimeout(()=>star.remove(),2100);}}
@@ -17,7 +19,7 @@
       const previous=localStorage.getItem(B.KEY);
       if(previous) {try{B.validate(JSON.parse(previous));localStorage.setItem(B.KEY+'-backup',previous);}catch{}}
       localStorage.setItem(B.KEY,JSON.stringify(s));
-      $('save-status').textContent='Guardado en este dispositivo · '+new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+      $('save-status').textContent=(demo?'DEMO AVANZADA · guardado independiente · ':'Guardado en este dispositivo · ')+new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
       $('save-status').classList.remove('error');return true;
     } catch { $('save-status').textContent='No se pudo guardar. Exporta tu partida para conservarla.';$('save-status').classList.add('error');return false; }
   }

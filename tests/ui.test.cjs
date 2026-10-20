@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
 const B=require('../core.js');
-function boot(initial={}) {
+function boot(initial={},search='') {
   const store=new Map(Object.entries(initial)),elements=new Map(),events={},timers=[];let now=0;
   const make=()=>{const classes=new Set();return {style:{},dataset:{},textContent:'',innerHTML:'',classList:{add:n=>classes.add(n),remove:n=>classes.delete(n),contains:n=>classes.has(n),toggle(n,force){const on=force===undefined?!classes.has(n):force;if(on)classes.add(n);else classes.delete(n);}},append(){},remove(){},click(){},setAttribute(){},value:''};};
   const html=fs.readFileSync('index.html','utf8');
@@ -12,7 +12,8 @@ function boot(initial={}) {
   const navButtons=views.map(view=>{const button=make();button.dataset.view=view.id;return button;});
   const filters=['all','cafe','pilates','yoga','team','zones','wellness'].map(filter=>{const button=make();button.dataset.filter=filter;return button;});
   const document={getElementById(id){assert.ok(elements.has(id),'Missing UI element: '+id);return elements.get(id);},querySelectorAll(selector){return selector==='.view'?views:selector==='.nav-btn'?navButtons:selector==='#filter-tabs button'?filters:[];},createElement:make,addEventListener(name,fn){events[name]=fn;},hidden:false};
-  const ctx={window:{Bloom:B,VenueScene:function(){},addEventListener(){},scrollTo(){}},document,localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},Date,Intl,console,URL,Blob,performance:{now:()=>now},setInterval(fn,ms){timers.push({fn,ms});},setTimeout(){},clearTimeout(){},navigator:{},location:{hostname:'127.0.0.1'},confirm:()=>true};
+  const ctx={window:{Bloom:B,VenueScene:function(){},addEventListener(){},scrollTo(){}},document,localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},Date,Intl,console,URL,Blob,performance:{now:()=>now},setInterval(fn,ms){timers.push({fn,ms});},setTimeout(){},clearTimeout(){},navigator:{},location:{hostname:'127.0.0.1',search},confirm:()=>true};
+  vm.runInNewContext(fs.readFileSync('demo.js','utf8'),ctx);
   vm.runInNewContext(fs.readFileSync('game.js','utf8'),ctx);
   return {store,elements,events,timers,document,navButtons,advance(seconds){for(let i=0;i<seconds*10;i++){now+=100;timers.find(t=>t.ms===100).fn();}timers.find(t=>t.ms===5000).fn();}};
 }
@@ -95,3 +96,16 @@ test('chapter and campaign menus allow real claims and keep challenges running b
 test('sports can be called from Turno and finish while the player manages upgrades',()=>{
   const s=B.fresh();s.levels={crossfitWing:1,functionalStations:1,functionalCoach:1,padelWing:1,padelCourt:1,padelCoach:1};s.last=Date.now();const ui=boot({[B.KEY]:JSON.stringify(s)});ui.navButtons.find(b=>b.dataset.view==='operations').onclick();assert.ok(ui.elements.get('sports-list').innerHTML.includes('Pádel por parejas'));ui.events.click({target:{closest:()=>({dataset:{sport:'padel'}})}});assert.ok(JSON.parse(ui.store.get(B.KEY)).sportsGroups.padel);ui.navButtons.find(b=>b.dataset.view==='shop').onclick();ui.advance(200);const saved=JSON.parse(ui.store.get(B.KEY));assert.ok(saved.sportSessions.padel>=1);assert.ok(saved.sportSessions.crossfit>=1);assert.equal(saved.sportVisits.padel,saved.sportSessions.padel*4);assert.ok(ui.elements.get('shop').classList.contains('active'));
 });
+
+test('advanced demo isolates normal saves across reload and reset',()=>{
+ const normal=JSON.stringify(B.fresh()),key='bloom-brew-demo-v2';
+ const demo=boot({[B.KEY]:normal},'?demo=club');
+ const state=JSON.parse(demo.store.get(key));
+ assert.equal(state.levels.padelCourt,1);assert.equal(state.levels.functionalStations,3);assert.equal(state.money,45000);
+ demo.advance(5);assert.equal(demo.store.get(B.KEY),normal);
+ const reload=boot(Object.fromEntries(demo.store),'?demo=club');
+ assert.equal(reload.store.get(B.KEY),normal);assert.ok(JSON.parse(reload.store.get(key)).levels.padelCoach);
+ reload.elements.get('reset').onclick();assert.equal(reload.store.get(B.KEY),normal);
+ const standard=boot(Object.fromEntries(reload.store));assert.equal(JSON.parse(standard.store.get(B.KEY)).levels.padelCourt||0,0);
+});
+

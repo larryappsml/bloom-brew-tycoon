@@ -1,3 +1,7 @@
+# v1.11.1
+
+- Demo avanzada pública con pádel y crossfit y guardado independiente.
+
 # Historial
 
 ## v1.11.0 — 20 octubre 2026

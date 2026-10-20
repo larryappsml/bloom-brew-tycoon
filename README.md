@@ -147,3 +147,7 @@ Detalles de la auditoría y cambios en [AUDIT.md](AUDIT.md) y [CHANGELOG.md](CHA
 Preferencias de clientes, formación del personal, decoración libre, un mapa jugable para cada sede y ajuste de progresión con sesiones reales. La v1.1 prioriza atención, clases, economía finita y persistencia.
 
 La v1.2 cambia la presentación por un local 3D con modelos propios, conservando la simulación y las partidas v2. El objetivo de render es 30 FPS, con DPR máximo 1,75 y sombra de 1024 px. La geometría estática se agrupa con instancias y las animaciones se pausan cuando la pestaña o el local están ocultos. El modo de movimiento reducido limita el ritmo de dibujo y evita balanceos de cámara innecesarios. El rendimiento en un iPhone físico no queda certificado por las pruebas de escritorio.
+
+### Demo avanzada
+
+[Centro completo con pádel y crossfit](https://larryappsml.github.io/bloom-brew-tycoon/?demo=club). Incluye 45.000 € y servicios abiertos. Guardado independiente: vuelve a la URL sin parámetros para recuperar tu partida normal.
