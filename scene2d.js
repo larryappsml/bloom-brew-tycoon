@@ -33,6 +33,7 @@
       c.beginPath();c.roundRect(px-5,py-17+bob,10,12,4);c.fill();
       this.ellipse(px,py-22+bob,4.5,5,colors[kind%4]);
       c.fillStyle='#524339';c.beginPath();c.arc(px,py-24+bob,4.5,Math.PI,Math.PI*2);c.fill();
+      c.fillStyle='#344b55';for(const side of [-1,1]){c.fillRect(px+side*2-1,py-22+bob,1.5,1.5);}
       if(role==='premium'){c.fillStyle='#fff8e6';c.fillRect(px-2,py-16,4,7);c.fillStyle='#9d5261';c.fillRect(px-.6,py-15,1.2,6);}
       if(working){c.fillStyle='#f4e9d6';c.fillRect(px-3,py-13,6,7);}
     }
@@ -56,7 +57,7 @@
       this.box(0,0,7,7,5,'#d8bd97','#b99a76');
       this.poly([this.point(0,0,5),this.point(7,0,5),this.point(7,0,68),this.point(0,0,68)],'#dfd6bc');
       this.poly([this.point(0,0,5),this.point(0,7,5),this.point(0,7,68),this.point(0,0,68)],'#eee6d4');
-      for(let x=0;x<7;x++)for(let y=0;y<7;y++)this.tile(x,y,.97,.97,5,x>=4?(l('mat')?'#d9dfc9':'#d8d2c5'):((x+y)%2?'#e5cbaa':'#e9d4b6'));
+      for(let x=0;x<7;x++)for(let y=0;y<7;y++){if(x>=4)this.tile(x,y,.97,.97,5,l('mat')?'#d9dfc9':'#d8d2c5');else for(let j=0;j<3;j++)this.tile(x+((x+y)%2?0:j*.32),y+((x+y)%2?j*.32:0),(x+y)%2?.97:.30,(x+y)%2?.30:.97,5,['#e4c298','#efcfaa','#e8cba5'][(x+y+j)%3]);}
       // Windows, botanical sign and warm pendants.
       this.poly([this.point(0,1,24),this.point(0,3.2,24),this.point(0,3.2,57),this.point(0,1,57)],'#a5bdb1','#c7b393');
       this.poly([this.point(4.6,0,22),this.point(6.5,0,22),this.point(6.5,0,54),this.point(4.6,0,54)],'#9db6aa','#c7b393');

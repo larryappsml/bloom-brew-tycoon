@@ -1,3 +1,10 @@
+# v1.13.0
+
+- Acabados procedurales nuevos: parquet, materiales, tapizados, cerámica, arquitectura y maquinaria más detallada en las salas.
+- Personajes con caras, peinados y gestos más cuidados. Exterior y fachada con mobiliario adicional.
+- Sombras de contacto e iluminación cálida. Instancing de personajes y empleados para reducir llamadas de dibujo manteniendo sus animaciones.
+- Actualización del aspecto del modo Canvas. Sin cambios de economía, rutas, capacidad o guardados.
+
 # v1.12.1
 
 - Panel de sala con beneficio automático estimado por minuto, porcentaje y puesto respecto a otras zonas. Recuperación desglosa sus dos servicios.
