@@ -1,16 +1,26 @@
 # Bloom & Brew Tycoon 🌿☕🧘
 
-**v1.10.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
+**v1.11.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
 
 **[Jugar](https://larryappsml.github.io/bloom-brew-tycoon/)**
 
-La v1.10 añade una progresión por **seis capítulos**: primer café, equipo, variedad de carta, pilates, recuperación y centro completo. Cada capítulo combina dos o tres metas, reconoce el progreso de partidas anteriores y concede una recompensa única y un trofeo físico en la estantería. El siguiente capítulo se revela al completar el actual. Las recomendaciones de inversión priorizan lo que falta para avanzar. El acceso superior del mapa muestra el siguiente paso o el reto activo y abre Objetivos.
+La v1.11 amplía el centro con **Bloom Strength**, un box de entrenamiento funcional de estética cálida y cuidada, y **Bloom Pádel**, una pista con red, líneas, cerramientos y focos. El centro completo alcanza **312 m²**. El box cuesta 5.200 € y se desbloquea al terminar seis clases de pilates; el club de pádel cuesta 9.000 € y requiere diez clases. Construir la zona no instala gratis su equipamiento.
+
+En **Mejoras → Fuerza** instala el circuito (1.400 €, dos plazas por nivel, máximo seis), rack de fuerza y ambiente con espejos y taquillas. En **Mejoras → Pádel** instala la pista de cuatro jugadores (2.200 €), material y focos. Los entrenadores de Equipo cuestan 1.800 € y 2.100 € y automatizan sus grupos con salario por participante. También puedes convocar sesiones manuales desde **Turno → Deportes del centro** y acercar la cámara con **Ver zona**.
+
+Los clientes llegan desde la calle por los accesos laterales. Cada grupo se reúne, espera a los inscritos, realiza la sesión y sale antes de recibir al siguiente. El circuito acepta grupos pequeños; el pádel necesita cuatro jugadores reales. Una reserva incompleta se cancela sin cobrar. Las mejoras no reinician relojes ni cambian la tarifa de una sesión ya empezada. El circuito muestra pesas en movimiento; el pádel muestra palas, golpes y una pelota animada solo cuando hay partido. Hora punta acelera sus relojes un 25 % y los ingresos offline estiman únicamente actividades automatizadas.
+
+La ropa identifica el destino desde la llegada: casual para cafetería, conjuntos deportivos distintos para pilates y yoga, bata con cinturón y zapatillas para tratamientos, camiseta de fuerza con pantalón corto para el box, y polo, visera, pantalón corto y pala para pádel. Los materiales y geometrías se comparten sin mezclar colores entre atuendos. Los personajes conservan su ropa al salir.
+
+Se añaden los capítulos **Fuerza con estilo** y **Tu club de pádel**, y el reto opcional **Encuentro deportivo**. Las estadísticas deportivas y los capítulos anteriores se conservan al importar; los grupos en curso se reinician al cargar, igual que las clases existentes. El catálogo tiene 55 inversiones y cuatro tipos de reto.
+
+La v1.10 añade una progresión por **ocho capítulos**: primer café, equipo, variedad de carta, pilates, recuperación, centro completo, fuerza y pádel. Cada capítulo combina dos o tres metas, reconoce el progreso de partidas anteriores y concede una recompensa única y un trofeo físico en la estantería. El siguiente capítulo se revela al completar el actual. Las recomendaciones de inversión priorizan lo que falta para avanzar. El acceso superior del mapa muestra el siguiente paso o el reto activo y abre Objetivos.
 
 En **Objetivos → Elige tu próximo reto**, puedes organizar **Club del café**, **Mesa de brunch** o **Tarde de bienestar**. Tienes cinco minutos de juego activo para entregar pedidos o terminar sesiones reales. Café y brunch orientan la mezcla de pedidos hacia las recetas correspondientes, sin saltarse el aforo ni generar ventas ficticias. Bienestar exige terminar clases o tratamientos; recibir al cliente no cuenta. Los requisitos impiden escoger actividades que todavía no has abierto.
 
 Hay un único reto activo. No cuesta dinero empezarlo y fallar o abandonarlo no quita saldo. Se conceden hasta **tres premios por día UTC**, cobrados expresamente; después de tres y seis victorias sube la cuota y la recompensa, con un límite de dos aumentos. Los retos no avanzan sin conexión ni durante la pausa por ocultar la app, pero continúan con los menús abiertos. Se guardan el tiempo y el progreso del reto. Al cobrar aparecen una breve celebración y, al organizar una campaña, banderines sobre la entrada. Los ocho hitos y el objetivo diario anteriores siguen disponibles.
 
-La v1.9 añade **lattes de autor, tartas artesanas y tostadas de aguacate**, con estaciones comprables, tres niveles y pedidos reales. Bandas de pilates, ritual sonoro de yoga y masaje aromático tienen dos niveles, requisitos y costes de materiales. El catálogo llega a 45 mejoras. Cada inversión incorpora objetos físicos al local: jarras, tartas por pisos, tostador y aguacates, bandas, cuencos y difusores.
+La v1.9 añade **lattes de autor, tartas artesanas y tostadas de aguacate**, con estaciones comprables, tres niveles y pedidos reales. Bandas de pilates, ritual sonoro de yoga y masaje aromático tienen dos niveles, requisitos y costes de materiales. El catálogo llega a 55 mejoras. Cada inversión incorpora objetos físicos al local: jarras, tartas por pisos, tostador y aguacates, bandas, cuencos y difusores.
 
 Los relojes muestran ahora un **icono de lo que se está completando**, sin números. Cada pedido tiene un modelo propio: taza con café, croissant, matcha verde, smoothie con pajita, latte con espuma, porción de tarta o tostada con aguacate. Aparece en la barra durante la preparación, acompaña al cliente y se coloca en su lado de la mesa durante el consumo; se retira al terminar. Las mesas vacías no mantienen cafés ni bollos decorativos. Las bebidas calientes tienen vapor, las clases con bandas muestran la goma y los servicios premium muestran ondas sonoras o aromáticas solo mientras se realizan. El modo Canvas también representa los productos y las nuevas actividades.
 
@@ -102,6 +112,8 @@ También puedes ejecutar directamente `node --test tests/*.test.cjs`, `node scri
 
 | Archivo | Responsabilidad |
 | --- | --- |
+| `sports.js` | Reservas, llegada, sesiones de fuerza y pádel, cobros y estadísticas deportivas |
+| `sports3d.mjs` | Box funcional, pista, accesorios y cerramientos de las ampliaciones deportivas |
 | `progression.js` | Capítulos, retos opcionales, requisitos, mezcla de demanda, validación y límites de premios |
 | `core.js` | Economía, pedidos, mejoras, clases, validación y offline; comprobable en Node |
 | `traffic.js` | Movimiento, separación entre visitantes, desvíos y reservas durante las salidas |

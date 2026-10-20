@@ -108,6 +108,7 @@
 </div>
 </div>
 <div class="card"><h3>🌿 Servicios del centro</h3><p class="service-intro">Los clientes llegan desde la calle. Cobra al terminar cada sesión.</p><div id="service-list"></div></div>
+<div class="card"><h3>🏋️ Deportes del centro</h3><p class="service-intro">Los grupos llegan desde la calle. Pádel requiere cuatro jugadores; el circuito acepta grupos pequeños.</p><div id="sports-list"></div></div>
 <p class="clock-legend"><span>🟡 Preparando</span><span>🟢 Disfrutando</span><span>🟣 Clase o tratamiento</span></p>
 <div class="card">
 <div class="progress-head">
@@ -148,6 +149,8 @@
 <button class="tab" data-filter="yoga">🌸 Yoga</button>
 <button class="tab" data-filter="team">👥 Equipo</button>
 <button class="tab" data-filter="zones">🏗️ Ampliaciones</button>
+<button class="tab" data-filter="crossfit">🏋️ Fuerza</button>
+<button class="tab" data-filter="padel">🎾 Pádel</button>
 <button class="tab" data-filter="wellness">🌿 Wellness</button>
 </div>
 <div class="card" id="shop-list">
@@ -237,7 +240,8 @@
 </p>
 <input type="file" id="import-file" accept="application/json" hidden>
 </div>
-<div class="footer-note">BLOOM & BREW TYCOON · VERSIÓN 1.10.0 · SIN ANUNCIOS NI COMPRAS</div>
+<div class="report"><div class="card"><small>Sesiones deportivas</small><strong id="sports-completed">0</strong></div><div class="card"><small>Participaciones deportivas</small><strong id="sports-attendance">0</strong></div></div>
+<div class="footer-note">BLOOM & BREW TYCOON · VERSIÓN 1.11.0 · SIN ANUNCIOS NI COMPRAS</div>
 </section>
 </main>
 <aside id="zone-panel" class="zone-panel" hidden aria-label="Mejorar zona del negocio">
@@ -262,6 +266,7 @@
 <script src="layout.js"></script>
 <script src="traffic.js"></script>
 <script src="progression.js"></script>
+<script src="sports.js"></script>
 <script src="clocks.js"></script>
 <script src="core.js">
 </script>

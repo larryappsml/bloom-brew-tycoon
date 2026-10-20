@@ -1,5 +1,16 @@
 # Historial
 
+## v1.11.0 — 20 octubre 2026
+
+- Dos ampliaciones físicas: box funcional aesthetic (+48 m²) y club de pádel (+80 m²). Superficie máxima de 312 m², con accesos desde el exterior.
+- Circuitos de hasta seis participantes y partidos de cuatro jugadores reales. Convocatoria, llegada, sesión y salida; sin ingresos por reservas incompletas.
+- Diez inversiones nuevas entre zonas, equipamiento, rack, espejos, taquillas, palas, focos y entrenadores. 55 mejoras en total, con filtros de Fuerza y Pádel.
+- Pesas durante ejercicios, palas articuladas y pelota animada durante partidos, círculos con iconos deportivos y cámaras por zona.
+- Vestimenta por destino: cafetería, pilates, yoga, tratamientos, funcional y pádel; conserva colores y recursos compartidos durante entrada y salida.
+- Salarios y materiales por asistente, tarifas y duración fijadas al comenzar, automatización, Hora punta y estimación offline deportiva.
+- Dos capítulos y un reto deportivo añadidos conservando los seis capítulos anteriores. Estadísticas deportivas persistentes y grupos transitorios validados.
+- Pruebas de aforo, grupos incompletos, cobros únicos, circulación, vestuario, geometrías compartidas, mejoras y menús abiertos.
+
 ## v1.10.0 — 20 octubre 2026
 
 - Seis capítulos encadenados con tareas combinadas, siguiente objetivo y recompensas únicas. El progreso anterior cuenta, sin reiniciar la partida.

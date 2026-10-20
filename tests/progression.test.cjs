@@ -5,8 +5,8 @@ const now=1800000000000;
 function advance(s,seconds,rng=()=>0){const events=[];for(let i=0;i<seconds*10;i++)events.push(...B.step(s,.1,now+i*100,rng));return events;}
 test('chapters recognise existing progress, require their tasks, and pay once in sequence',()=>{
   const s=B.fresh(now);assert.equal(B.claimChapter(s),0);s.served=5;s.levels.machine=1;assert.equal(B.chapterStatus(s).ready,true);assert.equal(B.claimChapter(s),35);assert.equal(s.money,55);assert.equal(B.chapterStatus(s).id,'team');assert.equal(B.claimChapter(s),0);
-  for(const u of B.UPGRADES)s.levels[u.id]=u.max;s.served=250;s.sessions=20;s.completedServices={pressotherapy:6,massage:6,yoga:4};let total=35;
-  while(!B.chapterStatus(s).complete)total+=B.claimChapter(s);assert.equal(total,1675);assert.equal(s.chapters.length,6);assert.equal(s.money,20+total);assert.equal(s.earned,0);assert.equal(B.claimChapter(s),0);
+  for(const u of B.UPGRADES)s.levels[u.id]=u.max;s.served=250;s.sessions=20;s.completedServices={pressotherapy:6,massage:6,yoga:4};s.sportSessions={crossfit:4,padel:3};let total=35;
+  while(!B.chapterStatus(s).complete)total+=B.claimChapter(s);assert.equal(total,3225);assert.equal(s.chapters.length,8);assert.equal(s.money,20+total);assert.equal(s.earned,0);assert.equal(B.claimChapter(s),0);
   const loaded=B.validate(JSON.parse(JSON.stringify(s)),now);assert.deepEqual(loaded.chapters,s.chapters);assert.equal(loaded.money,s.money);assert.equal(B.claimChapter(loaded),0);
 });
 test('legacy games acquire new progress safely and hostile chapter or campaign data is rejected',()=>{

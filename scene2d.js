@@ -25,11 +25,11 @@
       c.strokeStyle='#547d57';c.lineWidth=2;c.beginPath();c.moveTo(px,py-7*size);c.lineTo(px,py-24*size);c.stroke();
       this.ellipse(px-5*size,py-19*size,6*size,3*size,'#789f72');this.ellipse(px+5*size,py-24*size,6*size,3*size,'#527c59');
     }
-    person(x,y,kind,working=false,t=0) {
+    person(x,y,kind,working=false,t=0,role='cafe') {
       const [px,py]=this.point(x,y),c=this.ctx,bob=this.reduced?0:Math.sin(t*5+kind)*.7;
       this.ellipse(px,py,6,2.5,'#3d473723');
       c.strokeStyle='#5c594f';c.lineWidth=2.5;c.lineCap='round';c.beginPath();c.moveTo(px-2,py-6);c.lineTo(px-3,py);c.moveTo(px+2,py-6);c.lineTo(px+3,py);c.stroke();
-      c.fillStyle=working?'#527b61':['#c18c79','#8da0b0','#b1a178','#a79bb4'][kind%4];
+      c.fillStyle=role==='padel'?'#fff3db':role==='crossfit'?'#47624e':role==='wellness'?'#f4e9d4':role==='pilates'?'#b898b2':role==='yoga'?'#9dafa0':working?'#527b61':['#c18c79','#8da0b0','#b1a178','#a79bb4'][kind%4];
       c.beginPath();c.roundRect(px-5,py-17+bob,10,12,4);c.fill();
       this.ellipse(px,py-22+bob,4.5,5,colors[kind%4]);
       c.fillStyle='#524339';c.beginPath();c.arc(px,py-24+bob,4.5,Math.PI,Math.PI*2);c.fill();
@@ -48,6 +48,8 @@
       if(zones.wellness){this.box(7,0,3.4,7,5,'#d4e4da');for(const id of ['pressotherapy','massage'])for(let i=0;i<Math.min(2,l(id));i++){const x=7.35+i*1.45,y=id==='pressotherapy'?1:4.3;this.box(x,y,1,1.8,12,id==='pressotherapy'?'#92bfa8':'#d4aca0');this.tile(x+.1,y+.1,.8,.35,15,'#fff0d4');}}
       if(zones.yoga){this.box(0,-3.4,3.7,3.4,5,'#e5cab9');for(let i=0;i<Math.min(6,l('yoga')*2);i++)this.tile(.3+(i%3)*1.1,-2.9+Math.floor(i/3)*1.5,.7,1.1,7,'#c797a1');}
       if(zones.studio)this.box(3.7,-3.4,3.3,3.4,5,'#c7dfcf');
+      if(zones.crossfit){this.box(-3.3,-4.8,3.2,4.8,5,'#c6b89e');for(const spot of window.BloomLayout.sportSlots(s,'crossfit')){const q={x:(spot.x+7.35)/2.1,y:(spot.z+6.2)/1.77};this.tile(q.x-.25,q.y-.4,.5,.8,7,'#416658');}}
+      if(zones.padel){this.box(7,-5.8,3.8,5.8,5,'#72aaa1');this.box(7.15,-3,3.5,.04,19,'#f1e7c8');for(const x of [7.1,10.65])this.box(x,-5.5,.03,5.3,8,'#f6efdb');}
       this.ellipse(180,241,155,27,'#b09b7a20');
       // A continuous 2.5D floor and two back walls; no external image assets.
       this.box(0,0,7,7,5,'#d8bd97','#b99a76');
@@ -97,7 +99,9 @@
       const actors=window.BloomTraffic.agents(s).filter(a=>a.position).sort((a,b)=>(a.position.x+a.position.z)-(b.position.x+b.position.z));
       for(const agent of actors){const q=map(agent.position);let activity=null,kind=null;
         if(agent.type==='treatment'&&agent.stage==='active'&&agent.service!=='yoga') {const [px,py]=this.point(q.x,q.y,16);this.ellipse(px,py,4,4,colors[agent.kind]);c.fillStyle='#54765e';c.fillRect(px-3,py+3,6,12);if(agent.service==='pressotherapy'){c.fillStyle='#a1d4be';c.fillRect(px-6,py+12,5,10);c.fillRect(px+1,py+12,5,10);}}
-        else this.person(q.x,q.y,agent.kind,false,t);
+        else this.person(q.x,q.y,agent.kind,false,t,agent.sport||(agent.type==='pilates'?'pilates':agent.service==='yoga'?'yoga':agent.type==='treatment'?'wellness':'cafe'));
+        if(agent.type==='sport'&&agent.stage==='playing'){const g=s.sportsGroups[agent.sport];activity={remaining:g.remaining,duration:g.duration};kind=agent.sport;if(agent.sport==='padel')this.text('🎾',...this.point(q.x+.25,q.y,15),'#567c58',10);else{const [px,py]=this.point(q.x,q.y,12);c.fillStyle='#344c48';c.fillRect(px-8,py,16,3);}}
+
         if(agent.type==='cafe'&&agent.stage==='preparing'&&agent.remaining>0){activity=agent;kind='prepare';}
         if(agent.stage==='consuming'){activity=agent;kind='consume';}
         if(agent.type==='pilates'&&agent.stage==='exercising'){activity={remaining:s.classRemaining,duration:s.classDuration};kind='pilates';}

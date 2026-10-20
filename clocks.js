@@ -1,8 +1,8 @@
 (function(root){
   'use strict';
-  const colors={prepare:'#d29a36',consume:'#31846d',pilates:'#8970ba',pressotherapy:'#338caa',massage:'#ba7d81',yoga:'#739657'};
+  const colors={prepare:'#d29a36',consume:'#31846d',pilates:'#8970ba',pressotherapy:'#338caa',massage:'#ba7d81',yoga:'#739657',crossfit:'#bd7957',padel:'#4caa93'};
   const products={coffee:'☕',breakfast:'🥐',matcha:'🍵',smoothie:'🥤',latte:'🥛',cake:'🍰',toast:'🥑'};
-  const iconFor=(kind,product)=>products[product]||({pilates:'🧘',pressotherapy:'🦵',massage:'💆',yoga:'🪷'}[kind])||'☕';
+  const iconFor=(kind,product)=>products[product]||({pilates:'🧘',pressotherapy:'🦵',massage:'💆',yoga:'🪷',crossfit:'🏋️',padel:'🎾'}[kind])||'☕';
   function progress(remaining,duration){return Number.isFinite(remaining)&&Number.isFinite(duration)&&duration>0?Math.max(0,Math.min(1,1-remaining/duration)):0;}
   function drawClock(ctx,x,y,remaining,duration,kind,r=11,product=null){
     if(!Number.isFinite(remaining)||!Number.isFinite(duration)||duration<=0)return false;

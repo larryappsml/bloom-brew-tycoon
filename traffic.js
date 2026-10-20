@@ -1,7 +1,7 @@
 (function(root,factory){const api=factory(typeof module==='object'&&module.exports?require('./layout.js'):root.BloomLayout);if(typeof module==='object'&&module.exports)module.exports=api;else root.BloomTraffic=api;})(typeof globalThis==='undefined'?this:globalThis,function(Layout){
   'use strict';
   const GAP=.52,SPEED=3.2;
-  const agents=s=>[...(s.departing||[]),...(s.classGuests||[]),...(s.queue||[]),...(s.seated||[]),...(s.treatments||[])];
+  const agents=s=>[...(s.departing||[]),...Object.values(s.sportsGroups||{}).flatMap(g=>g?.guests||[]),...(s.classGuests||[]),...(s.queue||[]),...(s.seated||[]),...(s.treatments||[])];
   const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
   function create(s,target,type,rng=Math.random){const id=s.nextId++,others=agents(s);let position;
     for(let i=0;i<24;i++){const candidate={x:(id%2?1:-1)*(13+(i%12)*.7),z:9.25};if(others.every(a=>!a.position||distance(candidate,a.position)>=GAP)){position=candidate;break;}}
@@ -9,7 +9,7 @@
     return {id,type,kind:Math.max(0,Math.min(3,Math.floor(rng()*4))),position,previousPosition:{...position},path:Layout.entryRoute(target),destination:{...target},moving:true,stage:'arrival'};
   }
   function send(agent,path,target){agent.path=path;agent.detour=[];agent.navAge=0;agent.navDistance=Infinity;agent.destination={...target};agent.moving=path.length>0;}
-  function exit(agent){agent.stage='exiting';agent.exitOrigin={...agent.position};const path=Layout.exitRoute(agent.position,agent.id%2?1:-1);send(agent,path,path.at(-1));}
+  function exit(agent){agent.stage='exiting';agent.exitOrigin={...agent.position};const path=Layout.exitRoute({...agent.position,sport:agent.sport},agent.id%2?1:-1);send(agent,path,path.at(-1));}
   // A short local search lets visitors go around a stationary queue or a seated
   // guest instead of oscillating forever on the same side of the obstacle.
   function detour(agent,goal,list){const origin=agent.position,spacing=.3,limit=14,queue=[{x:0,z:0,parent:-1}],seen=new Set(['0,0']);let best=0,bestDistance=distance(origin,goal);

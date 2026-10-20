@@ -1,8 +1,8 @@
 (function (root, factory) {
-  const api = factory(typeof module==='object'&&module.exports?require('./layout.js'):root.BloomLayout,typeof module==='object'&&module.exports?require('./traffic.js'):root.BloomTraffic,typeof module==='object'&&module.exports?require('./progression.js'):root.BloomProgression);
+  const api = factory(typeof module==='object'&&module.exports?require('./layout.js'):root.BloomLayout,typeof module==='object'&&module.exports?require('./traffic.js'):root.BloomTraffic,typeof module==='object'&&module.exports?require('./progression.js'):root.BloomProgression,typeof module==='object'&&module.exports?require('./sports.js'):root.BloomSports);
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.Bloom = api;
-})(typeof globalThis === 'undefined' ? this : globalThis, function (Layout,Traffic,Progression) {
+})(typeof globalThis === 'undefined' ? this : globalThis, function (Layout,Traffic,Progression,Sports) {
   'use strict';
   const VERSION = 2;
   const KEY = 'bloom-brew-save-v2', LEGACY_KEY = 'bloom-brew-save-v1';
@@ -52,6 +52,16 @@
     ['pressurePump','Central de compresión','Bombas y tubos · sesiones más rápidas','🦵','wellness',980,3],
     ['massageStones','Piedras calientes','Calentador y bandejas para un masaje premium','🪨','wellness',1150,3],
     ['wellnessLinen','Textiles premium','Toallas y mantas de calidad para los tratamientos','🧺','wellness',540,3]
+    ,['crossfitWing','Box de entrenamiento aesthetic','Amplía el centro con una zona de fuerza de 48 m²','🏗️','zones',5200,1]
+    ,['functionalStations','Circuito funcional','Dos estaciones con pesas por nivel · hasta seis','🏋️','crossfit',1400,3]
+    ,['strengthRig','Rack y fuerza','Barras, discos y sesiones más rápidas y rentables','💪','crossfit',1100,3]
+    ,['gymAtmosphere','Ambiente del box','Espejos, luz cálida y taquillas premium','✨','crossfit',780,3]
+    ,['functionalCoach','Entrenador funcional','Organiza y dirige circuitos automáticamente','🧑‍🏫','team',1800,1]
+    ,['padelWing','Club de pádel','Añade una zona deportiva de 80 m²','🏗️','zones',9000,1]
+    ,['padelCourt','Pista de pádel','Pista con red y cuatro jugadores por partido','🎾','padel',2200,1]
+    ,['padelKit','Palas y entrenamiento','Material premium · partidos más ágiles','🏸','padel',950,3]
+    ,['courtLights','Iluminación de pista','Focos y acabados de un club premium','💡','padel',1400,2]
+    ,['padelCoach','Monitor de pádel','Organiza partidos de cuatro automáticamente','🧑‍🏫','team',2100,1]
   ].map(([id,name,desc,emoji,cat,base,max])=>({id,name,desc,emoji,cat,base,max}));
   const GOALS = [
     ['first','Tu primer turno','Sirve 10 pedidos',10,'served',45,'☕'],
@@ -74,7 +84,7 @@
   ];
   const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
   const level=(s,id)=>s.levels[id]||0;
-  const fresh=(now=Date.now())=>({...Progression.fresh(now),version:VERSION,money:20,earned:0,expenses:0,rewards:0,served:0,happy:0,lost:0,sessions:0,students:0,levels:{},claimed:[],last:now,seconds:0,reputation:75,tutorial:0,boostUntil:0,rushReady:0,classRemaining:0,classSeats:0,classPhase:'idle',classGuests:[],classBoardRemaining:0,classRecruitRemaining:0,classCooldown:0,departing:[],seatCursor:0,nextId:1,arrival:0.5,daily:{day:new Date(now).toISOString().slice(0,10),count:0,claimed:false},queue:[],seated:[],satellite:0,treatments:[],treatmentArrival:2,completedServices:{pressotherapy:0,massage:0,yoga:0},wellnessRevenue:0});
+  const fresh=(now=Date.now())=>({...Progression.fresh(now),...Sports.fresh(),version:VERSION,money:20,earned:0,expenses:0,rewards:0,served:0,happy:0,lost:0,sessions:0,students:0,levels:{},claimed:[],last:now,seconds:0,reputation:75,tutorial:0,boostUntil:0,rushReady:0,classRemaining:0,classSeats:0,classPhase:'idle',classGuests:[],classBoardRemaining:0,classRecruitRemaining:0,classCooldown:0,departing:[],seatCursor:0,nextId:1,arrival:0.5,daily:{day:new Date(now).toISOString().slice(0,10),count:0,claimed:false},queue:[],seated:[],satellite:0,treatments:[],treatmentArrival:2,completedServices:{pressotherapy:0,massage:0,yoga:0},wellnessRevenue:0});
   function validate(data, now=Date.now()) {
     if (!data || typeof data!=='object' || Array.isArray(data)) throw Error('Partida inválida');
     if (data.version!==undefined && data.version!==1 && data.version!==2) throw Error('Versión de partida incompatible');
@@ -101,6 +111,7 @@
     // Orders and ongoing classes are transient; restoring them must never mint money.
     if(migrating) { s.boostUntil=0; s.rushReady=0; }
     Progression.restore(data,s,now);
+    Sports.restore(data,s);
     return s;
   }
   function params(s) {
@@ -114,6 +125,12 @@
   }
   const price=(s,u)=>Math.ceil(u.base*Math.pow(1.65,level(s,u.id)));
   function requirement(s,u) {
+    if(u.id==='crossfitWing'&&s.sessions<6)return 'Completa 6 clases de pilates';
+    if(u.id==='padelWing'&&s.sessions<10)return 'Completa 10 clases de pilates';
+    if(u.id==='functionalStations'&&!Layout.zones(s).crossfit)return 'Construye el box de entrenamiento';
+    if(['strengthRig','gymAtmosphere','functionalCoach'].includes(u.id)&&!level(s,'functionalStations'))return 'Instala un circuito funcional';
+    if(u.id==='padelCourt'&&!Layout.zones(s).padel)return 'Construye el club de pádel';
+    if(['padelKit','courtLights','padelCoach'].includes(u.id)&&!level(s,'padelCourt'))return 'Instala la pista de pádel';
     if(['coach','reformer','classes','spa','wellnessWing','yogaWing'].includes(u.id)&&!level(s,'mat'))return 'Abre el estudio de pilates primero';
     if(['manager','second'].includes(u.id)&&s.sessions<10)return 'Completa 10 clases primero';
     if(u.id==='cafeWing'&&s.served<40)return 'Sirve 40 pedidos para ampliar';
@@ -213,6 +230,7 @@
       }
     }
     s.treatmentArrival-=dt;if(s.treatmentArrival<=0){for(const service of SERVICES)if(serviceConfig(s,service.id).automatic)startTreatment(s,service.id,rng);s.treatmentArrival=6;}
+    Sports.prepare(s,dt,rng);
     Traffic.advance(s,dt);
     s.departing=s.departing.filter(g=>g.path.length>0);
     for(const order of s.queue)if(order.stage==='arrival'&&!order.path.length)order.stage='waiting';
@@ -266,6 +284,7 @@
     }
     s.treatments=ongoing;
     if(p.branches) {const gross=p.branches*dt*3,cost=gross*.65;revenue(s,gross,cost);s.satellite+=gross-cost;}
+    Sports.update(s,activityDt,events,revenue);
     Progression.tick(s,dt,events,now);
     return events;
   }
@@ -276,7 +295,7 @@
     const expectedStudents=Math.min(p.capacity,22/classDemand(s)*.7);
     const cafe=Math.max(0,avg*orders),pilates=level(s,'mat')&&level(s,'coach')?expectedStudents*(p.classPrice-5-Math.min(2,level(s,'pilatesBands'))*.5)/(p.classTime+22+14+14+4):0;
     const wellness=SERVICES.reduce((sum,service)=>{const c=serviceConfig(s,service.id);return sum+(c.automatic?c.capacity*(c.price-c.cost-(service.id==='yoga'?2:4))/(c.duration+c.travel+6):0);},0);
-    return {cafe,pilates,wellness,total:cafe+pilates+wellness+p.branches*1.05};
+    const sports=Sports.estimate(s);return {cafe,pilates,wellness,sports,total:cafe+pilates+wellness+sports+p.branches*1.05};
   }
   function offline(s,now=Date.now()) {
     const duration=clamp((now-s.last)/1000,0,4*3600), net=estimate(s).total*duration*.35;
@@ -295,8 +314,8 @@
     daily(s,now);if(s.daily.claimed||s.daily.count<30)return 0;
     s.daily.claimed=true;s.money+=80;s.rewards+=80;return 80;
   }
-  const journeyMetrics=s=>({served:s.served,sessions:s.sessions,wellness:s.completedServices.pressotherapy+s.completedServices.massage,yoga:s.completedServices.yoga,menu:menu(s).length,area:Layout.footprint(s).area});
+  const journeyMetrics=s=>({served:s.served,sessions:s.sessions,wellness:s.completedServices.pressotherapy+s.completedServices.massage,yoga:s.completedServices.yoga,menu:menu(s).length,crossfit:s.sportSessions.crossfit,padel:s.sportSessions.padel,area:Layout.footprint(s).area});
   const chapterStatus=s=>Progression.status(s,journeyMetrics(s));
   const claimChapter=s=>Progression.claimChapter(s,journeyMetrics(s));
-  return {CHAPTERS:Progression.CHAPTERS,CAMPAIGNS:Progression.CAMPAIGNS,chapterStatus,claimChapter,campaignStatus:Progression.campaignStatus,campaignRequirement:Progression.requirement,startCampaign:Progression.startCampaign,claimCampaign:Progression.claimCampaign,cancelCampaign:Progression.cancelCampaign,VERSION,KEY,LEGACY_KEY,UPGRADES,GOALS,PRODUCTS,SERVICES,fresh,validate,params,level,price,requirement,unlocked,purchase,menu,spawn,startOrder,orderDuration,orderPrice,consumptionTime,startClass,startTreatment,serviceConfig,serviceOccupancy,rush,step,estimate,offline,value,claim,claimDaily};
+  return {SPORTS:Sports.SPORTS,sportConfig:Sports.config,startSport:Sports.start,CHAPTERS:Progression.CHAPTERS,CAMPAIGNS:Progression.CAMPAIGNS,chapterStatus,claimChapter,campaignStatus:Progression.campaignStatus,campaignRequirement:Progression.requirement,startCampaign:Progression.startCampaign,claimCampaign:Progression.claimCampaign,cancelCampaign:Progression.cancelCampaign,VERSION,KEY,LEGACY_KEY,UPGRADES,GOALS,PRODUCTS,SERVICES,fresh,validate,params,level,price,requirement,unlocked,purchase,menu,spawn,startOrder,orderDuration,orderPrice,consumptionTime,startClass,startTreatment,serviceConfig,serviceOccupancy,rush,step,estimate,offline,value,claim,claimDaily};
 });
