@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const B=window.Bloom,$=id=>document.getElementById(id),fmt=n=>new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:n>=100?0:2}).format(n);
-  let s=B.fresh(),filter='all',toastTimer,dirty=true,loadWarning='',readOnly=false;
+  let s=B.fresh(),filter='all',toastTimer,dirty=true,loadWarning='',readOnly=false,selectedZone=null,venueScene;
   function toast(text){$('toast').textContent=text;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3200);}
   try {
     const current=localStorage.getItem(B.KEY),legacy=localStorage.getItem(B.LEGACY_KEY),raw=current||legacy;
@@ -37,7 +37,20 @@
       const done=s.claimed.includes(g.id),v=B.value(s,g),ready=v>=g.target;
       return `<div class="card mission"><div class="mission-ico">${g.emoji}</div><div class="mission-content"><h3>${g.title}</h3><p>${g.desc} · ${Math.min(Math.floor(v),g.target)}/${g.target}</p><p class="highlight">Premio ${fmt(g.reward)}</p></div><button class="claim" data-claim="${g.id}" ${!ready||done?'disabled':''}>${done?'✓':ready?'Cobrar':'🔒'}</button></div>`;
     }).join('');dirty=false;
+    renderZone();
   }
+  function renderZone(){
+    const u=B.UPGRADES.find(u=>u.id===selectedZone);if(!u)return;
+    const cost=B.price(s,u),max=B.level(s,u.id)>=u.max,reason=lockedReason(u);
+    $('zone-title').textContent=u.name;$('zone-level').textContent='NIVEL '+B.level(s,u.id);
+    $('zone-description').textContent=reason||benefit(u);
+    $('zone-buy').disabled=!!reason||max||s.money<cost;$('zone-buy').textContent=max?'✓ Nivel máximo':reason?'Zona bloqueada':`Mejorar · ${fmt(cost)}`;
+  }
+  function selectZone(id){
+    if(!B.UPGRADES.some(u=>u.id===id))return;
+    selectedZone=id;$('zone-panel').hidden=false;$('app').classList.add('zone-open');venueScene?.select(id);renderZone();
+  }
+  function closeZone(){selectedZone=null;$('zone-panel').hidden=true;$('app').classList.remove('zone-open');}
   function render() {
     const p=B.params(s),estimate=B.estimate(s),serving=s.queue.find(o=>o.remaining!==null&&!o.worker),waiting=s.queue.find(o=>o.remaining===null),pilates=B.level(s,'mat')>0,boost=Date.now()<s.boostUntil;
     $('money').textContent=fmt(s.money);$('income').textContent=fmt(estimate.total);$('rep').textContent='⭐ '+(s.reputation/20).toFixed(1);
@@ -74,7 +87,7 @@
     $('tutorial').hidden=s.tutorial>=4;if(s.tutorial<4){$('tutorial-title').textContent=tutorial[s.tutorial][0];$('tutorial-copy').textContent=tutorial[s.tutorial][1];$('tutorial-next').textContent=s.tutorial===3?'¡A jugar!':'Siguiente';}
     if(dirty)renderLists();
   }
-  function nav(view){document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===view));document.querySelectorAll('.nav-btn').forEach(x=>{x.classList.toggle('active',x.dataset.view===view);x.setAttribute('aria-current',x.dataset.view===view?'page':'false');});window.scrollTo(0,0);dirty=true;render();}
+  function nav(view){closeZone();document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===view));document.querySelectorAll('.nav-btn').forEach(x=>{x.classList.toggle('active',x.dataset.view===view);x.setAttribute('aria-current',x.dataset.view===view?'page':'false');});window.scrollTo(0,0);dirty=true;render();}
   document.querySelectorAll('.nav-btn').forEach(x=>x.onclick=()=>nav(x.dataset.view));$('all-upgrades').onclick=()=>nav('shop');
   document.querySelectorAll('#filter-tabs button').forEach(x=>x.onclick=()=>{filter=x.dataset.filter;document.querySelectorAll('#filter-tabs button').forEach(y=>y.classList.toggle('active',x===y));dirty=true;render();});
   document.addEventListener('click',e=>{
@@ -127,7 +140,12 @@
   });
   window.addEventListener('pagehide',save);
   window.addEventListener('pageshow',e=>{if(e.persisted){tick=performance.now();const result=B.offline(s);if(result.net>0)toast('Bienvenido de nuevo · +'+fmt(result.net));save();render();}});
-  render();new window.VenueScene($('scene'),()=>s);
+  $('zone-close').onclick=closeZone;
+  $('zone-buy').onclick=()=>{if(B.purchase(s,selectedZone)){toast('¡Tu negocio sube de nivel!');save();dirty=true;render();}};
+  $('zoom-in').onclick=()=>venueScene?.changeZoom(.15);$('zoom-out').onclick=()=>venueScene?.changeZoom(-.15);
+  document.querySelectorAll('[data-camera]').forEach(button=>button.onclick=()=>{closeZone();venueScene?.focus(button.dataset.camera);document.querySelectorAll('[data-camera]').forEach(other=>other.classList.toggle('active',other===button));});
+  $('cafe-zone').onclick=()=>selectZone('machine');$('studio-zone').onclick=()=>selectZone('mat');
+  render();venueScene=new window.VenueScene($('scene'),()=>s,selectZone);
   if(loadWarning)setTimeout(()=>toast(loadWarning),500);else if(offline.net>0)setTimeout(()=>toast('Mientras descansabas · +'+fmt(offline.net)+' netos (máx. 4 h)'),600);
   save();
   if('serviceWorker' in navigator&&!['localhost','127.0.0.1'].includes(location.hostname))navigator.serviceWorker.register('./sw.js').catch(()=>{$('save-status').textContent+=' · Sin conexión no disponible en este navegador';});

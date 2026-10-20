@@ -18,7 +18,7 @@
 <header class="top">
 <div class="header-row">
 <div>
-<div class="eyebrow">TU PEQUEÑO IMPERIO WELLNESS</div>
+<div class="eyebrow">CAFÉ · PILATES · GOOD VIBES</div>
 <div class="logo">bloom <span style="color:#bb9065">&</span> brew<span style="font-size:13px"> ✿</span>
 </div>
 <div class="sub" id="subtitle">Un café, mil posibilidades</div>
@@ -42,22 +42,21 @@
 </header>
 <main class="main">
 <section id="home" class="view active">
-<div class="tutorial" id="tutorial">
-<div>
-<b id="tutorial-title">
-</b>
-<p id="tutorial-copy">
-</p>
-</div>
-<button id="tutorial-next">Siguiente</button>
+<div class="map-tabs" role="group" aria-label="Vista del local">
+<button data-camera="all" class="active">Tu negocio</button>
+<button data-camera="cafe">Cafetería</button>
+<button data-camera="pilates">Pilates</button>
 </div>
 <div class="section-head">
-<h2>Tu pequeño rincón 🌿</h2>
+<h2>Un pequeño gran imperio</h2>
 <span class="pill" id="level">NIVEL 1</span>
 </div>
 <div class="venue" id="venue">
-<canvas id="scene" width="720" height="620" role="img" aria-label="Vista isométrica animada de tu cafetería, clientes y estudio de pilates">
+<div class="map-badge"><span class="live-dot"></span> BLOOM VILLAGE</div>
+<div class="map-controls"><button id="zoom-in" aria-label="Acercar local">+</button><button id="zoom-out" aria-label="Alejar local">−</button></div>
+<canvas id="scene" width="720" height="800" role="img" aria-label="Local 3D interactivo: toca la barra, mesas o estudio para mejorar la zona">
 </canvas>
+<div class="map-zones"><button id="cafe-zone">☕ Mejorar café <span>↗</span></button><button id="studio-zone">🧘 Tu estudio <span>↗</span></button></div>
 <div class="venue-foot">
 <span>
 <i class="live-dot">
@@ -83,6 +82,15 @@
 </button>
 <button class="side-action" id="rush">⚡<small>Impulso</small>
 </button>
+</div>
+<div class="tutorial" id="tutorial">
+<div>
+<b id="tutorial-title">
+</b>
+<p id="tutorial-copy">
+</p>
+</div>
+<button id="tutorial-next">Siguiente</button>
 </div>
 <div class="card studio">
 <div class="section-head">
@@ -218,9 +226,13 @@
 </p>
 <input type="file" id="import-file" accept="application/json" hidden>
 </div>
-<div class="footer-note">BLOOM & BREW TYCOON · VERSIÓN 1.1.0 · SIN ANUNCIOS NI COMPRAS</div>
+<div class="footer-note">BLOOM & BREW TYCOON · VERSIÓN 1.2.0 · SIN ANUNCIOS NI COMPRAS</div>
 </section>
 </main>
+<aside id="zone-panel" class="zone-panel" hidden aria-label="Mejorar zona del negocio">
+<div class="zone-handle"></div><div class="section-head"><span class="pill" id="zone-level">NIVEL 0</span><button id="zone-close" class="round" aria-label="Cerrar mejora de zona">×</button></div>
+<h2 id="zone-title">Tu negocio</h2><p id="zone-description"></p><button class="zone-buy" id="zone-buy">Mejorar</button>
+</aside>
 <nav class="nav">
 <button data-view="home" class="nav-btn active">
 <span>🏡</span>Local</button>

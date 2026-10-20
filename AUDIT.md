@@ -27,3 +27,9 @@ Se conserva JavaScript sin librerías en producción. `core.js` separa la simula
 Se conservan los trece tipos de inversión, el dinero, los niveles comprados y los premios reclamados de v1. La producción cambia de incremental ilimitado a servicios con capacidad y costes. Las inversiones antiguas por encima de los nuevos máximos se conservan en el guardado; su efecto se limita al máximo actual. Las cifras antiguas estimadas de clientes/clases no se inventan como servicios completados.
 
 La expansión en esta iteración es económica: sedes satélite con margen limitado. No existe todavía un segundo mapa editable. Los perfiles de cliente son visuales; preferencias, formación especializada, decoración libre y prestigio quedan para iteraciones futuras.
+
+## Evolución visual v1.2
+
+Se incorpora Three.js 0.180.0 como renderizador local para responder a la dirección visual de tycoon 3D solicitada. La librería y su licencia se guardan en `vendor/`; solo se adapta la referencia relativa del módulo a la extensión `.mjs`. No se utilizan modelos, texturas ni personajes de otros videojuegos. Las mallas, materiales, composición y animaciones son propios.
+
+La simulación y el esquema de guardado no cambian. El renderizador consume el estado y comunica selecciones de zonas a la interfaz. Si falla la carga de WebGL o su módulo, se crea un lienzo nuevo y se carga la alternativa 2D, sin interrumpir el ciclo económico. La caché incluye ambos renderizadores y los módulos locales. El servidor de desarrollo y Pages deben servir `.mjs` como JavaScript.
