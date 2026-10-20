@@ -41,6 +41,11 @@ export function dressWorld(root,state,kit){
   if(level('cafeLounge')){const g=feature('cafeLounge',-10.7,5.05),n=level('cafeLounge');box(g,0,.28,0,2.8,.12,1.25,0xdfc6a2);box(g,0,.55,0,2.6,.45,.95,P.rose);box(g,0,.96,-.42,2.6,.7,.18,0xd78f85);for(const x of [-1.25,1.25])box(g,x,.78,0,.2,.5,1.1,0xd78f85);
     for(let i=0;i<n;i++){box(g,-.8+i*.8,.88,-.15,.48,.22,.45,[P.mint,P.gold,P.cream][i]);const book=box(g,-1.1+i*.55,.24,.9,.3,.06,.42,[P.sage,P.rose,P.dark][i]);book.rotation.y=.2*i;}const shelfUnit=shelf(g,2,-.2,.65);for(let i=0;i<n*2;i++)box(shelfUnit,-.2+i%3*.17,.6+Math.floor(i/3)*.7,0,.1,.42,.28,[P.rose,P.gold,P.sage][i%3]);
   }
+  if(level('tableService')){const g=feature('tableService',-6.75,3.85),n=level('tableService');box(g,0,.45,0,.58,.8,.7,P.oak);box(g,0,.91,0,.65,.08,.76,P.cream);
+    for(const x of [-.22,.22])for(const z of [-.25,.25])cylinder(g,x,.12,z,.06,.12,P.dark,8);
+    for(let i=0;i<n;i++){const z=-.22+i*.22;for(let j=0;j<3;j++)cylinder(g,0,.98+j*.035,z,.16,.025,P.white);box(g,.19,1.01,z,.09,.16,.13,[P.sage,P.rose,P.gold][i]);}
+    if(n>1)towel(g,0,.55,0,P.mint);if(n>2)bottle(g,0,1.08,-.23,P.sage);
+  }
   // Pilates: wall mirror, towel station, articulated reformer details and equipment.
   if(levels.mat){const g=group(root,0,0,0,'mat');g.name='detail:pilates';features.push('detail:pilates');
     const rear=zones.studio?-12.38:-5.6;

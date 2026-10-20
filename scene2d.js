@@ -71,6 +71,7 @@
       if(l('matcha')){this.box(3.45,.55,.4,.5,18,'#a2b49a','#6b8970');this.text('🍵',...this.point(3.65,.8,22),'#668660',10);}
       if(l('brewBar'))for(let i=0;i<Math.min(3,l('brewBar'));i++)this.box(.5+i*.42,.35,.3,.25,23,'#f6e8cf','#a28b5d');
       if(l('bakeryOven')){this.box(3.2,.15,.7,.7,27,'#627a6d','#435b54');for(let i=0;i<Math.min(3,l('bakeryOven'));i++)this.text('—',...this.point(3.6,.8,9+i*6),'#e4b570',9);}
+      if(l('tableService')){this.box(.15,5.4,.35,.5,17,'#d6b68b','#8b7254');for(let i=0;i<Math.min(3,l('tableService'));i++)this.box(.18,5.43+i*.12,.27,.09,20,'#fff5df','#d6cbb5');}
       if(l('cafeLounge'))this.box(-2.5,5.8,2,.6,15,'#d8a098','#b57e6f');
       this.plant(.35,.4,1.2);this.plant(.3,6.3,1.3);
       const map=p=>({x:(p.x+7.35)/2.1,y:(p.z+6.2)/1.77});

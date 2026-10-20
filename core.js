@@ -36,6 +36,7 @@
     ['brewBar','Barra de filtrados','Drippers y jarras · café más rápido y de mayor valor','🫖','cafe',480,3],
     ['bakeryOven','Horno de obrador','Horno y bandejas · desayunos más rápidos y rentables','🥖','cafe',640,3],
     ['cafeLounge','Rincón de lectura','Librería y sillones · mejora la calidad de la carta','📚','cafe',720,3],
+    ['tableService','Servicio de mesas','Consumos más ágiles y sillas libres antes · hasta −30 %','🍽️','cafe',180,3],
     ['pilatesKit','Accesorios de fuerza','Pesas, pelotas y aros para cada sesión','🏋️','pilates',450,3],
     ['studioMirror','Espejos y barras','Amplía los espejos y reduce el tiempo de clase','🪞','pilates',680,3],
     ['studioAudio','Ambiente del estudio','Altavoces e iluminación para clases premium','🎵','pilates',890,3],
@@ -114,6 +115,7 @@
     if(u.id==='brewBar'&&!level(s,'machine'))return 'Mejora la cafetera primero';
     if(u.id==='bakeryOven'&&!level(s,'pastries'))return 'Instala una vitrina de repostería';
     if(u.id==='cafeLounge'&&!Layout.zones(s).cafe)return 'Amplía la cafetería primero';
+    if(u.id==='tableService'&&!level(s,'barista'))return 'Contrata un barista primero';
     if(['pilatesKit','studioMirror','studioAudio'].includes(u.id)&&!level(s,'mat'))return 'Abre el estudio de pilates primero';
     if(['yogaBolsters','yogaTea'].includes(u.id)&&!level(s,'yoga'))return 'Instala esterillas de yoga primero';
     if(u.id==='zenGarden'&&!Layout.zones(s).yoga)return 'Construye la sala de yoga primero';
@@ -170,7 +172,7 @@
   }
   function classDemand(s){return Math.max(1,4.8-Math.min(4,level(s,'mat'))*.35-Math.min(4,level(s,'reformer'))*.25-Math.min(3,level(s,'studioAudio'))*.2-Math.min(2,level(s,'spa'))*.1-s.reputation/150);}
   function beginClass(s){s.classPhase='active';s.classSeats=s.classGuests.length;s.classDuration=params(s).classTime;s.classRemaining=s.classDuration;s.classAuto=!!level(s,'coach');s.classGuests.forEach(g=>g.stage='exercising');}
-  function consumptionTime(id,kind=0){return ({coffee:26,breakfast:38,matcha:30,smoothie:32}[id]||26)+kind*2;}
+  function consumptionTime(id,kind=0,s=null){const base=({coffee:26,breakfast:38,matcha:30,smoothie:32}[id]||26)+kind*2;return base*(1-.1*Math.min(3,s?level(s,'tableService'):0));}
   function freeSeat(s){
     const seats=Layout.cafeSeats(s),busy=new Set([...s.seated.map(g=>g.seat.key),...s.departing.map(g=>g.reservedSeat).filter(Boolean)]),available=seats.filter(p=>!busy.has(p.key));
     const tables=Layout.tables(s).length,load=table=>seats.filter(p=>p.table===table&&busy.has(p.key)).length;
@@ -218,7 +220,7 @@
         const product=PRODUCTS.find(x=>x.id===o.product),gross=orderPrice(s,o.product);
         const cost=(product.cost+(o.worker?.65:0))*(1-p.manager*.08);
         revenue(s,gross,cost);s.served++;s.happy++;s.daily.count++;s.reputation=clamp(s.reputation+.5,20,100);
-        const duration=consumptionTime(o.product,o.kind);o.stage='walkingToSeat';o.seat=seat;o.remaining=duration;o.duration=duration;Traffic.send(o,Layout.insideRoute(seat),seat);s.seated.push(o);
+        const duration=consumptionTime(o.product,o.kind,s);o.stage='walkingToSeat';o.seat=seat;o.remaining=duration;o.duration=duration;Traffic.send(o,Layout.insideRoute(seat),seat);s.seated.push(o);
         events.push({type:'sale',net:gross-cost,product:product.name});
       } else if(o.remaining===null&&o.wait>o.patience){s.lost++;s.reputation=clamp(s.reputation-1.5,20,100);Traffic.exit(o);s.departing.push(o);events.push({type:'lost'});}
       else pending.push(o);
@@ -253,7 +255,8 @@
   }
   function estimate(s) {
     const p=params(s), products=menu(s),avg=products.reduce((a,x)=>a+orderPrice(s,x.id)-x.cost-.65,0)/products.length;
-    const orders=p.baristas?Math.min(1/p.arrival,p.baristas*p.speed/4.5,p.seats/38):0;
+    const occupancyTime=products.reduce((sum,x)=>sum+consumptionTime(x.id,1.5,s),0)/products.length+9;
+    const orders=p.baristas?Math.min(1/p.arrival,p.baristas*p.speed/4.5,p.seats/occupancyTime):0;
     const expectedStudents=Math.min(p.capacity,22/classDemand(s)*.7);
     const cafe=Math.max(0,avg*orders),pilates=level(s,'mat')&&level(s,'coach')?expectedStudents*(p.classPrice-5)/(p.classTime+22+14+14+4):0;
     const wellness=SERVICES.reduce((sum,service)=>{const c=serviceConfig(s,service.id);return sum+(c.automatic?c.capacity*(c.price-c.cost-(service.id==='yoga'?2:4))/(c.duration+c.travel+6):0);},0);

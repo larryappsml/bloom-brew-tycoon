@@ -1,8 +1,12 @@
 # Bloom & Brew Tycoon 🌿☕🧘
 
-**v1.6.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
+**v1.7.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
 
 **[Jugar](https://larryappsml.github.io/bloom-brew-tycoon/)**
+
+La v1.7 añade **Servicio de mesas** en **Mejoras → Cafetería**, disponible tras contratar un barista. Sus tres niveles cuestan 180 €, 297 € y 491 € y reducen el tiempo de consumo un 10 %, 20 % y 30 % en total, para café, desayunos, matcha y smoothies. Un café base pasa de 26 a 18,2 segundos al máximo; un desayuno, de 38 a 26,6 segundos. La variación entre tipos de cliente también recibe la misma reducción.
+
+Cada nivel añade vajilla y accesorios a un carrito visible de servicio. Las compras afectan a los próximos pedidos, conservan los relojes ya iniciados y no alteran el precio ni cobran dos veces. La estimación offline tiene en cuenta el nuevo tiempo de ocupación, respetando los límites de demanda, personal y plazas. Las partidas anteriores mantienen su progreso y empiezan con esta mejora a nivel cero.
 
 La v1.6 corrige el recorrido y el uso real de las plazas. Cada visitante del café reserva una silla concreta, camina hasta ella, consume y sale a la calle. Las mesas del salón y la terraza comparten ese mismo aforo. La cola tiene seis posiciones distintas y, si todas las sillas están ocupadas, un pedido preparado espera una plaza libre. Las sillas y camillas no se reasignan hasta que su ocupante se ha apartado.
 
@@ -21,7 +25,7 @@ Los mini relojes sobre cada cliente muestran únicamente un círculo que se llen
 | Yoga | Cojines y mantas, jardín zen con bambú y rincón de infusiones |
 | Wellness | Central de compresión, piedras calientes y textiles premium |
 
-Estas mejoras tienen dos o tres niveles, requisitos de sala y el multiplicador de coste 1,65. Mejoran tiempos o márgenes con límites; piedras calientes e infusiones también añaden costes de materiales. El catálogo completo tiene 38 mejoras, con filtro propio para Yoga.
+Estas mejoras tienen dos o tres niveles, requisitos de sala y el multiplicador de coste 1,65. Mejoran tiempos o márgenes con límites; piedras calientes e infusiones también añaden costes de materiales. El catálogo completo tiene 39 mejoras, con filtro propio para Yoga.
 
 ## Cómo jugar
 

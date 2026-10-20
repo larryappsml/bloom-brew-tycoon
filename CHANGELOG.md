@@ -1,5 +1,13 @@
 # Historial
 
+## v1.7.0 — 20 octubre 2026
+
+- Servicio de mesas: tres niveles de 180/297/491 €, disponibles con un barista, para reducir el consumo de todos los productos de cafetería un 10/20/30 %.
+- Carrito de servicio visible y seleccionable con más vajilla y accesorios por nivel, también representado en Canvas. Catálogo de 39 mejoras.
+- La reducción afecta a próximos pedidos, respeta los relojes en curso y libera las sillas mediante el ciclo normal de salida. Sin cambios en tarifas, preparación ni cobros.
+- Estimación offline limitada por el tiempo real de ocupación, demanda y personal. Partidas v2 compatibles.
+- Pruebas de compras y límites, salida más rápida, contabilidad, relojes en curso, guardado, estimación y modelo por niveles.
+
 ## v1.6.0 — 20 octubre 2026
 
 - Sillas individuales con reserva exclusiva, reparto entre mesas, salón y terraza, consumo al sentarse y salida física a la calle. Barra con taburete para completar el aforo inicial.
