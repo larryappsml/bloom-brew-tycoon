@@ -4,7 +4,7 @@ const fs=require('node:fs');
 const vm=require('node:vm');
 const B=require('../core.js');
 function boot(initial={}) {
-  const store=new Map(Object.entries(initial)),elements=new Map(),events={},timers=[];
+  const store=new Map(Object.entries(initial)),elements=new Map(),events={},timers=[];let now=0;
   const make=()=>{const classes=new Set();return {style:{},dataset:{},textContent:'',innerHTML:'',classList:{add:n=>classes.add(n),remove:n=>classes.delete(n),contains:n=>classes.has(n),toggle(n,force){const on=force===undefined?!classes.has(n):force;if(on)classes.add(n);else classes.delete(n);}},append(){},remove(){},click(){},setAttribute(){},value:''};};
   const html=fs.readFileSync('index.html','utf8');
   for(const id of html.matchAll(/id="([^"]+)"/g)){const element=make();element.id=id[1];elements.set(id[1],element);}
@@ -12,9 +12,9 @@ function boot(initial={}) {
   const navButtons=views.map(view=>{const button=make();button.dataset.view=view.id;return button;});
   const filters=['all','cafe','pilates','team'].map(filter=>{const button=make();button.dataset.filter=filter;return button;});
   const document={getElementById(id){assert.ok(elements.has(id),'Missing UI element: '+id);return elements.get(id);},querySelectorAll(selector){return selector==='.view'?views:selector==='.nav-btn'?navButtons:selector==='#filter-tabs button'?filters:[];},createElement:make,addEventListener(name,fn){events[name]=fn;},hidden:false};
-  const ctx={window:{Bloom:B,VenueScene:function(){},addEventListener(){},scrollTo(){}},document,localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},Date,Intl,console,URL,Blob,performance:{now:()=>0},setInterval(fn,ms){timers.push({fn,ms});},setTimeout(){},clearTimeout(){},navigator:{},location:{hostname:'127.0.0.1'},confirm:()=>true};
+  const ctx={window:{Bloom:B,VenueScene:function(){},addEventListener(){},scrollTo(){}},document,localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},Date,Intl,console,URL,Blob,performance:{now:()=>now},setInterval(fn,ms){timers.push({fn,ms});},setTimeout(){},clearTimeout(){},navigator:{},location:{hostname:'127.0.0.1'},confirm:()=>true};
   vm.runInNewContext(fs.readFileSync('game.js','utf8'),ctx);
-  return {store,elements,events,timers,document,navButtons};
+  return {store,elements,events,timers,document,navButtons,advance(seconds){for(let i=0;i<seconds*10;i++){now+=100;timers.find(t=>t.ms===100).fn();}timers.find(t=>t.ms===5000).fn();}};
 }
 test('all interface IDs exist and a fresh game renders and saves',()=>{
   const {store,elements}=boot();assert.equal(JSON.parse(store.get(B.KEY)).version,2);assert.ok(elements.get('money').textContent.includes('20'));assert.equal(elements.get('serve').disabled,true);
@@ -58,4 +58,20 @@ test('floating staff menu filters hiring and Escape returns to the map',()=>{
   assert.equal(elements.get('shop-title').textContent,'Tu equipo');
   assert.ok(!elements.get('shop-list').innerHTML.includes('Cafetera de especialidad'));
   events.keydown({key:'Escape'});assert.equal(elements.get('app').classList.contains('menu-open'),false);
+});
+test('sales and pilates continue while every management menu stays open',()=>{
+  const s=B.fresh();s.levels={barista:1,mat:1,coach:1};s.money=1000;s.last=Date.now();
+  const ui=boot({[B.KEY]:JSON.stringify(s)});
+  for(const view of ['shop','operations','goals','reports']){
+    ui.navButtons.find(b=>b.dataset.view===view).onclick();
+    const before=JSON.parse(ui.store.get(B.KEY));ui.advance(100);
+    const after=JSON.parse(ui.store.get(B.KEY));
+    assert.ok(after.served>before.served,view+' delivers orders');
+    assert.ok(after.sessions>before.sessions,view+' completes classes');
+    assert.ok(after.money>before.money,view+' earns income');
+    assert.equal(ui.elements.get(view).classList.contains('active'),true);
+  }
+  ui.elements.get('staff-menu').onclick();const before=JSON.parse(ui.store.get(B.KEY));ui.advance(100);
+  assert.ok(JSON.parse(ui.store.get(B.KEY)).served>before.served);
+  assert.equal(ui.elements.get('shop-title').textContent,'Tu equipo');
 });

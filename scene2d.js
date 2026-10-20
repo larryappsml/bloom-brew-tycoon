@@ -106,7 +106,7 @@
     }
     frame(now) {
       requestAnimationFrame(this.frame);
-      if(document.hidden||!this.canvas.closest('.view.active')||this.canvas.closest('.menu-open')){this.last=now;return;}
+      if(document.hidden||!this.canvas.closest('.view.active')){this.last=now;return;}
       if(now-this.last<(this.reduced?200:33))return;
       const dt=Math.min(.1,(now-this.last)/1000||.033);this.last=now;this.time+=dt;
       this.draw(this.getState(),this.time,dt);

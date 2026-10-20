@@ -1,5 +1,10 @@
 # Historial
 
+## v1.3.1 — 20 octubre 2026
+
+- Los clientes, el personal y las animaciones siguen activos detrás de todos los menús, tanto en 3D como en el modo Canvas.
+- Pruebas de regresión: ventas, clases e ingresos continúan con cada panel abierto; al ocultar la aplicación se conserva la pausa y recuperación offline.
+
 ## v1.3.0 — 20 octubre 2026
 
 - El mapa 3D ocupa todo el viewport, sin cabecera de marca, tarjetas ni barra de navegación permanente.

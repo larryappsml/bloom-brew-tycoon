@@ -1,6 +1,6 @@
 # Bloom & Brew Tycoon 🌿☕🧘
 
-**v1.3.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
+**v1.3.1** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
 
 **[Jugar](https://larryappsml.github.io/bloom-brew-tycoon/)**
 
@@ -10,7 +10,7 @@ Empiezas con 20 €, una barra y una mesa. Los clientes entran, piden y esperan.
 
 Mejora la cafetera, añade desayunos y matcha, compra mesas y contrata baristas para automatizar la atención. El dinero mostrado por venta es el beneficio después de ingredientes y salarios por servicio. No hay ingresos infinitos por tocar ni gastos que lleven el saldo a negativo por inactividad.
 
-El mapa ocupa toda la pantalla: arrastra para moverte, pellizca para acercar o usa +/−. El botón ⌖ centra todo el negocio. Los accesos flotantes abren Turno (pedidos, clases y tutorial), Equipo (contratación), Mejoras, Objetivos y Negocio (estadísticas y partidas). Cierra cualquier panel con × para volver al mapa. En escritorio también puedes usar la rueda para hacer zoom y Escape para cerrar menús.
+El mapa ocupa toda la pantalla: arrastra para moverte, pellizca para acercar o usa +/−. El botón ⌖ centra todo el negocio. Los accesos flotantes abren Turno (pedidos, clases y tutorial), Equipo (contratación), Mejoras, Objetivos y Negocio (estadísticas y partidas). El juego sigue funcionando detrás de los menús: clientes, animaciones, pedidos y clases continúan mientras gestionas el negocio. Cierra cualquier panel con × para volver al mapa. En escritorio también puedes usar la rueda para hacer zoom y Escape para cerrar menús.
 
 El estudio cuesta 850 €. Puedes iniciar clases sin instructora; contratarla permite automatizarlas. Añade esterillas, reformers y salas de grupo. Tras completar diez clases, se desbloquean el gerente y la expansión a sedes satélite. Estas sedes producen un margen fijo limitado; aún no tienen mapa propio.
 
