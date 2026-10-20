@@ -5,7 +5,7 @@
 - Modelos con bordes suaves y madera con veta procedural. Suelos con juntas, marcos, molduras, apliques, pizarra, libros, estantes, toallas, accesorios y mobiliario de calle.
 - Más detalle en cafetería, pilates, yoga y wellness: reformers con raíles, espejos, accesorios de ejercicio, cojines, infusiones, tubos de compresión y carros de tratamiento.
 - Doce mejoras nuevas con cambios físicos por nivel, efectos económicos y requisitos. Catálogo de 38 inversiones y filtro de Yoga.
-- Relojes circulares con segundos sobre preparación, consumo, alumnos y tratamientos activos, incluidos en el renderizador Canvas.
+- Relojes circulares sin números ni símbolos interiores sobre preparación, consumo, alumnos y tratamientos activos, incluidos en el renderizador Canvas.
 - Duración de cada actividad capturada al comenzar: las compras no reinician los relojes. Los indicadores siguen la cámara sin interceptar toques ni detener el juego bajo menús.
 - Clientes con detalles de ropa y repostería en la mano durante el consumo; conservación de las partidas v2 y de su contabilidad.
 - Pruebas de temporizadores, recetas y tiempos, equipamiento por niveles, compatibilidad, alternativa Canvas y presupuesto de dibujo estático.

@@ -9,7 +9,6 @@
     ctx.beginPath();ctx.arc(0,0,r+2,0,Math.PI*2);ctx.fillStyle='#fffcf1';ctx.fill();ctx.shadowBlur=0;ctx.shadowOffsetY=0;
     ctx.lineWidth=3;ctx.strokeStyle='#e2e9db';ctx.beginPath();ctx.arc(0,0,r-1,0,Math.PI*2);ctx.stroke();
     if(fill>0){ctx.strokeStyle=color;ctx.lineCap='round';ctx.beginPath();ctx.arc(0,0,r-1,-Math.PI/2,-Math.PI/2+Math.PI*2*fill);ctx.stroke();}
-    ctx.fillStyle='#31564c';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`800 ${Math.max(8,r*.85)}px system-ui`;ctx.fillText(remaining<=0?'✓':String(Math.ceil(remaining)),0,.5);
     ctx.restore();return true;
   }
   class ClockLayer {

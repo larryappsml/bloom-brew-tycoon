@@ -6,7 +6,7 @@
 
 La v1.5 añade modelos con bordes suaves y veta de madera, suelos con juntas, marcos y apliques, menús de pizarra, estantes, toallas, accesorios de trabajo y doce mejoras nuevas. Las salas tienen una identidad propia y sus inversiones añaden piezas visibles. Todo el arte se genera localmente; no se descargan texturas ni modelos externos.
 
-Los mini relojes sobre cada cliente muestran segundos restantes y un círculo que se llena: preparación del pedido (ámbar), consumo de café o repostería (verde), pilates (lila) y tratamientos/yoga (colores de su servicio). El café se cobra al entregar el pedido; el reloj de consumo marca la estancia, sin duplicar la venta. Las clases y tratamientos se cobran al terminar. Los tiempos se fijan al iniciar cada actividad: mejorar un equipo no reinicia un reloj en marcha. Los relojes acompañan al personaje al mover o acercar el mapa, siguen avanzando con los menús abiertos y también existen en el modo Canvas.
+Los mini relojes sobre cada cliente muestran únicamente un círculo que se llena, sin cifras ni símbolos en el centro: preparación del pedido (ámbar), consumo de café o repostería (verde), pilates (lila) y tratamientos/yoga (colores de su servicio). El café se cobra al entregar el pedido; el reloj de consumo marca la estancia, sin duplicar la venta. Las clases y tratamientos se cobran al terminar. Los tiempos se fijan al iniciar cada actividad: mejorar un equipo no reinicia un reloj en marcha. Los relojes acompañan al personaje al mover o acercar el mapa, siguen avanzando con los menús abiertos y también existen en el modo Canvas.
 
 | Sala | Nuevas inversiones de v1.5 |
 | --- | --- |
