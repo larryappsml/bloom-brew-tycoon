@@ -1,5 +1,14 @@
 # Historial
 
+## v1.3.0 — 20 octubre 2026
+
+- El mapa 3D ocupa todo el viewport, sin cabecera de marca, tarjetas ni barra de navegación permanente.
+- HUD económico compacto y menús flotantes de Turno, Equipo, Mejoras, Objetivos y Negocio.
+- Pedidos, tutorial, clases y recomendaciones trasladados al menú Turno.
+- Paneles superpuestos con botón para volver al mapa; atajo Escape y pausa del render bajo los menús.
+- Desplazamiento del mapa por arrastre, zoom con pellizco o rueda y botón para centrar todo el negocio.
+- Controles de atención compactos y mejoras al tocar el equipamiento, conservando las partidas v2.
+
 ## v1.2.0 — 20 octubre 2026
 
 - Nuevo local 3D low-poly con cámara ortográfica, iluminación cálida y sombras suaves.

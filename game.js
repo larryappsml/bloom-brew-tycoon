@@ -30,6 +30,7 @@
     return `<div class="item ${reason?'locked':''}"><div class="item-icon">${u.emoji}</div><div class="item-info"><b>${u.name} <span class="muted">Nv. ${l}</span></b><small>${reason||u.desc}</small><em>${benefit(u)}</em></div><button class="buy ${s.money<cost?'secondary':''}" data-buy="${u.id}" ${reason||max||s.money<cost?'disabled':''} aria-label="${max?'Nivel máximo':`Comprar ${u.name} por ${fmt(cost)}`}">${max?'✓ Máx.':reason?'🔒':fmt(cost)}</button></div>`;
   }
   function renderLists() {
+    $('shop-title').textContent=filter==='team'?'Tu equipo':filter==='pilates'?'Tu estudio de pilates':filter==='cafe'?'Tu cafetería':'Invierte y crece';
     const available=B.UPGRADES.filter(u=>B.unlocked(s,u)&&B.level(s,u.id)<u.max).sort((a,b)=>B.price(s,a)-B.price(s,b));
     $('featured').innerHTML=available.slice(0,2).map(row).join('')||'<p>Tu imperio está completo. ¡Disfruta del local!</p>';
     $('shop-list').innerHTML=B.UPGRADES.filter(u=>filter==='all'||u.cat===filter).map(row).join('');
@@ -59,7 +60,8 @@
     $('venue-status').textContent=`${s.queue.length+s.seated.length} clientes · ${p.seats} plazas`;
     $('customers').textContent=pilates?'☕ + 🧘':'☕ Abierto';
     $('serve').disabled=!!serving||!waiting;
-    $('serve-label').textContent=serving?'Preparando…':waiting?'Preparar '+B.PRODUCTS.find(p=>p.id===waiting.product).name.toLowerCase():'Esperando clientes';
+    $('serve-label').textContent=serving?'Preparando…':waiting?'Atender':'Sin pedidos';
+    $('serve').setAttribute('aria-label',serving?'Preparando pedido':waiting?'Preparar '+B.PRODUCTS.find(p=>p.id===waiting.product).name.toLowerCase():'Sin pedidos pendientes');
     $('tap-gain').textContent=serving?Math.ceil(serving.remaining)+' s · entrega automática':waiting?'Toca para iniciar · cobra al entregar':'Los clientes llegarán en unos segundos';
     const remaining=Math.ceil((s.rushReady-Date.now())/1000);
     $('rush').disabled=remaining>0;$('rush').innerHTML=`⚡<small>${boost?'¡Hora punta!':remaining>0?`${remaining}s`:'Hora punta'}</small>`;
@@ -87,7 +89,12 @@
     $('tutorial').hidden=s.tutorial>=4;if(s.tutorial<4){$('tutorial-title').textContent=tutorial[s.tutorial][0];$('tutorial-copy').textContent=tutorial[s.tutorial][1];$('tutorial-next').textContent=s.tutorial===3?'¡A jugar!':'Siguiente';}
     if(dirty)renderLists();
   }
-  function nav(view){closeZone();document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===view));document.querySelectorAll('.nav-btn').forEach(x=>{x.classList.toggle('active',x.dataset.view===view);x.setAttribute('aria-current',x.dataset.view===view?'page':'false');});window.scrollTo(0,0);dirty=true;render();}
+  function nav(view){
+    closeZone();$('app').classList.toggle('menu-open',view!=='home');$('app').classList.toggle('mode-home',view==='home');
+    document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id==='home'||x.id===view));
+    document.querySelectorAll('.nav-btn').forEach(x=>{x.classList.toggle('active',x.dataset.view===view);x.setAttribute('aria-current',x.dataset.view===view?'page':'false');});
+    if($(view))$(view).scrollTop=0;dirty=true;render();
+  }
   document.querySelectorAll('.nav-btn').forEach(x=>x.onclick=()=>nav(x.dataset.view));$('all-upgrades').onclick=()=>nav('shop');
   document.querySelectorAll('#filter-tabs button').forEach(x=>x.onclick=()=>{filter=x.dataset.filter;document.querySelectorAll('#filter-tabs button').forEach(y=>y.classList.toggle('active',x===y));dirty=true;render();});
   document.addEventListener('click',e=>{
@@ -141,8 +148,12 @@
   window.addEventListener('pagehide',save);
   window.addEventListener('pageshow',e=>{if(e.persisted){tick=performance.now();const result=B.offline(s);if(result.net>0)toast('Bienvenido de nuevo · +'+fmt(result.net));save();render();}});
   $('zone-close').onclick=closeZone;
+  $('menu-close').onclick=()=>nav('home');
+  $('staff-menu').onclick=()=>{filter='team';document.querySelectorAll('#filter-tabs button').forEach(x=>x.classList.toggle('active',x.dataset.filter===filter));nav('shop');};
+  document.addEventListener('keydown',event=>{if(event.key==='Escape'){closeZone();nav('home');}});
   $('zone-buy').onclick=()=>{if(B.purchase(s,selectedZone)){toast('¡Tu negocio sube de nivel!');save();dirty=true;render();}};
   $('zoom-in').onclick=()=>venueScene?.changeZoom(.15);$('zoom-out').onclick=()=>venueScene?.changeZoom(-.15);
+  $('camera-reset').onclick=()=>venueScene?.focus('all');
   document.querySelectorAll('[data-camera]').forEach(button=>button.onclick=()=>{closeZone();venueScene?.focus(button.dataset.camera);document.querySelectorAll('[data-camera]').forEach(other=>other.classList.toggle('active',other===button));});
   $('cafe-zone').onclick=()=>selectZone('machine');$('studio-zone').onclick=()=>selectZone('mat');
   render();venueScene=new window.VenueScene($('scene'),()=>s,selectZone);

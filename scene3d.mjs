@@ -97,7 +97,7 @@ export function hitZone(hit){
 
 export class Venue3D {
   constructor(canvas,getState,onSelect=()=>{}){
-    this.canvas=canvas;this.getState=getState;this.onSelect=onSelect;this.people=new Map();this.time=0;this.last=0;this.fingerprint='';this.target=new THREE.Vector3(0,.1,.5);this.look=this.target.clone();this.zoom=1.12;this.selected='';this.reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.canvas=canvas;this.getState=getState;this.onSelect=onSelect;this.people=new Map();this.time=0;this.last=0;this.fingerprint='';this.target=new THREE.Vector3(0,.1,.5);this.look=this.target.clone();this.zoom=.8;this.selected='';this.reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:'low-power'});
     this.renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.75));this.renderer.setClearColor(0xb5d5ba);this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=THREE.PCFSoftShadowMap;this.renderer.outputColorSpace=THREE.SRGBColorSpace;this.renderer.toneMapping=THREE.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.05;
     this.scene=new THREE.Scene();this.scene.background=new THREE.Color(0xb5d5ba);this.scene.fog=new THREE.Fog(0xb5d5ba,40,85);
@@ -105,8 +105,19 @@ export class Venue3D {
     this.scene.add(new THREE.HemisphereLight(0xfff8e4,0x789579,1.8));const sun=new THREE.DirectionalLight(0xffe9bd,2.2);sun.position.set(-8,18,9);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-13,right:13,top:13,bottom:-13,near:.1,far:45});sun.shadow.normalBias=.04;sun.shadow.bias=-.0003;sun.shadow.radius=3;this.scene.add(sun);this.scene.add(new THREE.AmbientLight(0xffffff,.2));
     box(this.scene,0,-.81,0,180,.1,180,0xb5d5ba);
     this.raycaster=new THREE.Raycaster();this.pointer=new THREE.Vector2();
-    this.onPointer=e=>{const r=canvas.getBoundingClientRect();this.pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);this.raycaster.setFromCamera(this.pointer,this.camera);for(const hit of this.raycaster.intersectObject(this.world.root,true)){const zone=hitZone(hit);if(zone){this.select(zone);this.onSelect(zone);break;}}};canvas.addEventListener('pointerup',this.onPointer);
-    this.resize=()=>{const r=canvas.getBoundingClientRect(),width=Math.max(240,r.width),height=Math.max(260,r.height),aspect=width/height;this.renderer.setSize(width,height,false);const horizontal=12.15;this.camera.left=-horizontal;this.camera.right=horizontal;this.camera.top=horizontal/aspect;this.camera.bottom=-horizontal/aspect;this.camera.updateProjectionMatrix();};
+    this.pointers=new Map();
+    this.onDown=e=>{this.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});this.gestureStart={x:e.clientX,y:e.clientY};this.dragged=false;canvas.setPointerCapture?.(e.pointerId);};
+    this.onMove=e=>{
+      const previous=this.pointers.get(e.pointerId);if(!previous)return;
+      const others=[...this.pointers.entries()].filter(([id])=>id!==e.pointerId);
+      if(others.length){const other=others[0][1],oldDistance=Math.hypot(previous.x-other.x,previous.y-other.y),newDistance=Math.hypot(e.clientX-other.x,e.clientY-other.y);if(oldDistance>2)this.zoom=THREE.MathUtils.clamp(this.zoom*newDistance/oldDistance,.3,1.7);this.dragged=true;}
+      else {const dx=e.clientX-previous.x,dy=e.clientY-previous.y,scale=(this.camera.right-this.camera.left)/this.camera.zoom/canvas.getBoundingClientRect().width;this.target.x+=(-.822*dx-.569*dy*1.4)*scale;this.target.z+=(.569*dx-.822*dy*1.4)*scale;this.target.x=THREE.MathUtils.clamp(this.target.x,-12,12);this.target.z=THREE.MathUtils.clamp(this.target.z,-12,16);if(Math.hypot(e.clientX-this.gestureStart.x,e.clientY-this.gestureStart.y)>7)this.dragged=true;}
+      this.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    };
+    this.onPointer=e=>{this.pointers.delete(e.pointerId);if(this.dragged)return;const r=canvas.getBoundingClientRect();this.pointer.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);this.raycaster.setFromCamera(this.pointer,this.camera);for(const hit of this.raycaster.intersectObject(this.world.root,true)){const zone=hitZone(hit);if(zone){this.select(zone);this.onSelect(zone);break;}}};
+    this.onCancel=e=>{this.pointers.delete(e.pointerId);};this.onWheel=e=>{e.preventDefault();this.changeZoom(e.deltaY<0?.08:-.08);};
+    canvas.addEventListener('pointerdown',this.onDown);canvas.addEventListener('pointermove',this.onMove);canvas.addEventListener('pointerup',this.onPointer);canvas.addEventListener('pointercancel',this.onCancel);canvas.addEventListener('wheel',this.onWheel,{passive:false});
+    this.resize=()=>{const r=canvas.getBoundingClientRect(),width=Math.max(240,r.width),height=Math.max(260,r.height),aspect=width/height;this.renderer.setSize(width,height,false);const vertical=11,horizontal=vertical*aspect;this.fitZoom=Math.min(1,horizontal*2/23);this.camera.left=-horizontal;this.camera.right=horizontal;this.camera.top=vertical;this.camera.bottom=-vertical;this.camera.updateProjectionMatrix();};
     this.observer=new ResizeObserver(this.resize);this.observer.observe(canvas);this.resize();
     this.rebuild();this.frame=this.frame.bind(this);requestAnimationFrame(this.frame);
     canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();canvas.dataset.renderer='recovering';});canvas.addEventListener('webglcontextrestored',()=>{canvas.dataset.renderer='3d';});canvas.dataset.renderer='3d';
@@ -121,8 +132,8 @@ export class Venue3D {
     if(this.selected)this.select(this.selected);
   }
   select(id){this.selected=id;if(this.ring){this.ring.geometry.dispose();this.ring.material.dispose();this.ring.removeFromParent();}const locations={machine:[-3.1,-2.9,3],pastries:[-1.4,-2.9,1.4],matcha:[-5,-3,1.5],seats:[-3.3,1.5,3],mat:[3.7,-.2,3.8],reformer:[3.7,-.2,3.8],barista:[-3.2,-4.2,2],coach:[5.9,-3.7,1.4],terrace:[0,7.1,2.5],classes:[3.7,2.5,3],spa:[6,-1,1.5],manager:[-3.2,-4.2,2],second:[0,6,2]};const [x,z,r]=locations[id]||locations.machine;this.ring=new THREE.Mesh(new THREE.RingGeometry(r-.055,r,64),new THREE.MeshBasicMaterial({color:0xffdf75,side:THREE.DoubleSide,transparent:true,opacity:.9}));this.ring.rotation.x=-Math.PI/2;this.ring.position.set(x,.13,z);this.scene.add(this.ring);}
-  focus(zone){if(zone==='cafe'){this.target.set(-3,.1,-.3);this.zoom=1.4;}else if(zone==='pilates'){this.target.set(3.7,.1,-.1);this.zoom=1.45;}else{this.target.set(0,.1,.5);this.zoom=1.12;} }
-  changeZoom(delta){this.zoom=THREE.MathUtils.clamp(this.zoom+delta,.85,1.7);}
+  focus(zone){if(zone==='cafe'){this.target.set(-3,.1,-.3);this.zoom=.95;}else if(zone==='pilates'){this.target.set(3.7,.1,-.1);this.zoom=1.05;}else{this.target.set(0,.1,.5);this.zoom=this.fitZoom;} }
+  changeZoom(delta){this.zoom=THREE.MathUtils.clamp(this.zoom+delta,.3,1.7);}
   updatePeople(s,dt){const targets=new Map();s.queue.forEach((o,i)=>targets.set(o.id,{x:-3.8+(i%3)*.7,z:-1.45+Math.floor(i/3)*.62,order:o,kind:o.kind}));s.seated.forEach((o,i)=>{const [x,z]=this.world.tablePositions[i%this.world.tableCount];targets.set(o.id,{x:x+.98,z,kind:o.kind,seated:true});});
     for(const [id,target]of targets)if(!this.people.has(id)){const p=character(target.kind);p.root.position.set(-.4,0,8);p.target=target;p.cup=cup(p.body,.19,.22,.3);p.cup.visible=false;this.people.set(id,p);this.scene.add(p.root);}
     for(const [id,p]of this.people){const target=targets.get(id);p.target=target;const destination=target?new THREE.Vector3(target.x,0,target.z):new THREE.Vector3(-.4,0,8.8);const current=p.root.position;const goal=destination.clone();
@@ -140,10 +151,10 @@ export class Venue3D {
       if(!target&&current.z>8.5){disposeGroup(p.root);this.people.delete(id);}
     }
   }
-  frame(now){if(this.stopped)return;requestAnimationFrame(this.frame);if(document.hidden||!this.canvas.closest('.view.active')||this.canvas.dataset.renderer==='recovering'){this.last=now;return;}if(now-this.last<(this.reduced?180:33))return;const dt=Math.min(.08,(now-this.last)/1000||.033);this.last=now;this.time+=dt;const s=this.getState();if(JSON.stringify(s.levels)!==this.fingerprint)this.rebuild();
+  frame(now){if(this.stopped)return;requestAnimationFrame(this.frame);if(document.hidden||!this.canvas.closest('.view.active')||this.canvas.closest('.menu-open')||this.canvas.dataset.renderer==='recovering'){this.last=now;return;}if(now-this.last<(this.reduced?180:33))return;const dt=Math.min(.08,(now-this.last)/1000||.033);this.last=now;this.time+=dt;const s=this.getState();if(JSON.stringify(s.levels)!==this.fingerprint)this.rebuild();
     this.updatePeople(s,dt);const brewing=s.queue.some(o=>o.remaining!==null);this.manual.root.visible=!(s.levels.barista)&&brewing;this.steam.forEach((p,i)=>{p.visible=brewing;const phase=(this.time*.6+i*.2)%1;p.position.y=2.45+phase*.8;p.position.x=-4.6+Math.sin(this.time*2+i)*.08;p.scale.setScalar(.04+phase*.09);});this.staff.forEach((p,i)=>{p.arms[0].rotation.x=this.reduced?-.3:-.7+Math.sin(this.time*5+i)*.28;p.arms[1].rotation.x=-.4;});
     this.students.forEach((p,i)=>{p.root.visible=s.classRemaining>0&&i<s.classSeats;p.legs[0].rotation.x=this.reduced ? .3 : Math.sin(this.time*1.6+i)*.38;p.legs[1].rotation.x=-p.legs[0].rotation.x;});
     const a=this.reduced?1:Math.min(1,dt*5);this.look.lerp(this.target,a);this.camera.position.set(this.look.x+18,this.look.y+22,this.look.z+26);this.camera.lookAt(this.look);this.camera.zoom+=(this.zoom-this.camera.zoom)*a;this.camera.updateProjectionMatrix();this.renderer.render(this.scene,this.camera);
   }
-  destroy(){this.stopped=true;this.observer.disconnect();this.canvas.removeEventListener('pointerup',this.onPointer);if(this.world)disposeGroup(this.world.root);for(const p of this.people.values())disposeGroup(p.root);this.renderer.dispose();}
+  destroy(){this.stopped=true;this.observer.disconnect();for(const [type,handler]of [['pointerdown',this.onDown],['pointermove',this.onMove],['pointerup',this.onPointer],['pointercancel',this.onCancel],['wheel',this.onWheel]])this.canvas.removeEventListener(type,handler);if(this.world)disposeGroup(this.world.root);for(const p of this.people.values())disposeGroup(p.root);this.renderer.dispose();}
 }
