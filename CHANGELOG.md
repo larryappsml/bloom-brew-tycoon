@@ -1,5 +1,15 @@
 # Historial
 
+## v1.6.0 — 20 octubre 2026
+
+- Sillas individuales con reserva exclusiva, reparto entre mesas, salón y terraza, consumo al sentarse y salida física a la calle. Barra con taburete para completar el aforo inicial.
+- Cola de seis posiciones, preparación después de llegar y espera de asiento si la cafetería está llena.
+- Pilates con convocatoria, demanda progresiva, llegada desde el exterior, espera de inscritos, clase y salida del grupo. Ingresos y costes solo por asistentes reales.
+- Movimiento compartido por simulación y renderizadores: separación entre clientes y búsqueda de desvíos alrededor de personas detenidas. Sin alumnos ni pacientes decorativos duplicados.
+- Reservas de sillas y camillas hasta despejar el espacio; temporizadores de consumo y servicio después de alcanzar la plaza. Nuevas articulaciones de rodilla y postura sentada.
+- Menús con ocupación y estados de llegada/salida; estimación offline adaptada al ciclo completo de las clases. Partidas v2 compatibles.
+- Pruebas de ciclos completos, demanda nula, reserva exclusiva, llegada antes del reloj, separación, circulación prolongada y guardado.
+
 ## v1.5.0 — 20 octubre 2026
 
 - Modelos con bordes suaves y madera con veta procedural. Suelos con juntas, marcos, molduras, apliques, pizarra, libros, estantes, toallas, accesorios y mobiliario de calle.

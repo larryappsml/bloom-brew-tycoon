@@ -65,11 +65,12 @@ export function buildWorld(state){
   const bar=counter(root,levels);targets.machine=bar.g;targets.pastries=bar.g;
   for(const x of [-4.85,-1.7]){const lamp=group(root,x,0,-2.35);cylinder(lamp,0,3.18,0,.025,1.25,0x6c7e69,6);mesh(lamp,geometry('shade',()=>new THREE.ConeGeometry(.38,.3,16)),palette.gold,0,2.62,0);cylinder(lamp,0,2.48,0,.23,.025,0xfff0b3);}
   const tablePositions=Layout.tables(state),tableCount=tablePositions.length;
-  tablePositions.forEach(([x,z])=>table(root,x,z,levels.seats||0));
+  tablePositions.filter(([,z])=>z<6.3).forEach(([x,z])=>table(root,x,z,levels.seats||0));
+  const stool=group(root,-5.6,0,-1.55,'seats');cylinder(stool,0,.28,0,.045,.52,palette.dark);cylinder(stool,0,.58,0,.24,.12,palette.sage);
   for(let i=0;i<Math.min(3,levels.cafeDecor||0);i++){plant(root,-5.8+i*2.3,5.05,.8+i*.1);box(root,-5.8+i*2.3,2.8,-5.45,1.2,.6,.08,[palette.rose,palette.mint,palette.gold][i]);}
   plant(root,-6.15,4.7,1.25);plant(root,.05,-4.8,1.1);plant(root,6.3,4.8,1.2);
   // Divider is low so that the studio remains legible on a phone.
-  box(root,.65,.28,-1.1,.12,.5,8.7,palette.white);for(const z of [-4.8,-1.1,2.65])plant(root,.65,z,.63);
+  for(const [z,d]of [[-3.1,4.7],[.95,1],[2.95,.6]])box(root,.65,.28,z,.12,.5,d,palette.white);for(const z of [-4.8,-1.1,3.15])plant(root,.65,z,.63);
   const studioGroup=group(root,3.85,0,-.3,'mat');targets.mat=studioGroup;
   label(studioGroup,studio?'ESTUDIO PILATES':'PRÓXIMA APERTURA',0,2.35,-3.7,3.8,studio?'#326b55':'#687b70',studio?'#e8f8da':'#edf0e4');
   const students=[];
@@ -124,11 +125,11 @@ export function character(kind=0,staff=false){
   const g=new THREE.Group(),skin=[0xf1c39c,0xc59069,0x8b5b42,0xe7b895][kind%4],shirt=staff?palette.sage:[0xe6a496,0x8badc9,0xd9bd75,0xaa9fc8][kind%4];
   const body=group(g,0,.47,0);cylinder(body,0,.25,0,.2,.48,shirt);ball(body,0,.66,0,.22,skin,1,1.12,.95);ball(body,0,.79,-.035,.224,0x594333,1,.55,1);if(kind%2)ball(body,0,.72,-.2,.14,0x594333);
   if(staff){box(body,0,.2,.215,.18,.12,.025,palette.oak);ball(body,-.09,.4,.22,.025,palette.gold);ball(body,.09,.4,.22,.025,palette.gold);}else{box(body,0,.28,.2,.02,.3,.025,0xffffff);if(kind%2)box(body,-.22,.02,0,.18,.2,.22,palette.oak);}
-  const legs=[],arms=[];
-  for(const side of [-1,1]){const leg=group(g,side*.105,.43,0);box(leg,0,-.17,0,.13,.34,.14,0x43596a);box(leg,0,-.34,.04,.15,.09,.23,palette.white);legs.push(leg);const arm=group(body,side*.25,.43,0);cylinder(arm,0,-.14,0,.065,.3,shirt,8);ball(arm,0,-.31,0,.07,skin);arms.push(arm);}
+  const legs=[],arms=[],knees=[];
+  for(const side of [-1,1]){const leg=group(g,side*.105,.43,0);box(leg,0,-.085,0,.13,.17,.14,0x43596a);const knee=group(leg,0,-.17,0);box(knee,0,-.085,0,.13,.17,.14,0x43596a);box(knee,0,-.17,.04,.15,.09,.23,palette.white);knees.push(knee);legs.push(leg);const arm=group(body,side*.25,.43,0);cylinder(arm,0,-.14,0,.065,.3,shirt,8);ball(arm,0,-.31,0,.07,skin);arms.push(arm);}
   for(const side of [-1,1])ball(body,side*.075,.68,.205,.019,palette.ink);if(staff){box(body,0,.2,.19,.27,.35,.025,palette.cream);box(body,0,.43,.2,.15,.04,.025,palette.cream);}
-  batchCharacterPart(body,`body:${kind%4}:${staff}`);legs.forEach(leg=>batchCharacterPart(leg,'leg'));arms.forEach(arm=>batchCharacterPart(arm,`arm:${kind%4}:${staff}`));
-  return {root:g,body,legs,arms};
+  batchCharacterPart(body,`body:${kind%4}:${staff}`);legs.forEach(leg=>batchCharacterPart(leg,'thigh'));knees.forEach(knee=>batchCharacterPart(knee,'shin'));arms.forEach(arm=>batchCharacterPart(arm,`arm:${kind%4}:${staff}`));
+  return {root:g,body,legs,arms,knees};
 }
 function disposeGroup(root){root.traverse(o=>{if(o.isSprite){o.material.map?.dispose();o.material.dispose();}if(o.isInstancedMesh)o.dispose();});root.removeFromParent();}
 
@@ -190,7 +191,7 @@ export class Venue3D {
     for(let i=0;i<Math.min(3,s.levels.barista||0);i++){const staff=character(i,true);staff.root.position.set(-4.7+i*1.3,0,-4.2);this.world.root.add(staff.root);this.staff.push(staff);}
     if(s.levels.coach){const staff=character(2,true);staff.root.position.set(5.9,0,-3.7);this.world.root.add(staff.root);this.staff.push(staff);}
     for(let i=0;i<Math.min(2,s.levels.therapist||0);i++){const staff=character(i+1,true);staff.root.position.set(8.4+i*2.8,0,1.5);this.world.root.add(staff.root);this.staff.push(staff);}
-    this.students=this.world.students.map((spot,i)=>{const p=character(i);p.root.position.set(spot.x,spot.premium ? .66 : .17,spot.z);p.root.rotation.set(-Math.PI/2,0,0);this.world.root.add(p.root);return p;});
+    this.students=[];
     this.manual=character(0,true);this.manual.root.position.set(-3,0,-4.2);this.world.root.add(this.manual.root);
     if(this.ring){this.ring.geometry.dispose();this.ring.material.dispose();this.ring.removeFromParent();this.ring=null;}
     if(this.selected)this.select(this.selected);
@@ -199,45 +200,40 @@ export class Venue3D {
   focus(zone){if(zone==='cafe'){this.target.set(-3,.1,-.3);this.zoom=.95;}else if(['pressotherapy','massage','yoga'].includes(zone)){const spot=Layout.serviceSlots(this.getState(),zone)[0];if(spot){this.target.set(spot.x,.1,spot.z);this.zoom=.85;}}else if(zone==='pilates'){this.target.set(3.7,.1,-.1);this.zoom=1.05;}else{const f=this.world.footprint;this.target.set((f.left+f.right)/2,.1,(f.back+12)/2);this.zoom=this.fitZoom;} }
   changeZoom(delta){this.zoom=THREE.MathUtils.clamp(this.zoom+delta,.22,1.7);}
   updatePeople(s,dt){const targets=new Map();
-    s.queue.forEach((o,i)=>targets.set(o.id,{x:-3.8+(i%3)*.7,z:-1.45+Math.floor(i/3)*.62,order:o,kind:o.kind}));
-    s.seated.forEach(o=>{const [x,z]=this.world.tablePositions[o.id%this.world.tableCount];targets.set(o.id,{x:x+.98,z,kind:o.kind,seated:true,guest:o});});
-    for(const t of s.treatments||[]){const spot=Layout.serviceSlots(s,t.service)[t.slot];if(spot)targets.set(t.id,{...spot,kind:t.kind,treatment:t});}
-    for(const [id,target]of targets)if(!this.people.has(id)){const p=character(target.kind);p.root.position.set(id%2?-11:11,0,9.25);p.cup=cup(p.body,.19,.22,.3);batchCharacterPart(p.cup,'cup');p.cup.visible=false;p.snack=group(p.body,.2,.22,.3);cylinder(p.snack,0,0,0,.15,.025,palette.cream);ball(p.snack,0,.065,0,.11,0xe3a04c,1,.5,.65);batchCharacterPart(p.snack,'snack');p.snack.visible=false;p.boots=[];
+    const add=(agent,extra)=>targets.set(agent.id,{...agent.position,agent,kind:agent.kind,...extra});
+    s.queue.forEach(o=>add(o,{order:o}));s.seated.forEach(o=>add(o,{guest:o}));s.treatments.forEach(t=>add(t,{service:t.service,treatment:t}));s.classGuests.forEach(g=>add(g,{pilates:g}));s.departing.forEach(g=>add(g,{}));
+    for(const [id,target]of targets)if(!this.people.has(id)){const p=character(target.kind);p.root.position.set(target.x,0,target.z);p.cup=cup(p.body,.19,.22,.3);batchCharacterPart(p.cup,'cup');p.cup.visible=false;p.snack=group(p.body,.2,.22,.3);cylinder(p.snack,0,0,0,.15,.025,palette.cream);ball(p.snack,0,.065,0,.11,0xe3a04c,1,.5,.65);batchCharacterPart(p.snack,'snack');p.snack.visible=false;p.boots=[];
       for(const leg of p.legs){const boot=group(leg);boot.name='Bota de presoterapia';for(let j=0;j<4;j++){const cuff=cylinder(boot,0,-.05-j*.09,.01,.115,.075,j%2?0x89cad5:0x355d72,10);cuff.name='Cámara de compresión';}box(boot,0,-.34,.08,.22,.13,.31,0x355d72);batchCharacterPart(boot,'boot');boot.visible=false;p.boots.push(boot);}
       this.people.set(id,p);this.scene.add(p.root);
     }
-    for(const [id,p]of this.people){const target=targets.get(id),current=p.root.position,destination=target||{x:id%2?17:-17,z:9.25};
-      p.activity=target;
-      const key=target?`${target.x}/${target.z}`:'leaving';if(p.destinationKey!==key){p.destinationKey=key;p.route=Layout.route(current,destination,current.z>6.2, !target);}
-      p.root.rotation.x=0;current.y=0;
-      const {moving,heading}=walkPath(current,p.route,dt*3.5);
-      if(moving)p.root.rotation.y=heading;
-      else{p.root.rotation.y=target?.seated?-Math.PI/2:Math.PI;if(target){current.x=target.x;current.z=target.z;}}
+    for(const [id,p]of this.people){const target=targets.get(id);if(!target){disposeGroup(p.root);this.people.delete(id);continue;}const current=p.root.position,agent=target.agent,moving=agent.moving;
+      p.activity=target;p.root.rotation.x=0;current.y=0;const blend=moving?Math.min(1,dt*18):1;current.x+=(target.x-current.x)*blend;current.z+=(target.z-current.z)*blend;
+      p.root.rotation.y=moving?(agent.heading||0):(target.guest?.seat.facing??Math.PI);p.knees.forEach(k=>{k.rotation.x=0;k.scale.y=1;});p.arms.forEach(a=>a.rotation.z=0);
       const gait=this.reduced?0:Math.sin(this.time*11+id)*.5*(moving?1:.08);p.legs[0].rotation.x=gait;p.legs[1].rotation.x=-gait;p.arms[0].rotation.x=-gait*.7;p.arms[1].rotation.x=gait*.7;
       p.body.position.y=.47+(moving&&!this.reduced?Math.abs(Math.sin(this.time*11+id))*.025:0);
       const treating=!moving&&target?.treatment?.stage==='active',pressure=treating&&target.service==='pressotherapy';
       p.boots.forEach(boot=>{boot.visible=pressure;boot.scale.x=1+(this.reduced?0:Math.sin(this.time*2)*.045);});
       if(treating){if(target.service==='yoga'){p.arms[0].rotation.z=-1.25;p.arms[1].rotation.z=1.25;p.legs[0].rotation.x=.25;}else{p.root.rotation.set(-Math.PI/2,0,0);current.y=.73;current.z=target.z+.55;p.legs.forEach(leg=>leg.rotation.x=0);p.arms.forEach(arm=>arm.rotation.x=0);}}
-      else p.arms.forEach(arm=>arm.rotation.z=0);
-      p.snack.visible=!!target?.seated&&!moving&&target.guest.product==='breakfast';p.cup.visible=!!target?.seated&&!moving&&!p.snack.visible;if(p.cup.visible||p.snack.visible)p.arms[1].rotation.x=-.85+(this.reduced?0:Math.sin(this.time*1.3+id)*.08);
+      if(target.pilates?.stage==='exercising'){const spot=Layout.pilates(s)[target.pilates.slot];p.root.rotation.set(-Math.PI/2,0,0);current.y=spot.premium?.66:.17;current.z=target.z+.5;p.legs[0].rotation.x=this.reduced?.3:Math.sin(this.time*1.6+id)*.38;p.legs[1].rotation.x=-p.legs[0].rotation.x;}
+      else if(target.pilates?.stage==='ready')current.y=Layout.pilates(s)[target.pilates.slot].premium?.5:0;
+      if(target.guest?.stage==='consuming'&&target.guest.seat.table>=0){current.y=.08;p.legs.forEach(leg=>leg.rotation.x=-Math.PI/2);p.knees.forEach(k=>{k.rotation.x=Math.PI/2;k.scale.y=2.6;});}
+      p.snack.visible=!!target.guest&&target.guest.product==='breakfast';p.cup.visible=!!target.guest&&!p.snack.visible;if(p.cup.visible||p.snack.visible)p.arms[1].rotation.x=-.85+(this.reduced?0:Math.sin(this.time*1.3+id)*.08);
       if(target?.order&&(!p.bubble||p.product!==target.order.product)){if(p.bubble)disposeGroup(p.bubble);p.product=target.order.product;const words={coffee:'☕',breakfast:'🥐',matcha:'🍵',smoothie:'🥤'};p.bubble=group(p.root);label(p.bubble,words[p.product]||'☕',0,1.65,0,.95,'#42604e','#fff9e9');}
       if(p.bubble)p.bubble.visible=!!target?.order&&(s.queue.slice(0,2).some(o=>o.id===id)||target.order.remaining!==null);
       if(!target?.order&&p.bubble){disposeGroup(p.bubble);p.bubble=null;}
-      if(!target&&!moving){disposeGroup(p.root);this.people.delete(id);}
     }
   }
   drawClocks(s){const entries=[];
     for(const p of this.people.values()){const t=p.activity,pos=p.root.position;if(!t)continue;
       if(t.order?.remaining!==null&&t.order?.remaining!==undefined)entries.push({x:pos.x,y:1.95,z:pos.z,remaining:t.order.remaining,duration:t.order.duration||window.Bloom.orderDuration(s,t.order.product),kind:'prepare'});
-      else if(t.guest)entries.push({x:pos.x,y:1.95,z:pos.z,remaining:t.guest.remaining,duration:t.guest.duration||18,kind:'consume'});
+      else if(t.guest?.stage==='consuming')entries.push({x:pos.x,y:1.8,z:pos.z,remaining:t.guest.remaining,duration:t.guest.duration,kind:'consume'});
       else if(t.treatment?.stage==='active')entries.push({x:pos.x,y:pos.y+(t.service==='yoga'?1.95:1.0),z:pos.z-(t.service==='yoga'?0:.5),remaining:t.treatment.remaining,duration:t.treatment.duration||window.Bloom.serviceConfig(s,t.service).duration,kind:t.service});
+      else if(t.pilates?.stage==='exercising')entries.push({x:pos.x,y:pos.y+1,z:pos.z-.4,remaining:s.classRemaining,duration:s.classDuration,kind:'pilates'});
     }
-    this.students.forEach((p,i)=>{if(p.root.visible&&i<s.classSeats)entries.push({x:p.root.position.x,y:p.root.position.y+1,z:p.root.position.z-.4,remaining:s.classRemaining,duration:s.classDuration||window.Bloom.params(s).classTime,kind:'pilates'});});
     this.clockLayer.draw(entries,entry=>this.clockVector.set(entry.x,entry.y,entry.z).project(this.camera),this.camera.zoom);
   }
   frame(now){if(this.stopped)return;requestAnimationFrame(this.frame);if(document.hidden||!this.canvas.closest('.view.active')||this.canvas.dataset.renderer==='recovering'){this.last=now;this.statsAt=now;this.statsFrames=0;return;}if(now-this.last<(this.reduced?180:33))return;const dt=Math.min(1,(now-this.last)/1000||.033);this.last=now;this.time+=dt;const s=this.getState();if(JSON.stringify(s.levels)!==this.fingerprint)this.rebuild();
     this.updatePeople(s,dt);const brewing=s.queue.some(o=>o.remaining!==null);this.manual.root.visible=!(s.levels.barista)&&brewing;this.steam.forEach((p,i)=>{p.visible=brewing;const phase=(this.time*.6+i*.2)%1;p.position.y=2.45+phase*.8;p.position.x=-4.6+Math.sin(this.time*2+i)*.08;p.scale.setScalar(.04+phase*.09);});this.staff.forEach((p,i)=>{p.arms[0].rotation.x=this.reduced?-.3:-.7+Math.sin(this.time*5+i)*.28;p.arms[1].rotation.x=-.4;});
-    this.students.forEach((p,i)=>{p.root.visible=s.classRemaining>0&&i<s.classSeats;p.legs[0].rotation.x=this.reduced ? .3 : Math.sin(this.time*1.6+i)*.38;p.legs[1].rotation.x=-p.legs[0].rotation.x;});
     const a=this.reduced?1:Math.min(1,dt*5);this.look.lerp(this.target,a);this.camera.position.set(this.look.x+18,this.look.y+22,this.look.z+26);this.camera.lookAt(this.look);this.camera.zoom+=(this.zoom-this.camera.zoom)*a;this.camera.updateProjectionMatrix();this.renderer.render(this.scene,this.camera);this.drawClocks?.(s);
     this.statsFrames=(this.statsFrames||0)+1;if(this.renderer.info&&now-(this.statsAt||0)>=1000){this.canvas.dataset.fps=String(Math.round(this.statsFrames*1000/(now-(this.statsAt||0))));this.canvas.dataset.drawCalls=String(this.renderer.info.render.calls);this.canvas.dataset.triangles=String(this.renderer.info.render.triangles);this.statsFrames=0;this.statsAt=now;}
   }

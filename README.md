@@ -1,8 +1,14 @@
 # Bloom & Brew Tycoon 🌿☕🧘
 
-**v1.5.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
+**v1.6.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
 
 **[Jugar](https://larryappsml.github.io/bloom-brew-tycoon/)**
+
+La v1.6 corrige el recorrido y el uso real de las plazas. Cada visitante del café reserva una silla concreta, camina hasta ella, consume y sale a la calle. Las mesas del salón y la terraza comparten ese mismo aforo. La cola tiene seis posiciones distintas y, si todas las sillas están ocupadas, un pedido preparado espera una plaza libre. Las sillas y camillas no se reasignan hasta que su ocupante se ha apartado.
+
+Pilates reúne un grupo durante hasta 22 segundos: los alumnos aparecen en la calle, entran y se colocan en una esterilla o reformer. La clase espera a todos los inscritos y cobra únicamente por los asistentes reales. Al terminar, el grupo sale antes de convocar el siguiente. Sin instructora puedes convocar y adelantar el inicio cuando todos hayan llegado; con instructora se automatiza el ciclo completo. La demanda depende del equipamiento y la reputación: una sala ampliada no se llena por arte de magia.
+
+La simulación comparte posiciones y rutas con ambos renderizadores. Los visitantes mantienen distancia entre sí y buscan un desvío local cuando una cola o una persona detenida bloquea su paso. Los círculos aparecen durante la actividad, sin números; el consumo y los tratamientos no descuentan tiempo durante el trayecto. Los menús siguen dejando correr el juego. Se conserva el formato de guardado v2, el dinero y todas las inversiones.
 
 La v1.5 añade modelos con bordes suaves y veta de madera, suelos con juntas, marcos y apliques, menús de pizarra, estantes, toallas, accesorios de trabajo y doce mejoras nuevas. Las salas tienen una identidad propia y sus inversiones añaden piezas visibles. Todo el arte se genera localmente; no se descargan texturas ni modelos externos.
 
@@ -25,17 +31,17 @@ Mejora la cafetera, añade desayunos y matcha, compra mesas y contrata baristas 
 
 El mapa ocupa toda la pantalla: arrastra para moverte, pellizca para acercar o usa +/−. El botón ⌖ centra todo el negocio. Los accesos flotantes abren Turno (pedidos, clases y tutorial), Equipo (contratación), Mejoras, Objetivos y Negocio (estadísticas y partidas). El juego sigue funcionando detrás de los menús: clientes, animaciones, pedidos y clases continúan mientras gestionas el negocio. Cierra cualquier panel con × para volver al mapa. En escritorio también puedes usar la rueda para hacer zoom y Escape para cerrar menús.
 
-El estudio cuesta 850 €. Puedes iniciar clases sin instructora; contratarla permite automatizarlas. Añade esterillas, reformers y salas de grupo. Tras completar diez clases, se desbloquean el gerente y la expansión a sedes satélite. Estas sedes producen un margen fijo limitado; aún no tienen mapa propio.
+El estudio cuesta 850 €. Puedes convocar grupos sin instructora; contratarla automatiza las llegadas, las clases y las salidas. Añade esterillas, reformers y salas de grupo. Tras completar diez clases, se desbloquean el gerente y la expansión a sedes satélite. Estas sedes producen un margen fijo limitado; aún no tienen mapa propio.
 
-En **Ampliar** construyes zonas reales: salón botánico (1.800 €, tras 40 pedidos), ala de recuperación (3.200 €, con pilates abierto) y sala de yoga (2.600 €, con pilates abierto). El centro pasa de 72 a 184 m² con las cuatro ampliaciones, incluida la sala de grupos de pilates. Los terrenos disponibles tienen un marcador + que también permite comprar la zona. La calle, la acera y el paso peatonal permanecen fuera del centro; los clientes de café y wellness llegan por ella.
+En **Ampliar** construyes zonas reales: salón botánico (1.800 €, tras 40 pedidos), ala de recuperación (3.200 €, con pilates abierto) y sala de yoga (2.600 €, con pilates abierto). El centro pasa de 72 a 184 m² con las cuatro ampliaciones, incluida la sala de grupos de pilates. Los terrenos disponibles tienen un marcador + que también permite comprar la zona. La calle, la acera y el paso peatonal permanecen fuera del centro; los clientes de café, pilates y wellness llegan por ella.
 
-En **Mejoras → Wellness** instala hasta dos tumbonas de presoterapia y dos camillas de masaje. Los pacientes caminan hasta la plaza reservada, se tumban y, en presoterapia, llevan botas con cámaras de compresión animadas. La sala de yoga admite seis plazas. En **Turno → Servicios** puedes recibir clientes manualmente o usar **Ver sala** para acercar la cámara. Contrata especialistas wellness para automatizar presoterapia y masajes; la instructora automatiza yoga. Una plaza sigue ocupada durante el trayecto y la sesión; solo se cobra al finalizar. Cada servicio descuenta materiales y, si está automatizado, salario por atención.
+En **Mejoras → Wellness** instala hasta dos tumbonas de presoterapia y dos camillas de masaje. Los pacientes caminan hasta la plaza reservada, se tumban y, en presoterapia, llevan botas con cámaras de compresión animadas. La sala de yoga admite seis plazas. En **Turno → Servicios** puedes recibir clientes manualmente o usar **Ver sala** para acercar la cámara. Contrata especialistas wellness para automatizar presoterapia y masajes; la instructora automatiza yoga. Una plaza sigue reservada durante el trayecto, la sesión y los primeros pasos de salida; solo se cobra al finalizar. Cada servicio descuenta materiales y, si está automatizado, salario por atención.
 
 | Servicio | Equipamiento inicial | Sesión base | Tarifa base | Coste manual / automático |
 | --- | --- | --- | --- | --- |
-| Presoterapia | 1.100 € por primera tumbona | 36 s + 18 s de llegada | 28 € | 6 € / 10 € |
-| Masaje | 1.700 € por primera camilla | 42 s + 18 s de llegada | 36 € | 8 € / 12 € |
-| Yoga | 900 € por dos primeras plazas | 30 s + 20 s de llegada | 14 € | 2 € / 4 € |
+| Presoterapia | 1.100 € por primera tumbona | 36 s tras llegar | 28 € | 6 € / 10 € |
+| Masaje | 1.700 € por primera camilla | 42 s tras llegar | 36 € | 8 € / 12 € |
+| Yoga | 900 € por dos primeras plazas | 30 s tras llegar | 14 € | 2 € / 4 € |
 
 Las mejoras de equipo reducen tiempos y suben tarifas. Cada nivel añade elementos visibles: controles, aceites, accesorios, plantas, cuadros, maquinaria y mesas. La vitrina de bollería tiene cristal y bandejas de bollos que crecen al mejorarla. Los siguientes niveles mantienen el multiplicador de coste 1,65 y límites de compra. Las inversiones antiguas en mesas superiores al nivel tres conservan sus mesas y reciben el salón lateral para evitar perder capacidad.
 
@@ -79,6 +85,7 @@ También puedes ejecutar directamente `node --test tests/*.test.cjs`, `node scri
 | Archivo | Responsabilidad |
 | --- | --- |
 | `core.js` | Economía, pedidos, mejoras, clases, validación y offline; comprobable en Node |
+| `traffic.js` | Movimiento, separación entre visitantes, desvíos y reservas durante las salidas |
 | `layout.js` | Zonas, superficie, capacidad física, posiciones de equipos y rutas por puertas; compartido entre simulación y mapa |
 | `scene.js` | Carga del renderizador 3D y recuperación con Canvas 2D si WebGL no está disponible |
 | `scene3d.mjs` | Modelos y animaciones 3D, cámara ortográfica y selección de zonas con raycasting |

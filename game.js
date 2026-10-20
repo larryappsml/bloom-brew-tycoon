@@ -23,7 +23,7 @@
   const lockedReason=u=>B.requirement(s,u);
   function benefit(u) {
     const descriptions={machine:'Más velocidad y precio por taza',pastries:'Pedidos de desayuno · 9 € base',seats:'+2 plazas de café por nivel',barista:'Un pedido simultáneo más · 0,65 €/venta',matcha:'Pedidos de matcha · 8 € base',mat:'+2 plazas · clases de 45 s',coach:'Clases automáticas · 3 €/alumno',reformer:'+5 € por plaza y nivel',terrace:'+4 plazas de café por nivel',classes:'+4 plazas de pilates por nivel',manager:'−8 % costes de café · +15 % velocidad',spa:'Smoothies y +3 € por plaza de pilates',second:'+1,05 €/s netos por sede'};
-    Object.assign(descriptions,{cafeWing:'+32 m² y dos mesas · habilita más mesas',wellnessWing:'+32 m² · habilita presoterapia y masajes',yogaWing:'+24 m² · instala después las esterillas',pressotherapy:'+1 plaza · hasta dos tumbonas',pressureCare:'−3 s y +4 € por sesión y nivel',massage:'+1 plaza · hasta dos camillas',massageCare:'−3 s y +4 € por sesión y nivel',recoveryComfort:'+2 € por sesión de recuperación y nivel',therapist:'Automatiza servicios · nivel 2 reduce 2 s',yoga:'+2 plazas de yoga · máximo seis',yogaCare:'−2 s y +2 € por sesión y nivel',cafeDecor:'+4 % al precio base de la carta por nivel',roaster:'+8 % a calidad y +6 % a velocidad por nivel'});
+    Object.assign(descriptions,{cafeWing:'+32 m² y tres mesas · habilita más mesas',wellnessWing:'+32 m² · habilita presoterapia y masajes',yogaWing:'+24 m² · instala después las esterillas',pressotherapy:'+1 plaza · hasta dos tumbonas',pressureCare:'−3 s y +4 € por sesión y nivel',massage:'+1 plaza · hasta dos camillas',massageCare:'−3 s y +4 € por sesión y nivel',recoveryComfort:'+2 € por sesión de recuperación y nivel',therapist:'Automatiza servicios · nivel 2 reduce 2 s',yoga:'+2 plazas de yoga · máximo seis',yogaCare:'−2 s y +2 € por sesión y nivel',cafeDecor:'+4 % al precio base de la carta por nivel',roaster:'+8 % a calidad y +6 % a velocidad por nivel'});
     Object.assign(descriptions,{brewBar:'+8 % a rapidez y +0,35 € por café y nivel',bakeryOven:'+10 % a rapidez y +0,40 € por desayuno y nivel',cafeLounge:'+2,5 % a calidad de la carta por nivel',pilatesKit:'+1 € por alumno y nivel',studioMirror:'−1 s por clase y nivel',studioAudio:'+1 € por alumno y nivel',yogaBolsters:'−1 s y +1 € por sesión y nivel',zenGarden:'+1 € por sesión de yoga y nivel',yogaTea:'+2 € por sesión y nivel · coste +0,50 €',pressurePump:'−2 s y +2 € por sesión y nivel',massageStones:'+3 € por sesión y nivel · coste +1 €',wellnessLinen:'+1 € por tratamiento y nivel'});
     return (descriptions[u.id]||u.desc)+(B.level(s,u.id)>=u.max?' · Nivel máximo':'');
   }
@@ -55,11 +55,11 @@
   }
   function closeZone(){selectedZone=null;$('zone-panel').hidden=true;$('app').classList.remove('zone-open');}
   function render() {
-    const p=B.params(s),estimate=B.estimate(s),serving=s.queue.find(o=>o.remaining!==null&&!o.worker),waiting=s.queue.find(o=>o.remaining===null),pilates=B.level(s,'mat')>0,boost=Date.now()<s.boostUntil;
+    const p=B.params(s),estimate=B.estimate(s),serving=s.queue.find(o=>o.remaining!==null&&!o.worker),waiting=s.queue.find(o=>o.stage==='waiting'),pilates=B.level(s,'mat')>0,boost=Date.now()<s.boostUntil;
     $('money').textContent=fmt(s.money);$('income').textContent=fmt(estimate.total);$('rep').textContent='⭐ '+(s.reputation/20).toFixed(1);
     $('level').textContent='NIVEL '+(1+Math.floor(Math.sqrt(s.earned/120)));
     $('subtitle').textContent=pilates?'Café de especialidad · Pilates y wellness':'Un café, mil posibilidades';
-    $('venue-status').textContent=`${p.area} m² · ${s.queue.length+s.seated.length+s.treatments.length} clientes`;
+    $('venue-status').textContent=`${p.area} m² · ${s.queue.length+s.seated.length+s.treatments.length+s.classGuests.length} clientes`;
     $('customers').textContent=pilates?'☕ + 🧘':'☕ Abierto';
     $('serve').disabled=!!serving||!waiting;
     $('serve-label').textContent=serving?'Preparando…':waiting?'Atender':'Sin pedidos';
@@ -69,16 +69,18 @@
     $('rush').disabled=remaining>0;$('rush').innerHTML=`⚡<small>${boost?'¡Hora punta!':remaining>0?`${remaining}s`:'Hora punta'}</small>`;
     $('orders').innerHTML=s.queue.map(o=>{
       const product=B.PRODUCTS.find(p=>p.id===o.product),working=o.remaining!==null;
-      return `<div class="order ${o.wait>o.patience*.7?'urgent':''}"><span>${product.icon} ${['Habitual','Estudiante','De paso','Wellness'][o.kind]}</span><b>${product.name}</b><small>${working?(o.worker?'Barista · ':'Tú · ')+Math.ceil(o.remaining)+' s':'Espera '+Math.floor(o.wait)+' s'}</small><div class="bar"><i style="width:${working?Math.max(0,(1-o.remaining/(o.duration||B.orderDuration(s,o.product)))*100):Math.max(0,1-o.wait/o.patience)*100}%"></i></div></div>`;
+      return `<div class="order ${o.wait>o.patience*.7?'urgent':''}"><span>${product.icon} ${['Habitual','Estudiante','De paso','Wellness'][o.kind]}</span><b>${product.name}</b><small>${o.stage==='arrival'?'Llegando al mostrador':working?(o.remaining===0?'Esperando una silla libre':(o.worker?'Barista · ':'Tú · ')+Math.ceil(o.remaining)+' s'):'Espera '+Math.floor(o.wait)+' s'}</small><div class="bar"><i style="width:${working?Math.max(0,(1-o.remaining/(o.duration||B.orderDuration(s,o.product)))*100):Math.max(0,1-o.wait/o.patience)*100}%"></i></div></div>`;
     }).join('')||'<div class="empty-orders">🌿 Un momento de calma. El próximo cliente está en camino.</div>';
-    $('business-strip').innerHTML=`<span>Atención <b>${s.happy} felices</b></span><span>Equipo <b>${p.baristas} baristas</b></span><span>Margen aprox. <b>${fmt(estimate.total*60)}/min</b></span>`;
+    $('business-strip').innerHTML=`<span>Cafetería <b>${s.seated.length}/${p.seats} plazas</b></span><span>Equipo <b>${p.baristas} baristas</b></span><span>Margen aprox. <b>${fmt(estimate.total*60)}/min</b></span>`;
     $('studio-description').textContent=!pilates?'Abre tu estudio desde 850 €. Empieza dando clases y contrata después una instructora.':`${p.capacity} plazas · ${fmt(p.classPrice)}/alumno · ${p.classTime} s por clase. ${B.level(s,'coach')?'Instructora contratada: clases automáticas.':'Impartes las clases; sin salario de instructora.'}`;
-    $('class-start').disabled=pilates&&s.classRemaining>0;
-    $('class-start').textContent=!pilates?'Ver inversión del estudio →':s.classRemaining>0?`Clase en marcha · ${Math.ceil(s.classRemaining)} s · ${s.classSeats} alumnos`:'Empezar clase de pilates';
+    const ready=s.classGuests.filter(g=>g.stage==='ready').length,boarding=s.classPhase==='boarding';
+    if(pilates)$('studio-description').textContent+=boarding?` Llegando ${s.classGuests.length-ready} · en su plaza ${ready}/${p.capacity}.`:s.classPhase==='leaving'?' El grupo está saliendo; después recibiremos al siguiente.':' Cada grupo entra desde la calle y sale al terminar.';
+    $('class-start').disabled=pilates&&(s.classPhase==='active'||s.classPhase==='leaving'||s.classCooldown>0||(boarding&&(!ready||ready!==s.classGuests.length)));
+    $('class-start').textContent=!pilates?'Ver inversión del estudio →':s.classPhase==='active'?`Clase en marcha · ${s.classSeats} alumnos`:s.classPhase==='leaving'?'El grupo está saliendo':boarding?(ready===s.classGuests.length&&ready?`Empezar con ${ready} alumnos`:'Esperando a los alumnos'):s.classCooldown>0?'Preparando el estudio':'Convocar clase de pilates';
     $('class-progress').style.width=pilates&&s.classRemaining>0?(1-s.classRemaining/(s.classDuration||p.classTime))*100+'%':'0%';
     const nextServiceMarkup=B.SERVICES.map(service=>{
-      const c=B.serviceConfig(s,service.id),active=s.treatments.filter(t=>t.service===service.id),arriving=active.filter(t=>t.stage==='arrival').length;
-      return `<div class="service-row"><div><b>${service.icon} ${service.name}</b><small>${c.capacity?`${active.length}/${c.capacity} plazas · ${fmt(c.price)}/sesión · ${c.duration} s`:'Instala el servicio desde Mejoras'}</small><small>${c.capacity?(arriving?`${arriving} clientes en camino · `:'')+(c.automatic?'Atención automática':'Atención manual'):''}</small></div><div class="service-actions"><button class="tab" data-focus="${service.id}" ${!c.capacity?'disabled':''}>Ver sala</button><button class="claim" data-service="${service.id}" ${!c.capacity||active.length>=c.capacity?'disabled':''}>${active.length>=c.capacity&&c.capacity?'En sesión':'Recibir'}</button></div></div>`;
+      const c=B.serviceConfig(s,service.id),active=s.treatments.filter(t=>t.service===service.id),arriving=active.filter(t=>t.stage==='arrival').length,occupied=B.serviceOccupancy(s,service.id);
+      return `<div class="service-row"><div><b>${service.icon} ${service.name}</b><small>${c.capacity?`${active.length}/${c.capacity} plazas · ${fmt(c.price)}/sesión · ${c.duration} s`:'Instala el servicio desde Mejoras'}</small><small>${c.capacity?(arriving?`${arriving} clientes en camino · `:'')+(c.automatic?'Atención automática':'Atención manual'):''}</small></div><div class="service-actions"><button class="tab" data-focus="${service.id}" ${!c.capacity?'disabled':''}>Ver sala</button><button class="claim" data-service="${service.id}" ${!c.capacity||occupied>=c.capacity?'disabled':''}>${occupied>=c.capacity&&c.capacity?(occupied>active.length?'Saliendo':'En sesión'):'Recibir'}</button></div></div>`;
     }).join('');
     if(nextServiceMarkup!==serviceMarkup){$('service-list').innerHTML=nextServiceMarkup;serviceMarkup=nextServiceMarkup;}
     const next=B.GOALS.find(g=>!s.claimed.includes(g.id));

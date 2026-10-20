@@ -1,8 +1,8 @@
 (function (root, factory) {
-  const api = factory(typeof module==='object'&&module.exports?require('./layout.js'):root.BloomLayout);
+  const api = factory(typeof module==='object'&&module.exports?require('./layout.js'):root.BloomLayout,typeof module==='object'&&module.exports?require('./traffic.js'):root.BloomTraffic);
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.Bloom = api;
-})(typeof globalThis === 'undefined' ? this : globalThis, function (Layout) {
+})(typeof globalThis === 'undefined' ? this : globalThis, function (Layout,Traffic) {
   'use strict';
   const VERSION = 2;
   const KEY = 'bloom-brew-save-v2', LEGACY_KEY = 'bloom-brew-save-v1';
@@ -64,7 +64,7 @@
   ];
   const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
   const level=(s,id)=>s.levels[id]||0;
-  const fresh=(now=Date.now())=>({version:VERSION,money:20,earned:0,expenses:0,rewards:0,served:0,happy:0,lost:0,sessions:0,students:0,levels:{},claimed:[],last:now,seconds:0,reputation:75,tutorial:0,boostUntil:0,rushReady:0,classRemaining:0,classSeats:0,nextId:1,arrival:0.5,daily:{day:new Date(now).toISOString().slice(0,10),count:0,claimed:false},queue:[],seated:[],satellite:0,treatments:[],treatmentArrival:2,completedServices:{pressotherapy:0,massage:0,yoga:0},wellnessRevenue:0});
+  const fresh=(now=Date.now())=>({version:VERSION,money:20,earned:0,expenses:0,rewards:0,served:0,happy:0,lost:0,sessions:0,students:0,levels:{},claimed:[],last:now,seconds:0,reputation:75,tutorial:0,boostUntil:0,rushReady:0,classRemaining:0,classSeats:0,classPhase:'idle',classGuests:[],classBoardRemaining:0,classRecruitRemaining:0,classCooldown:0,departing:[],seatCursor:0,nextId:1,arrival:0.5,daily:{day:new Date(now).toISOString().slice(0,10),count:0,claimed:false},queue:[],seated:[],satellite:0,treatments:[],treatmentArrival:2,completedServices:{pressotherapy:0,massage:0,yoga:0},wellnessRevenue:0});
   function validate(data, now=Date.now()) {
     if (!data || typeof data!=='object' || Array.isArray(data)) throw Error('Partida inválida');
     if (data.version!==undefined && data.version!==1 && data.version!==2) throw Error('Versión de partida incompatible');
@@ -94,8 +94,8 @@
   }
   function params(s) {
     const l=id=>Math.min(level(s,id),UPGRADES.find(u=>u.id===id).max);
-    const seats=3+l('seats')*2+l('terrace')*4+(Layout.zones(s).cafe?6:0);
-    const arrival=Math.max(1.4,6.5-l('seats')*.22-l('terrace')*.7-l('matcha')*.12)*(1.15-s.reputation/300);
+    const seats=Layout.cafeSeats(s).length;
+    const arrival=Math.max(1.25,6.5-l('seats')*.55-l('terrace')*.95-l('matcha')*.18-l('cafeDecor')*.24)*(1.15-s.reputation/300);
     const speed=1+l('machine')*.18+l('manager')*.15+l('roaster')*.06;
     const capacity=2+l('mat')*2+l('classes')*4;
     const classPrice=12+l('reformer')*5+l('spa')*3+l('pilatesKit')+l('studioAudio');
@@ -130,7 +130,13 @@
     if(id==='yoga')return {capacity,duration:30-l('yogaCare')*2-l('yogaBolsters'),price:14+l('yogaCare')*2+l('yogaBolsters')+l('zenGarden')+l('yogaTea')*2,cost:2+l('yogaTea')*.5,automatic:l('coach')>0,travel:20};
     return {capacity:0,duration:1,price:0,cost:0,automatic:false,travel:0};
   }
-  function startTreatment(s,id,rng=Math.random){if(!SERVICES.some(x=>x.id===id))return false;const p=serviceConfig(s,id);const taken=s.treatments.filter(t=>t.service===id).map(t=>t.slot);const slot=Array.from({length:p.capacity},(_,i)=>i).find(i=>!taken.includes(i));if(slot===undefined)return false;s.treatments.push({id:s.nextId++,service:id,slot,stage:'arrival',travel:p.travel,remaining:p.duration,duration:p.duration,kind:Math.min(3,Math.floor(rng()*4)),automatic:p.automatic});return true;}
+  function serviceOccupancy(s,id){return s.treatments.filter(t=>t.service===id).length+s.departing.filter(t=>t.reservedService===id).length;}
+  function startTreatment(s,id,rng=Math.random){
+    if(!SERVICES.some(x=>x.id===id))return false;
+    const p=serviceConfig(s,id),spots=Layout.serviceSlots(s,id),taken=new Set([...s.treatments.filter(t=>t.service===id).map(t=>t.slot),...s.departing.filter(t=>t.reservedService===id).map(t=>t.reservedSlot)]);
+    const slot=spots.findIndex((_,i)=>!taken.has(i));if(slot<0)return false;
+    s.treatments.push({...Traffic.create(s,spots[slot],'treatment',rng),service:id,slot,remaining:p.duration,duration:p.duration,automatic:p.automatic});return true;
+  }
   function purchase(s,id) {
     const u=UPGRADES.find(u=>u.id===id);
     if(!u||!unlocked(s,u)||level(s,id)>=u.max)return false;
@@ -139,14 +145,15 @@
   }
   function menu(s) {return PRODUCTS.filter(p=>p.id==='coffee'||p.id==='breakfast'&&level(s,'pastries')||p.id==='matcha'&&level(s,'matcha')||p.id==='smoothie'&&level(s,'spa'));}
   function spawn(s,rng=Math.random) {
-    const p=params(s), types=menu(s), product=types[Math.min(types.length-1,Math.floor(rng()*types.length))];
-    s.queue.push({id:s.nextId++,product:product.id,wait:0,patience:28+rng()*12,remaining:null,worker:false,kind:Math.floor(rng()*4)});
+    const slots=Layout.queueSlots(),used=new Set(s.queue.map(o=>o.queueSlot)),slot=slots.find(p=>!used.has(p.index));if(!slot)return false;
+    const types=menu(s),product=types[Math.min(types.length-1,Math.floor(rng()*types.length))];
+    s.queue.push({...Traffic.create(s,slot,'cafe',rng),queueSlot:slot.index,product:product.id,wait:0,patience:28+rng()*12,remaining:null,worker:false});return true;
   }
   function startOrder(s) {
     if(s.queue.some(o=>o.remaining!==null&&!o.worker))return false;
-    const order=s.queue.find(o=>o.remaining===null); if(!order)return false;
+    const order=s.queue.find(o=>o.remaining===null&&o.stage==='waiting'); if(!order)return false;
     order.remaining=orderDuration(s,order.product);order.duration=order.remaining;
-    order.worker=false; return true;
+    order.worker=false;order.stage='preparing';return true;
   }
   function orderDuration(s,id){const product=PRODUCTS.find(p=>p.id===id);return product.time/params(s).speed/(1+(id==='coffee'?Math.min(3,level(s,'brewBar'))*.08:id==='breakfast'?Math.min(3,level(s,'bakeryOven'))*.1:0));}
   function orderPrice(s,id){const product=PRODUCTS.find(p=>p.id===id);return product.price*params(s).quality+(id==='coffee'?Math.min(3,level(s,'brewBar'))*.35:id==='breakfast'?Math.min(3,level(s,'bakeryOven'))*.4:0);}
@@ -156,11 +163,19 @@
     s.boostUntil=now+20000;s.rushReady=now+180000;return true;
   }
   function startClass(s,now=Date.now()) {
-    if(!level(s,'mat')||s.classRemaining>0)return false;
-    const p=params(s);
-    s.classSeats=Math.max(1,Math.floor(p.capacity*(.55+s.reputation/250)));
-    s.classSeats=Math.min(p.capacity,s.classSeats);
-    s.classRemaining=p.classTime;s.classDuration=p.classTime; return true;
+    if(!level(s,'mat'))return false;
+    if(s.classPhase==='boarding'){if(!s.classGuests.length||s.classGuests.some(g=>g.stage!=='ready'))return false;beginClass(s);return true;}
+    if(s.classPhase!=='idle'||s.classCooldown>0)return false;
+    s.classPhase='boarding';s.classBoardRemaining=22;s.classRecruitRemaining=.5;s.classGuests=[];s.classSeats=0;return true;
+  }
+  function classDemand(s){return Math.max(1,4.8-Math.min(4,level(s,'mat'))*.35-Math.min(4,level(s,'reformer'))*.25-Math.min(3,level(s,'studioAudio'))*.2-Math.min(2,level(s,'spa'))*.1-s.reputation/150);}
+  function beginClass(s){s.classPhase='active';s.classSeats=s.classGuests.length;s.classDuration=params(s).classTime;s.classRemaining=s.classDuration;s.classAuto=!!level(s,'coach');s.classGuests.forEach(g=>g.stage='exercising');}
+  function consumptionTime(id,kind=0){return ({coffee:26,breakfast:38,matcha:30,smoothie:32}[id]||26)+kind*2;}
+  function freeSeat(s){
+    const seats=Layout.cafeSeats(s),busy=new Set([...s.seated.map(g=>g.seat.key),...s.departing.map(g=>g.reservedSeat).filter(Boolean)]),available=seats.filter(p=>!busy.has(p.key));
+    const tables=Layout.tables(s).length,load=table=>seats.filter(p=>p.table===table&&busy.has(p.key)).length;
+    available.sort((a,b)=>(a.table<0?10:load(a.table))-(b.table<0?10:load(b.table))||((a.table-s.seatCursor+tables)%tables)-((b.table-s.seatCursor+tables)%tables));
+    const seat=available[0];if(seat)s.seatCursor=(seat.table+1)%tables;return seat;
   }
   function revenue(s,gross,cost) {s.earned+=gross;s.expenses+=cost;s.money+=gross-cost;}
   function daily(s,now) {
@@ -169,46 +184,68 @@
   }
   function step(s,dt,now=Date.now(),rng=Math.random) {
     dt=clamp(Number.isFinite(dt)?dt:0,0,1);
-    const events=[],p=params(s); daily(s,now); s.seconds+=dt;
+    const events=[],p=params(s); daily(s,now); s.seconds+=dt;s.classCooldown=Math.max(0,s.classCooldown-dt);
     s.arrival-=dt*(active(s,now)?1.6:1);
-    if(s.arrival<=0) { if(s.queue.length+s.seated.length<p.seats+3)spawn(s,rng); s.arrival=p.arrival; }
-    for(const guest of s.seated)guest.remaining-=dt;
-    s.seated=s.seated.filter(g=>g.remaining>0);
+    if(s.arrival<=0){spawn(s,rng);s.arrival=p.arrival;}
+    if(level(s,'coach')&&s.classPhase==='idle'&&s.classCooldown===0)startClass(s,now);
+    if(s.classPhase==='boarding'){
+      s.classBoardRemaining=Math.max(0,s.classBoardRemaining-dt);s.classRecruitRemaining-=dt;
+      if(s.classBoardRemaining>0&&s.classRecruitRemaining<=0&&s.classGuests.length<p.capacity){
+        if(rng()<.82){const spots=Layout.pilates(s),slot=s.classGuests.length;s.classGuests.push({...Traffic.create(s,spots[slot],'pilates',rng),slot});}
+        s.classRecruitRemaining=classDemand(s);
+      }
+    }
+    s.treatmentArrival-=dt;if(s.treatmentArrival<=0){for(const service of SERVICES)if(serviceConfig(s,service.id).automatic)startTreatment(s,service.id,rng);s.treatmentArrival=6;}
+    Traffic.advance(s,dt);
+    s.departing=s.departing.filter(g=>g.path.length>0);
+    for(const order of s.queue)if(order.stage==='arrival'&&!order.path.length)order.stage='waiting';
+    const sitting=[];
+    for(const guest of s.seated){
+      if(guest.stage==='walkingToSeat'){if(!guest.path.length)guest.stage='consuming';sitting.push(guest);continue;}
+      guest.remaining=Math.max(0,guest.remaining-dt);
+      if(guest.remaining>0){sitting.push(guest);continue;}
+      guest.reservedSeat=guest.seat.key;Traffic.exit(guest);s.departing.push(guest);
+    }
+    s.seated=sitting;
     let workers=s.queue.filter(o=>o.worker&&o.remaining!==null).length;
-    for(const o of s.queue)if(workers<p.baristas&&o.remaining===null) {o.remaining=orderDuration(s,o.product);o.duration=o.remaining;o.worker=true;workers++;}
+    for(const o of s.queue)if(workers<p.baristas&&o.remaining===null&&o.stage==='waiting'){o.remaining=orderDuration(s,o.product);o.duration=o.remaining;o.worker=true;o.stage='preparing';workers++;}
     const pending=[];
     for(const o of s.queue) {
-      o.wait+=dt;
-      if(o.remaining!==null)o.remaining-=dt*(active(s,now)?1.5:1);
-      if(o.remaining!==null&&o.remaining<=0&&s.seated.length<p.seats) {
+      if(o.stage==='waiting')o.wait+=dt;
+      if(o.remaining!==null)o.remaining=Math.max(0,o.remaining-dt*(active(s,now)?1.5:1));
+      const seat=o.remaining===0?freeSeat(s):null;
+      if(o.remaining===0&&seat) {
         const product=PRODUCTS.find(x=>x.id===o.product),gross=orderPrice(s,o.product);
         const cost=(product.cost+(o.worker?.65:0))*(1-p.manager*.08);
         revenue(s,gross,cost);s.served++;s.happy++;s.daily.count++;s.reputation=clamp(s.reputation+.5,20,100);
-        s.seated.push({id:o.id,kind:o.kind,remaining:18,duration:18,product:o.product});
+        const duration=consumptionTime(o.product,o.kind);o.stage='walkingToSeat';o.seat=seat;o.remaining=duration;o.duration=duration;Traffic.send(o,Layout.insideRoute(seat),seat);s.seated.push(o);
         events.push({type:'sale',net:gross-cost,product:product.name});
-      } else if(o.remaining===null&&o.wait>o.patience) {s.lost++;s.reputation=clamp(s.reputation-1.5,20,100);events.push({type:'lost'});}
+      } else if(o.remaining===null&&o.wait>o.patience){s.lost++;s.reputation=clamp(s.reputation-1.5,20,100);Traffic.exit(o);s.departing.push(o);events.push({type:'lost'});}
       else pending.push(o);
     }
     s.queue=pending;
-    if(s.classRemaining>0) {
+    for(const guest of s.classGuests)if(guest.stage==='arrival'&&!guest.path.length)guest.stage='ready';
+    if(s.classPhase==='boarding'&&(s.classBoardRemaining===0||s.classGuests.length===p.capacity)&&s.classGuests.every(g=>g.stage==='ready')){
+      if(s.classGuests.length)beginClass(s);else{s.classPhase='idle';s.classCooldown=4;}
+    }
+    if(s.classPhase==='active') {
       s.classRemaining=Math.max(0,s.classRemaining-dt);
       if(s.classRemaining===0) {
-        const gross=s.classSeats*p.classPrice,cost=s.classSeats*(2+ (level(s,'coach')?3:0));
+        const gross=s.classSeats*p.classPrice,cost=s.classSeats*(2+(s.classAuto?3:0));
         revenue(s,gross,cost);s.sessions++;s.students+=s.classSeats;s.reputation=clamp(s.reputation+1,20,100);
-        events.push({type:'class',net:gross-cost});s.classSeats=0;
+        events.push({type:'class',net:gross-cost});s.classSeats=0;s.classPhase='leaving';s.classGuests.forEach(Traffic.exit);
       }
     }
-    if(level(s,'coach')&&s.classRemaining===0)startClass(s,now);
-    s.treatmentArrival-=dt;
-    if(s.treatmentArrival<=0){for(const service of SERVICES)if(serviceConfig(s,service.id).automatic)startTreatment(s,service.id,rng);s.treatmentArrival=6;}
+    if(s.classPhase==='leaving'){s.classGuests=s.classGuests.filter(g=>g.path.length);if(!s.classGuests.length){s.classPhase='idle';s.classCooldown=4;}}
     const ongoing=[];
     for(const treatment of s.treatments){
-      if(treatment.stage==='arrival'){treatment.travel=Math.max(0,treatment.travel-dt);if(treatment.travel===0)treatment.stage='active';ongoing.push(treatment);continue;}
+      if(treatment.stage==='arrival'){if(!treatment.path.length)treatment.stage='active';ongoing.push(treatment);continue;}
       treatment.remaining=Math.max(0,treatment.remaining-dt);
       if(treatment.remaining>0){ongoing.push(treatment);continue;}
       const config=serviceConfig(s,treatment.service),cost=config.cost+(treatment.automatic?(treatment.service==='yoga'?2:4):0);
       revenue(s,config.price,cost);s.wellnessRevenue+=config.price;s.completedServices[treatment.service]++;s.happy++;s.reputation=clamp(s.reputation+.3,20,100);
       events.push({type:'service',service:treatment.service,net:config.price-cost,first:s.completedServices[treatment.service]===1});
+      treatment.reservedService=treatment.service;treatment.reservedSlot=treatment.slot;Traffic.exit(treatment);s.departing.push(treatment);
     }
     s.treatments=ongoing;
     if(p.branches) {const gross=p.branches*dt*3,cost=gross*.65;revenue(s,gross,cost);s.satellite+=gross-cost;}
@@ -216,8 +253,9 @@
   }
   function estimate(s) {
     const p=params(s), products=menu(s),avg=products.reduce((a,x)=>a+orderPrice(s,x.id)-x.cost-.65,0)/products.length;
-    const orders=p.baristas?Math.min(1/p.arrival,p.baristas*p.speed/4.5):0;
-    const cafe=Math.max(0,avg*orders),pilates=level(s,'mat')&&level(s,'coach')?Math.floor(p.capacity*.85)*(p.classPrice-5)/p.classTime:0;
+    const orders=p.baristas?Math.min(1/p.arrival,p.baristas*p.speed/4.5,p.seats/38):0;
+    const expectedStudents=Math.min(p.capacity,22/classDemand(s)*.7);
+    const cafe=Math.max(0,avg*orders),pilates=level(s,'mat')&&level(s,'coach')?expectedStudents*(p.classPrice-5)/(p.classTime+22+14+14+4):0;
     const wellness=SERVICES.reduce((sum,service)=>{const c=serviceConfig(s,service.id);return sum+(c.automatic?c.capacity*(c.price-c.cost-(service.id==='yoga'?2:4))/(c.duration+c.travel+6):0);},0);
     return {cafe,pilates,wellness,total:cafe+pilates+wellness+p.branches*1.05};
   }
@@ -238,5 +276,5 @@
     daily(s,now);if(s.daily.claimed||s.daily.count<30)return 0;
     s.daily.claimed=true;s.money+=80;s.rewards+=80;return 80;
   }
-  return {VERSION,KEY,LEGACY_KEY,UPGRADES,GOALS,PRODUCTS,SERVICES,fresh,validate,params,level,price,requirement,unlocked,purchase,menu,spawn,startOrder,orderDuration,orderPrice,startClass,startTreatment,serviceConfig,rush,step,estimate,offline,value,claim,claimDaily};
+  return {VERSION,KEY,LEGACY_KEY,UPGRADES,GOALS,PRODUCTS,SERVICES,fresh,validate,params,level,price,requirement,unlocked,purchase,menu,spawn,startOrder,orderDuration,orderPrice,consumptionTime,startClass,startTreatment,serviceConfig,serviceOccupancy,rush,step,estimate,offline,value,claim,claimDaily};
 });

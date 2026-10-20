@@ -14,7 +14,7 @@ test('clock fill advances from zero to full and handles invalid or completed tim
 });
 test('buying faster equipment does not reset the duration of an ongoing service',()=>{
   const s=B.fresh(now);s.money=1e5;s.levels={machine:1,mat:1,wellnessWing:1,pressotherapy:1};s.arrival=1000;
-  B.spawn(s,()=>0);B.startOrder(s);B.startClass(s);B.startTreatment(s,'pressotherapy');
+  B.startClass(s);for(let i=0;i<900&&s.classPhase!=='active';i++)B.step(s,.1,now+i*100,()=>.25);B.spawn(s,()=>0);advance(s,15);B.startOrder(s);B.startTreatment(s,'pressotherapy');
   const order=s.queue[0],orderTotal=order.duration,classTotal=s.classDuration,treatment=s.treatments[0],treatmentTotal=treatment.duration;
   advance(s,1);const oldRemaining=order.remaining;
   B.purchase(s,'brewBar');B.purchase(s,'studioMirror');B.purchase(s,'pressurePump');
@@ -39,13 +39,13 @@ test('each new furnishing exists in 3D and higher levels add physical details wi
 });
 test('3D timers use each customer and student clock and exclude arriving treatments',async()=>{
   const {Venue3D}=await import('../scene3d.mjs');const s=B.fresh(now);s.classSeats=2;s.classRemaining=20;s.classDuration=40;
-  const pos={x:1,y:0,z:2},people=new Map([[1,{root:{position:pos},activity:{order:{remaining:2,duration:4}}}],[2,{root:{position:pos},activity:{guest:{remaining:9,duration:18}}}],[3,{root:{position:pos},activity:{service:'pressotherapy',treatment:{stage:'arrival',remaining:30,duration:30}}}],[4,{root:{position:pos},activity:{service:'massage',treatment:{stage:'active',remaining:15,duration:30}}}]]);
-  let entries;const v={people,students:[{root:{visible:true,position:pos}},{root:{visible:true,position:pos}}],camera:{zoom:.8},clockLayer:{draw:e=>entries=e},clockVector:{set(){return this;},project(){return {x:0,y:0,z:0};}}};
+  const pos={x:1,y:0,z:2},people=new Map([[1,{root:{position:pos},activity:{order:{remaining:2,duration:4}}}],[2,{root:{position:pos},activity:{guest:{stage:'consuming',remaining:9,duration:18}}}],[3,{root:{position:pos},activity:{service:'pressotherapy',treatment:{stage:'arrival',remaining:30,duration:30}}}],[4,{root:{position:pos},activity:{service:'massage',treatment:{stage:'active',remaining:15,duration:30}}}]]);
+  people.set(5,{root:{position:pos},activity:{pilates:{stage:'exercising'}}});people.set(6,{root:{position:pos},activity:{pilates:{stage:'exercising'}}});let entries;const v={people,students:[{root:{visible:true,position:pos}},{root:{visible:true,position:pos}}],camera:{zoom:.8},clockLayer:{draw:e=>entries=e},clockVector:{set(){return this;},project(){return {x:0,y:0,z:0};}}};
   Venue3D.prototype.drawClocks.call(v,s);assert.deepEqual(entries.map(e=>e.kind),['prepare','consume','massage','pilates','pilates']);assert.ok(entries.every(e=>C.progress(e.remaining,e.duration)===.5));
 });
 test('Canvas fallback draws matching clocks for cafe, pilates and active wellness',()=>{
-  const s=B.fresh(now);s.levels={mat:1,wellnessWing:1,pressotherapy:1};B.spawn(s,()=>0);B.startOrder(s);B.startClass(s);B.startTreatment(s,'pressotherapy');s.treatments[0].stage='active';s.seated.push({id:100,kind:0,remaining:9,duration:18,product:'coffee'});
-  const kinds=[],ctx={window:{Bloom:B,BloomLayout:require('../layout.js'),BloomClocks:{drawClock:(...v)=>kinds.push(v[5])}}};vm.runInNewContext(fs.readFileSync('scene2d.js','utf8'),ctx);
+  const s=B.fresh(now);s.levels={mat:1,wellnessWing:1,pressotherapy:1};B.spawn(s,()=>0);B.startOrder(s);B.startClass(s);B.startTreatment(s,'pressotherapy');s.treatments[0].stage='active';s.seated.push({id:100,type:'cafe',kind:0,stage:'consuming',position:{x:-5.81,z:.33},remaining:9,duration:18,product:'coffee'});s.queue[0].remaining=2;s.queue[0].duration=4;s.queue[0].stage='preparing';s.classRemaining=20;s.classDuration=40;s.classGuests=[{id:101,type:'pilates',kind:1,stage:'exercising',position:{x:1.7,z:-3.5}}];
+  const kinds=[],ctx={window:{Bloom:B,BloomLayout:require('../layout.js'),BloomTraffic:require('../traffic.js'),BloomClocks:{drawClock:(...v)=>kinds.push(v[5])}}};vm.runInNewContext(fs.readFileSync('scene2d.js','utf8'),ctx);
   const venue=Object.create(ctx.window.VenueScene2D.prototype);Object.assign(venue,{ctx:context2D(),people:new Map(),reduced:false});venue.draw(s,1,.1);
   for(const kind of ['prepare','consume','pilates','pressotherapy'])assert.ok(kinds.includes(kind),kind);
 });
@@ -64,8 +64,8 @@ test('clients follow the same route in real time when browser drawing is throttl
   for(let i=0;i<18*30;i++)walkPath(smooth,a,3.5/30);for(let i=0;i<18;i++)walkPath(slow,b,3.5);
   assert.deepEqual(smooth,end);assert.deepEqual(slow,end);assert.equal(a.length,0);assert.equal(b.length,0);
 });
-test('character batching keeps independent joints with five shared draw meshes',async()=>{
+test('character batching keeps independent joints with seven shared draw meshes and articulated knees',async()=>{
   const {character}=await import('../scene3d.mjs'),a=character(0),b=character(0);let count=0;a.root.traverse(o=>{if(o.isMesh){count++;for(const n of o.geometry.attributes.position.array)assert.ok(Number.isFinite(n));}});
-  assert.equal(count,5);assert.equal(a.body.children.find(o=>o.isMesh).geometry,b.body.children.find(o=>o.isMesh).geometry);
+  assert.equal(count,7);assert.equal(a.knees.length,2);assert.equal(a.body.children.find(o=>o.isMesh).geometry,b.body.children.find(o=>o.isMesh).geometry);
   a.arms[0].rotation.x=.8;assert.equal(b.arms[0].rotation.x,0);assert.equal(a.arms[1].rotation.x,0);
 });

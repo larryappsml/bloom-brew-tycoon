@@ -7,7 +7,7 @@ test('physical expansions require progression and increase footprint and furnitu
   const s=B.fresh(now);s.money=1e5;
   assert.equal(B.purchase(s,'cafeWing'),false);assert.equal(B.purchase(s,'wellnessWing'),false);
   assert.equal(B.purchase(s,'pressotherapy'),false);assert.equal(B.purchase(s,'yoga'),false);
-  s.served=40;assert.equal(B.purchase(s,'cafeWing'),true);assert.equal(L.footprint(s).area,104);assert.equal(L.tables(s).length,3);
+  s.served=40;assert.equal(B.purchase(s,'cafeWing'),true);assert.equal(L.footprint(s).area,104);assert.equal(L.tables(s).length,4);
   B.purchase(s,'mat');B.purchase(s,'wellnessWing');B.purchase(s,'yogaWing');B.purchase(s,'classes');
   assert.equal(L.footprint(s).area,184);assert.equal(L.footprint(s).left,-14.1);assert.equal(L.footprint(s).right,14.1);assert.equal(L.footprint(s).back,-12.6);
   assert.equal(B.purchase(s,'pressureCare'),false);B.purchase(s,'pressotherapy');assert.equal(B.purchase(s,'pressureCare'),true);
@@ -16,8 +16,8 @@ test('physical expansions require progression and increase footprint and furnitu
 test('treatment reserves a bed, travels from the street, and pays once on completion',()=>{
   const s=B.fresh(now);s.levels={wellnessWing:1,pressotherapy:2};s.arrival=1e6;
   assert.equal(B.startTreatment(s,'pressotherapy',()=>0),true);assert.equal(B.startTreatment(s,'pressotherapy',()=>0),true);assert.equal(B.startTreatment(s,'pressotherapy'),false);
-  assert.deepEqual(s.treatments.map(t=>t.slot),[0,1]);advance(s,17);assert.equal(s.money,20);assert.equal(s.treatments[0].stage,'arrival');
-  advance(s,3);assert.equal(s.money,20);assert.equal(s.treatments[0].stage,'active');
+  assert.deepEqual(s.treatments.map(t=>t.slot),[0,1]);advance(s,1);assert.equal(s.money,20);assert.equal(s.treatments[0].stage,'arrival');
+  advance(s,19);assert.equal(s.money,20);assert.equal(s.treatments[0].stage,'active');
   const events=advance(s,40);assert.equal(s.treatments.length,0);assert.equal(s.money,64);assert.equal(s.wellnessRevenue,56);assert.equal(s.expenses,12);assert.equal(s.completedServices.pressotherapy,2);assert.equal(events.filter(e=>e.type==='service').length,2);
   advance(s,100);assert.equal(s.completedServices.pressotherapy,2);assert.equal(s.money,64);
 });
@@ -49,8 +49,8 @@ test('3D rooms, beds and bakery cases follow purchased equipment',async()=>{
 });
 test('a patient walks in, lies on the assigned lounger with boots and exits after treatment',async()=>{
   const {Venue3D}=await import('../scene3d.mjs'),THREE=await import('../vendor/three.module.min.mjs');
-  const s=B.fresh(now);s.levels={wellnessWing:1,pressotherapy:1};B.startTreatment(s,'pressotherapy',()=>0);s.treatments[0].stage='active';
-  const v={people:new Map(),scene:new THREE.Scene(),world:{tablePositions:L.tables(s),tableCount:1},time:0,reduced:false};
+  const s=B.fresh(now);s.levels={wellnessWing:1,pressotherapy:1};B.startTreatment(s,'pressotherapy',()=>0);s.arrival=1e6;for(let i=0;i<400&&s.treatments[0].stage!=='active';i++)B.step(s,.1,now+i*100,()=>0);
+  B.step(s,.1,now,()=>0);const v={people:new Map(),scene:new THREE.Scene(),world:{tablePositions:L.tables(s),tableCount:1},time:0,reduced:false};
   for(let i=0;i<600;i++){v.time+=.05;Venue3D.prototype.updatePeople.call(v,s,.05);}
   const patient=[...v.people.values()][0];assert.equal(patient.root.rotation.x,-Math.PI/2);assert.equal(patient.boots.length,2);assert.ok(patient.boots.every(b=>b.visible));assert.equal(patient.root.position.x,L.serviceSlots(s,'pressotherapy')[0].x);
   s.treatments=[];for(let i=0;i<600;i++){v.time+=.05;Venue3D.prototype.updatePeople.call(v,s,.05);}assert.equal(v.people.size,0);

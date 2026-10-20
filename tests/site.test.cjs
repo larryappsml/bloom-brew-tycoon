@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 test('JavaScript assets parse', () => {
-  for (const file of ['game.js','sw.js','core.js','layout.js','clocks.js','scene.js','scene2d.js']) if (fs.existsSync(file)) new vm.Script(fs.readFileSync(file, 'utf8'), {filename:file});
+  for (const file of ['game.js','sw.js','core.js','layout.js','traffic.js','clocks.js','scene.js','scene2d.js']) if (fs.existsSync(file)) new vm.Script(fs.readFileSync(file, 'utf8'), {filename:file});
 });
 test('HTML local resources exist and support the repository subpath', () => {
   const html = fs.readFileSync('index.html','utf8');

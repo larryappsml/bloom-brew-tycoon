@@ -5,7 +5,7 @@ const now=1800000000000;
 const advance=(s,seconds)=>{for(let i=0;i<seconds*10;i++)B.step(s,.1,now+i*100,()=>.25);};
 test('orders only pay after preparation, with ingredient costs and one manual station',()=>{
   const s=B.fresh(now);B.spawn(s,()=>.1);B.spawn(s,()=>.1);s.arrival=1000;
-  assert.equal(B.startOrder(s),true);assert.equal(B.startOrder(s),false);assert.equal(s.money,20);
+  advance(s,15);assert.equal(B.startOrder(s),true);assert.equal(B.startOrder(s),false);assert.equal(s.money,20);
   advance(s,2);assert.equal(s.served,0);advance(s,2);assert.equal(s.served,1);
   assert.equal(s.earned,5);assert.equal(s.expenses,1.2);assert.equal(s.money,23.8);
 });
@@ -24,9 +24,9 @@ test('purchase locks and limits enforced in simulation',()=>{
 });
 test('pilates pays once, counts completed classes, charges instructor salary',()=>{
   const s=B.fresh(now);assert.equal(B.startClass(s),false);s.levels.mat=1;assert.equal(B.startClass(s),true);
-  assert.equal(B.startClass(s),false);const seats=s.classSeats;advance(s,46);
+  assert.equal(B.startClass(s),false);for(let i=0;i<900&&s.classPhase!=='active';i++)B.step(s,.1,now+i*100,()=>.25);const seats=s.classSeats;assert.ok(seats>0);advance(s,46);
   assert.equal(s.sessions,1);assert.equal(s.students,seats);assert.equal(s.earned,seats*12);assert.equal(s.expenses,seats*2);
-  s.levels.coach=1;advance(s,90);assert.ok(s.sessions>=3);assert.ok(s.expenses>seats*2);
+  s.levels.coach=1;advance(s,180);assert.ok(s.sessions>=3);assert.ok(s.expenses>seats*2);
 });
 test('offline rewards capped at four hours and cannot be claimed twice',()=>{
   const s=B.fresh(now);s.levels.barista=1;
@@ -53,5 +53,5 @@ test('rush has a three minute cooldown and no reward multiplier exploit',()=>{
 });
 test('one hour simulation remains finite with maximal infrastructure',()=>{
   const s=B.fresh(now);for(const u of B.UPGRADES)s.levels[u.id]=u.max;
-  advance(s,3600);assert.ok(s.served>200);assert.ok(s.sessions>50);assert.ok(Number.isFinite(s.money));assert.ok(s.money<1e6);assert.ok(s.earned>=s.expenses);assert.ok(s.queue.length<40);
+  advance(s,3600);assert.ok(s.served>200);assert.ok(s.sessions>30);assert.ok(Number.isFinite(s.money));assert.ok(s.money<1e6);assert.ok(s.earned>=s.expenses);assert.ok(s.queue.length<40);
 });
