@@ -80,7 +80,7 @@
     }).join('');if(sports!==sportsMarkup){$('sports-list').innerHTML=sports;sportsMarkup=sports;}
 
     const p=B.params(s),estimate=B.estimate(s),serving=s.queue.find(o=>o.remaining!==null&&!o.worker),waiting=s.queue.find(o=>o.stage==='waiting'),pilates=B.level(s,'mat')>0,boost=Date.now()<s.boostUntil;
-    $('money').textContent=fmt(s.money);$('income').textContent=fmt(estimate.total);$('rep').textContent='⭐ '+(s.reputation/20).toFixed(1);
+    $('money').textContent=fmt(s.money);$('income').textContent=fmt(estimate.total*60);$('rep').textContent='⭐ '+(s.reputation/20).toFixed(1);
     $('level').textContent='NIVEL '+(1+Math.floor(Math.sqrt(s.earned/120)));
     $('subtitle').textContent=pilates?'Café de especialidad · Pilates y wellness':'Un café, mil posibilidades';
     $('venue-status').textContent=`${p.area} m² · ${s.queue.length+s.seated.length+s.treatments.length+s.classGuests.length+Object.values(s.sportsGroups).reduce((n,g)=>n+(g?.guests.length||0),0)} clientes`;

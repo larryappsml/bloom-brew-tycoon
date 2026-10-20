@@ -1,3 +1,7 @@
+# v1.11.3
+
+- El indicador superior muestra el beneficio automático estimado por minuto, después de gastos, en lugar de por segundo.
+
 # v1.11.2
 
 - Retirados los carteles flotantes permanentes de las salas y parcelas. Sus nombres, niveles y mejoras siguen disponibles al tocar cada zona.

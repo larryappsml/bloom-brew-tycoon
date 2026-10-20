@@ -109,3 +109,10 @@ test('advanced demo isolates normal saves across reload and reset',()=>{
  const standard=boot(Object.fromEntries(reload.store));assert.equal(JSON.parse(standard.store.get(B.KEY)).levels.padelCourt||0,0);
 });
 
+
+test('top income indicator shows estimated net earnings per minute',()=>{
+ const fixture=fs.readFileSync('tests/fixtures/detailed-v2.json','utf8');
+ const {elements}=boot({[B.KEY]:fixture});
+ const expected=B.estimate(B.validate(JSON.parse(fixture))).total*60;
+ assert.equal(elements.get('income').textContent,new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:expected>=100?0:2}).format(expected));
+});
