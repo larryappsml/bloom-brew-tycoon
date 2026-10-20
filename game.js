@@ -1,23 +1,134 @@
-(()=>{'use strict';
-const K='bloom-brew-save-v1',$=id=>document.getElementById(id);
-const U=[['machine','Cafetera de segunda mano','Más calidad en cada taza','☕','cafe',12,.12,1],['pastries','Vitrina de repostería','Croissants y dulces recién hechos','🥐','cafe',65,.7,0],['seats','Mesas acogedoras','Espacio para más clientes','🪑','cafe',170,2,0],['barista','Barista a tiempo parcial','Cafés que se preparan solos','👩‍🍳','team',310,4.5,0],['matcha','Carta de matcha y chai','Bebidas irresistibles','🍵','cafe',650,10,2],['mat','Rincón de pilates','Inaugura tus primeras clases','🧘','pilates',1200,18,0],['coach','Instructora de pilates','Más sesiones y mejor experiencia','🤸','team',2700,35,0],['reformer','Máquina reformer','Clases premium de alta demanda','🛏️','pilates',5600,75,0],['terrace','Terraza botánica','Un espacio que enamora','🌿','cafe',12500,145,0],['classes','Clases en grupo','Llena el estudio de energía','👯','pilates',26000,300,0],['manager','Gerente del local','Optimiza el negocio','🧑‍💼','team',60000,650,0],['spa','Wellness & smoothies','Nueva experiencia de bienestar','🥤','pilates',140000,1500,0],['second','Segunda sede','¡Abre otro Bloom & Brew!','🏬','cafe',350000,3500,0]].map(([id,name,desc,emoji,cat,base,rate,tap])=>({id,name,desc,emoji,cat,base,rate,tap}));
-const M=[['first','El primer café','Sirve 10 cafés',10,'served',40,'☕'],['earn','Pequeño negocio','Gana €500',500,'earned',120,'🌱'],['passive','Dinero mientras respiras','Alcanza €10/s',10,'rate',400,'💸'],['pilates','Namasté y café','Abre pilates',1,'mat',1000,'🧘'],['growth','Un local de moda','Alcanza €100/s',100,'rate',3000,'⭐'],['empire','Un auténtico imperio','Gana €100.000',100000,'earned',12000,'🏆']].map(([id,title,desc,target,key,reward,emoji])=>({id,title,desc,target,key,reward,emoji}));
-const fresh=()=>({money:0,earned:0,served:0,levels:{},claimed:[],last:Date.now(),seconds:0,boostUntil:0});let s;try{s={...fresh(),...JSON.parse(localStorage.getItem(K)||'null')}}catch(e){s=fresh()}if(!s.levels)s.levels={};if(!Array.isArray(s.claimed))s.claimed=[];
-const lvl=id=>s.levels[id]||0,rate=()=>U.reduce((a,u)=>a+u.rate*lvl(u.id),0),tap=()=>1+U.reduce((a,u)=>a+u.tap*lvl(u.id),0),price=u=>Math.ceil(u.base*Math.pow(1.7,lvl(u.id))),pilates=()=>lvl('mat')>0,boost=()=>Date.now()<s.boostUntil?2:1,fmt=n=>'€'+(n>=1e6?(n/1e6).toFixed(2)+'M':n>=10000?(n/1000).toFixed(1)+'k':n>=100?Math.floor(n).toLocaleString('es-ES'):n>=10?n.toFixed(1):n.toFixed(n%1?2:0)),v=m=>m.key==='served'?s.served:m.key==='earned'?s.earned:m.key==='rate'?rate():lvl(m.key);
-function save(){s.last=Date.now();localStorage.setItem(K,JSON.stringify(s))}function earn(n){s.money+=n;s.earned+=n}let timer;function toast(t){const x=$('toast');x.textContent=t;x.classList.add('show');clearTimeout(timer);timer=setTimeout(()=>x.classList.remove('show'),2100)}
-const offline=Math.min(Math.max((Date.now()-s.last)/1000,0),28800);if(offline>15){earn(rate()*offline*.5);setTimeout(()=>toast('Ingresos mientras estabas fuera: '+fmt(rate()*offline*.5)),700)}let filter='all';
-function row(u){const locked=u.id!=='mat'&&['coach','reformer','terrace','classes','manager','spa','second'].includes(u.id)&&!pilates();return '<div class="item '+(locked?'locked':'')+'"><div class="item-icon">'+u.emoji+'</div><div class="item-info"><b>'+u.name+' <span class="muted">Nv. '+lvl(u.id)+'</span></b><small>'+u.desc+(locked?' · Abre pilates primero':'')+'</small><em>+'+fmt(u.rate)+'/s'+(u.tap?' · +€'+u.tap+'/toque':'')+'</em></div><button class="buy '+(s.money>=price(u)?'':'secondary')+'" data-buy="'+u.id+'" '+(locked?'disabled':'')+'>'+fmt(price(u))+'</button></div>'}
-function render(){const r=rate();$('money').textContent=fmt(s.money);$('income').textContent=fmt(r*boost());$('rep').textContent='⭐ '+(1+Math.min(4,Math.floor(Math.log10(Math.max(1,s.earned))/1.3)));$('level').textContent='NIVEL '+(1+Math.floor(Math.log10(Math.max(1,s.earned))/1.25));$('tap-gain').textContent='+'+fmt(tap()*boost())+' por toque';$('subtitle').textContent=pilates()?'Café de especialidad · Pilates & wellness':'Un café, mil posibilidades';$('venue-status').textContent=pilates()?'Café + estudio de pilates':'Cafetería abierta';$('pilates-room').style.opacity=pilates()?'1':'.23';$('customers').innerHTML=['☕','🥐','😊','🧘','🍵'].slice(0,Math.min(5,1+Math.floor(Math.log10(Math.max(1,s.earned))/1.15))).map(e=>'<span class="bubble">'+e+'</span>').join('');$('rush').innerHTML=boost()>1?'⚡<small>Activo</small>':'⚡<small>Impulso</small>';
-const next=M.find(m=>!s.claimed.includes(m.id))||M[M.length-1];$('goal-label').textContent=next.title;$('goal-count').textContent=Math.min(Math.floor(v(next)),next.target)+' / '+next.target;$('goal-progress').style.width=Math.min(100,v(next)/next.target*100)+'%';$('mission-title').textContent=next.title;$('mission-desc').textContent=next.desc+' · Premio '+fmt(next.reward);$('claim').textContent=v(next)>=next.target&&!s.claimed.includes(next.id)?'COBRAR':'VER';$('claim').disabled=v(next)<next.target||s.claimed.includes(next.id);
-$('featured').innerHTML=U.filter(u=>u.id==='mat'||!['coach','reformer','terrace','classes','manager','spa','second'].includes(u.id)||pilates()).sort((a,b)=>Math.abs(price(a)-s.money)-Math.abs(price(b)-s.money)).slice(0,2).map(row).join('');$('shop-list').innerHTML=U.filter(u=>filter==='all'||u.cat===filter).map(row).join('');$('milestone-list').innerHTML=M.map(m=>{const done=s.claimed.includes(m.id),ready=v(m)>=m.target;return '<div class="card mission"><div class="mission-ico">'+m.emoji+'</div><div class="mission-content"><h3>'+m.title+'</h3><p>'+m.desc+' · '+Math.min(Math.floor(v(m)),m.target)+'/'+m.target+'</p><p style="color:#62825f;font-weight:800">Premio '+fmt(m.reward)+'</p></div><button class="claim" data-claim="'+m.id+'" '+(!ready||done?'disabled':'')+'>'+(done?'✓':ready?'COBRAR':'🔒')+'</button></div>'}).join('');
-$('total-earned').textContent=fmt(s.earned);$('served').textContent=s.served.toLocaleString('es-ES');$('clients').textContent=Math.floor(s.earned/6+s.served).toLocaleString('es-ES');$('purchases').textContent=Object.values(s.levels).reduce((a,b)=>a+b,0);$('sessions').textContent=pilates()?Math.floor(s.seconds*(lvl('mat')+lvl('coach')+lvl('classes'))/35):0;$('playtime').textContent=Math.floor(s.seconds/60)+'m';$('tip').textContent=!r?'Sirve cafés y compra tu primera cafetera para tener ingresos automáticos.':!pilates()?'Ahorra para abrir el rincón de pilates y desbloquear más servicios.':'Invierte en reformers, instructores y clases en grupo.'}
-function claim(id){const m=M.find(x=>x.id===id);if(!m||s.claimed.includes(id)||v(m)<m.target)return;earn(m.reward);s.claimed.push(id);toast('Recompensa: +'+fmt(m.reward));save();render()}
-document.addEventListener('click',e=>{const b=e.target.closest('[data-buy],[data-claim]');if(!b)return;if(b.dataset.claim)return claim(b.dataset.claim);const u=U.find(x=>x.id===b.dataset.buy);if(!u)return;const p=price(u);if(s.money<p)return toast('Te faltan '+fmt(p-s.money));s.money-=p;s.levels[u.id]=lvl(u.id)+1;toast('Mejora comprada ✨');save();render()});
-$('serve').onclick=e=>{const n=tap()*boost();earn(n);s.served++;const f=document.createElement('div');f.className='floating';f.style.position='fixed';f.style.left=(e.clientX||150)+'px';f.style.top=(e.clientY||400)+'px';f.textContent='+'+fmt(n);document.body.append(f);setTimeout(()=>f.remove(),850);render()};
-$('rush').onclick=()=>{if(boost()>1)return toast('Impulso activo');s.boostUntil=Date.now()+30000;toast('⚡ Doble ingreso durante 30 segundos');render()};
-$('claim').onclick=()=>{const m=M.find(x=>!s.claimed.includes(x.id));if(m)claim(m.id)};
-function nav(view){document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===view));document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x.dataset.view===view));window.scrollTo(0,0);render()}
-document.querySelectorAll('.nav-btn').forEach(x=>x.onclick=()=>nav(x.dataset.view));$('all-upgrades').onclick=()=>nav('shop');document.querySelectorAll('#filter-tabs button').forEach(x=>x.onclick=()=>{filter=x.dataset.filter;document.querySelectorAll('#filter-tabs button').forEach(y=>y.classList.toggle('active',x===y));render()});let muted=true;$('sound').onclick=()=>{muted=!muted;$('sound').textContent=muted?'🔈':'🔊'};
-$('export').onclick=()=>{save();const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(s,null,2)],{type:'application/json'}));a.download='bloom-brew-partida.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};$('import').onclick=()=>$('import-file').click();$('import-file').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());if(typeof d.money!=='number'||!d.levels)throw Error();s={...fresh(),...d,last:Date.now()};save();render();toast('Partida importada')}catch{toast('Archivo no válido')}};$('reset').onclick=()=>{if(confirm('¿Reiniciar toda la partida?')){s=fresh();save();nav('home')}};
-let tick=Date.now(),renderTime=0;setInterval(()=>{const now=Date.now(),dt=Math.min((now-tick)/1000,5);tick=now;s.seconds+=dt;earn(rate()*boost()*dt);renderTime+=dt;if(renderTime>=.3){render();renderTime=0}},100);setInterval(save,5000);document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});window.addEventListener('pagehide',save);render();if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+(() => {
+  'use strict';
+  const B=window.Bloom,$=id=>document.getElementById(id),fmt=n=>new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:n>=100?0:2}).format(n);
+  let s=B.fresh(),filter='all',toastTimer,dirty=true,loadWarning='',readOnly=false;
+  function toast(text){$('toast').textContent=text;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3200);}
+  try {
+    const current=localStorage.getItem(B.KEY),legacy=localStorage.getItem(B.LEGACY_KEY),raw=current||legacy;
+    if(raw)s=B.validate(JSON.parse(raw));
+    if(!current&&legacy) {localStorage.setItem(B.KEY+'-legacy-backup',legacy);loadWarning='Partida anterior migrada: conservamos tu dinero, mejoras y premios.';}
+  } catch(error) {readOnly=true;loadWarning='No pudimos leer la partida. Exporta una copia antes de importar o reiniciar; no sobrescribiremos el guardado.';}
+  const offline=B.offline(s);
+  function save() {
+    if(readOnly)return false;
+    try {
+      s.last=Date.now();
+      const previous=localStorage.getItem(B.KEY);
+      if(previous) {try{B.validate(JSON.parse(previous));localStorage.setItem(B.KEY+'-backup',previous);}catch{}}
+      localStorage.setItem(B.KEY,JSON.stringify(s));
+      $('save-status').textContent='Guardado en este dispositivo · '+new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+      $('save-status').classList.remove('error');return true;
+    } catch { $('save-status').textContent='No se pudo guardar. Exporta tu partida para conservarla.';$('save-status').classList.add('error');return false; }
+  }
+  const lockedReason=u=>!B.unlocked(s,u)?(['manager','second'].includes(u.id)?'Completa 10 clases primero':'Abre el estudio de pilates primero'):'';
+  function benefit(u) {
+    const descriptions={machine:'Más velocidad y precio por taza',pastries:'Pedidos de desayuno · 9 € base',seats:'+2 plazas de café por nivel',barista:'Un pedido simultáneo más · 0,65 €/venta',matcha:'Pedidos de matcha · 8 € base',mat:'+2 plazas · clases de 45 s',coach:'Clases automáticas · 3 €/alumno',reformer:'+5 € por plaza y nivel',terrace:'+4 plazas de café por nivel',classes:'+4 plazas de pilates por nivel',manager:'−8 % costes de café · +15 % velocidad',spa:'Smoothies y +3 € por plaza de pilates',second:'+1,05 €/s netos por sede'};
+    return descriptions[u.id]+(B.level(s,u.id)>=u.max?' · Nivel máximo':'');
+  }
+  function row(u) {
+    const l=B.level(s,u.id),cost=B.price(s,u),reason=lockedReason(u),max=l>=u.max;
+    return `<div class="item ${reason?'locked':''}"><div class="item-icon">${u.emoji}</div><div class="item-info"><b>${u.name} <span class="muted">Nv. ${l}</span></b><small>${reason||u.desc}</small><em>${benefit(u)}</em></div><button class="buy ${s.money<cost?'secondary':''}" data-buy="${u.id}" ${reason||max||s.money<cost?'disabled':''} aria-label="${max?'Nivel máximo':`Comprar ${u.name} por ${fmt(cost)}`}">${max?'✓ Máx.':reason?'🔒':fmt(cost)}</button></div>`;
+  }
+  function renderLists() {
+    const available=B.UPGRADES.filter(u=>B.unlocked(s,u)&&B.level(s,u.id)<u.max).sort((a,b)=>B.price(s,a)-B.price(s,b));
+    $('featured').innerHTML=available.slice(0,2).map(row).join('')||'<p>Tu imperio está completo. ¡Disfruta del local!</p>';
+    $('shop-list').innerHTML=B.UPGRADES.filter(u=>filter==='all'||u.cat===filter).map(row).join('');
+    $('milestone-list').innerHTML=B.GOALS.map(g=>{
+      const done=s.claimed.includes(g.id),v=B.value(s,g),ready=v>=g.target;
+      return `<div class="card mission"><div class="mission-ico">${g.emoji}</div><div class="mission-content"><h3>${g.title}</h3><p>${g.desc} · ${Math.min(Math.floor(v),g.target)}/${g.target}</p><p class="highlight">Premio ${fmt(g.reward)}</p></div><button class="claim" data-claim="${g.id}" ${!ready||done?'disabled':''}>${done?'✓':ready?'Cobrar':'🔒'}</button></div>`;
+    }).join('');dirty=false;
+  }
+  function render() {
+    const p=B.params(s),estimate=B.estimate(s),serving=s.queue.find(o=>o.remaining!==null&&!o.worker),waiting=s.queue.find(o=>o.remaining===null),pilates=B.level(s,'mat')>0,boost=Date.now()<s.boostUntil;
+    $('money').textContent=fmt(s.money);$('income').textContent=fmt(estimate.total);$('rep').textContent='⭐ '+(s.reputation/20).toFixed(1);
+    $('level').textContent='NIVEL '+(1+Math.floor(Math.sqrt(s.earned/120)));
+    $('subtitle').textContent=pilates?'Café de especialidad · Pilates y wellness':'Un café, mil posibilidades';
+    $('venue-status').textContent=`${s.queue.length+s.seated.length} clientes · ${p.seats} plazas`;
+    $('customers').textContent=pilates?'☕ + 🧘':'☕ Abierto';
+    $('serve').disabled=!!serving||!waiting;
+    $('serve-label').textContent=serving?'Preparando…':waiting?'Preparar '+B.PRODUCTS.find(p=>p.id===waiting.product).name.toLowerCase():'Esperando clientes';
+    $('tap-gain').textContent=serving?Math.ceil(serving.remaining)+' s · entrega automática':waiting?'Toca para iniciar · cobra al entregar':'Los clientes llegarán en unos segundos';
+    const remaining=Math.ceil((s.rushReady-Date.now())/1000);
+    $('rush').disabled=remaining>0;$('rush').innerHTML=`⚡<small>${boost?'¡Hora punta!':remaining>0?`${remaining}s`:'Hora punta'}</small>`;
+    $('orders').innerHTML=s.queue.map(o=>{
+      const product=B.PRODUCTS.find(p=>p.id===o.product),working=o.remaining!==null;
+      return `<div class="order ${o.wait>o.patience*.7?'urgent':''}"><span>${product.icon} ${['Habitual','Estudiante','De paso','Wellness'][o.kind]}</span><b>${product.name}</b><small>${working?(o.worker?'Barista · ':'Tú · ')+Math.ceil(o.remaining)+' s':'Espera '+Math.floor(o.wait)+' s'}</small><div class="bar"><i style="width:${working?Math.max(0,(1-o.remaining/(product.time/p.speed))*100):Math.max(0,1-o.wait/o.patience)*100}%"></i></div></div>`;
+    }).join('')||'<div class="empty-orders">🌿 Un momento de calma. El próximo cliente está en camino.</div>';
+    $('business-strip').innerHTML=`<span>Atención <b>${s.happy} felices</b></span><span>Equipo <b>${p.baristas} baristas</b></span><span>Margen aprox. <b>${fmt(estimate.total*60)}/min</b></span>`;
+    $('studio-description').textContent=!pilates?'Abre tu estudio desde 850 €. Empieza dando clases y contrata después una instructora.':`${p.capacity} plazas · ${fmt(p.classPrice)}/alumno · ${p.classTime} s por clase. ${B.level(s,'coach')?'Instructora contratada: clases automáticas.':'Impartes las clases; sin salario de instructora.'}`;
+    $('class-start').disabled=pilates&&s.classRemaining>0;
+    $('class-start').textContent=!pilates?'Ver inversión del estudio →':s.classRemaining>0?`Clase en marcha · ${Math.ceil(s.classRemaining)} s · ${s.classSeats} alumnos`:'Empezar clase de pilates';
+    $('class-progress').style.width=pilates&&s.classRemaining>0?(1-s.classRemaining/p.classTime)*100+'%':'0%';
+    const next=B.GOALS.find(g=>!s.claimed.includes(g.id));
+    $('goal-label').textContent=next?.title||'Todos los hitos completados';
+    $('goal-count').textContent=next?`${Math.min(Math.floor(B.value(s,next)),next.target)} / ${next.target}`:'✓';
+    $('goal-progress').style.width=next?Math.min(100,B.value(s,next)/next.target*100)+'%':'100%';
+    $('mission-title').textContent=next?.title||'Tu comunidad florece';$('mission-desc').textContent=next?`${next.desc} · Premio ${fmt(next.reward)}`:'Sigue cuidando a tus clientes';
+    $('claim').disabled=!next||B.value(s,next)<next.target;$('claim').textContent=next&&B.value(s,next)>=next.target?'COBRAR':'EN CURSO';
+    $('daily-text').textContent=`${Math.min(s.daily.count,30)}/30 pedidos hoy · Premio 80 €`;$('daily-claim').disabled=s.daily.claimed||s.daily.count<30;$('daily-claim').textContent=s.daily.claimed?'✓ Cobrado':'Cobrar';
+    $('total-earned').textContent=fmt(s.earned);$('served').textContent=Math.floor(s.served).toLocaleString('es-ES');$('clients').textContent=Math.floor(s.happy).toLocaleString('es-ES');
+    $('purchases').textContent=Object.values(s.levels).reduce((a,b)=>a+b,0);$('sessions').textContent=s.sessions.toLocaleString('es-ES');$('playtime').textContent=Math.floor(s.seconds/60)+' min';
+    $('expenses').textContent=fmt(s.expenses);$('profit').textContent=fmt(s.earned-s.expenses);$('lost').textContent=s.lost;$('students').textContent=s.students;
+    $('tip').textContent=!p.baristas?'Prepara pedidos y ahorra 220 € para un barista. Las ventas descuentan ingredientes; el barista cobra 0,65 € por pedido.':!pilates?'El café tiene demanda y aforo limitados. Invierte en mesas o abre pilates para diversificar.':'Las clases descuentan 2 € por alumno en operación y 3 € adicionales si tienes instructora. El beneficio offline se estima al 35 %, hasta 4 horas.';
+    const tutorial=[['Tu primer café','Toca «Preparar» cuando llegue un pedido. Se cobrará al terminar.'],['Hazlo tuyo','Compra una cafetera o una vitrina en Mejoras. El mobiliario aparece en tu local.'],['Tu primer equipo','Contrata un barista para servir sin tocar. Más mesas atraen más visitas.'],['Café y movimiento','Ahorra para abrir el estudio. Puedes dar clases antes de contratar instructora.']];
+    $('tutorial').hidden=s.tutorial>=4;if(s.tutorial<4){$('tutorial-title').textContent=tutorial[s.tutorial][0];$('tutorial-copy').textContent=tutorial[s.tutorial][1];$('tutorial-next').textContent=s.tutorial===3?'¡A jugar!':'Siguiente';}
+    if(dirty)renderLists();
+  }
+  function nav(view){document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===view));document.querySelectorAll('.nav-btn').forEach(x=>{x.classList.toggle('active',x.dataset.view===view);x.setAttribute('aria-current',x.dataset.view===view?'page':'false');});window.scrollTo(0,0);dirty=true;render();}
+  document.querySelectorAll('.nav-btn').forEach(x=>x.onclick=()=>nav(x.dataset.view));$('all-upgrades').onclick=()=>nav('shop');
+  document.querySelectorAll('#filter-tabs button').forEach(x=>x.onclick=()=>{filter=x.dataset.filter;document.querySelectorAll('#filter-tabs button').forEach(y=>y.classList.toggle('active',x===y));dirty=true;render();});
+  document.addEventListener('click',e=>{
+    const button=e.target.closest('[data-buy],[data-claim]');if(!button)return;
+    if(button.dataset.buy){if(B.purchase(s,button.dataset.buy)){toast('Tu local crece ✨');save();dirty=true;render();}return;}
+    const reward=B.claim(s,button.dataset.claim);if(reward){toast('Objetivo completado · +'+fmt(reward));save();dirty=true;render();}
+  });
+  let audio=null,muted=true;
+  function chime(){if(muted)return;try{audio=audio||new(window.AudioContext||window.webkitAudioContext)();audio.resume().catch(()=>{});const o=audio.createOscillator(),g=audio.createGain();o.connect(g);g.connect(audio.destination);o.frequency.setValueAtTime(660,audio.currentTime);o.frequency.exponentialRampToValueAtTime(990,audio.currentTime+.12);g.gain.setValueAtTime(.025,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.2);o.start();o.stop(audio.currentTime+.22);}catch{}}
+  $('sound').onclick=()=>{muted=!muted;$('sound').textContent=muted?'🔈':'🔊';$('sound').setAttribute('aria-pressed',String(!muted));if(!muted)chime();};
+  $('serve').onclick=()=>{if(B.startOrder(s)){chime();render();}};
+  $('rush').onclick=()=>{if(B.rush(s)){toast('Hora punta · más visitas y preparación rápida durante 20 s');save();render();}};
+  $('class-start').onclick=()=>{if(!B.level(s,'mat')){filter='pilates';document.querySelectorAll('#filter-tabs button').forEach(x=>x.classList.toggle('active',x.dataset.filter===filter));nav('shop');return;}if(B.startClass(s)){save();render();}};
+  $('claim').onclick=()=>{const g=B.GOALS.find(g=>!s.claimed.includes(g.id));const reward=g&&B.claim(s,g.id);if(reward){toast('Recompensa · +'+fmt(reward));save();dirty=true;render();}};
+  $('daily-claim').onclick=()=>{if(B.claimDaily(s)){toast('Turno completado · +80 €');save();dirty=true;render();}};
+  $('tutorial-next').onclick=()=>{s.tutorial++;save();render();};
+  $('export').onclick=()=>{
+    let data;try {data=readOnly?(localStorage.getItem(B.KEY)||localStorage.getItem(B.LEGACY_KEY)):JSON.stringify({...s,last:Date.now()},null,2);}catch{data=JSON.stringify(s);}
+    const a=document.createElement('a'),url=URL.createObjectURL(new Blob([data],{type:'application/json'}));a.href=url;a.download='bloom-brew-partida-v2.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  };
+  $('import').onclick=()=>$('import-file').click();
+  $('import-file').onchange=async e=>{
+    const file=e.target.files[0];if(!file)return;
+    try{
+      if(file.size>1000000)throw Error('Archivo demasiado grande');
+      const candidate=B.validate(JSON.parse(await file.text()));candidate.last=Date.now();
+      if(!confirm('¿Sustituir la partida actual por esta copia? La partida anterior quedará respaldada en este dispositivo.'))return;
+      try{localStorage.setItem(B.KEY+'-before-import',readOnly?(localStorage.getItem(B.KEY)||''):JSON.stringify(s));}catch{throw Error('No se pudo crear el respaldo');}
+      s=candidate;readOnly=false;save();dirty=true;render();toast('Partida importada correctamente');
+    }catch(error){toast(error.message==='Versión de partida incompatible'?error.message:'Archivo no válido o no se pudo crear el respaldo.');}
+    finally{e.target.value='';}
+  };
+  $('reset').onclick=()=>{if(confirm('¿Reiniciar tu progreso? Exporta antes si quieres conservarlo.')){try{localStorage.setItem(B.KEY+'-before-reset',readOnly?(localStorage.getItem(B.KEY)||''):JSON.stringify(s));}catch{toast('Exporta una copia antes de reiniciar: no pudimos respaldar.');return;}s=B.fresh();readOnly=false;save();dirty=true;nav('home');}};
+  $('restore').onclick=()=>{
+    try{const raw=localStorage.getItem(B.KEY+'-before-import')||localStorage.getItem(B.KEY+'-before-reset')||localStorage.getItem(B.KEY+'-backup')||localStorage.getItem(B.KEY+'-legacy-backup');if(!raw)throw Error();const candidate=B.validate(JSON.parse(raw));if(confirm('¿Restaurar la última copia de seguridad disponible?')){s=candidate;s.last=Date.now();readOnly=false;save();dirty=true;render();toast('Copia restaurada');}}catch{toast('No hay una copia de seguridad válida disponible');}
+  };
+  function feedback(events){for(const event of events){if(event.type==='sale'||event.type==='class'){dirty=true;const f=document.createElement('div');f.className='floating';f.style.left=(event.type==='class'?'65%':'35%');f.style.top='45%';f.textContent='+'+fmt(event.net);$('venue').append(f);setTimeout(()=>f.remove(),1000);if(event.type==='class')toast('Clase completada · beneficio '+fmt(event.net));}else if(event.type==='lost')dirty=true;}}
+  let tick=performance.now(),renderAt=0,listsAt=0;
+  setInterval(()=>{
+    const now=performance.now();if(document.hidden){tick=now;return;}
+    let dt=Math.min(1,(now-tick)/1000);tick=now;
+    while(dt>0){const part=Math.min(.1,dt);feedback(B.step(s,part,Date.now()));dt-=part;}
+    if(now-listsAt>=1000){dirty=true;listsAt=now;}
+    if(now-renderAt>=250){render();renderAt=now;}
+  },100);
+  setInterval(()=>{if(!document.hidden)save();},5000);
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden){save();return;}
+    const result=B.offline(s);tick=performance.now();if(result.net>0)toast('Mientras descansabas · +'+fmt(result.net)+' netos');save();dirty=true;render();
+  });
+  window.addEventListener('pagehide',save);
+  window.addEventListener('pageshow',e=>{if(e.persisted){tick=performance.now();const result=B.offline(s);if(result.net>0)toast('Bienvenido de nuevo · +'+fmt(result.net));save();render();}});
+  render();new window.VenueScene($('scene'),()=>s);
+  if(loadWarning)setTimeout(()=>toast(loadWarning),500);else if(offline.net>0)setTimeout(()=>toast('Mientras descansabas · +'+fmt(offline.net)+' netos (máx. 4 h)'),600);
+  save();
+  if('serviceWorker' in navigator&&!['localhost','127.0.0.1'].includes(location.hostname))navigator.serviceWorker.register('./sw.js').catch(()=>{$('save-status').textContent+=' · Sin conexión no disponible en este navegador';});
 })();

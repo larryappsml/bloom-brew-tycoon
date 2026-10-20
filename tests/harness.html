@@ -1,0 +1,13 @@
+<!doctype html><html lang="es"><meta charset="utf-8"><title>Bloom & Brew · QA local</title>
+<h1>Partidas de prueba · solo desarrollo local</h1>
+<p>Estas acciones afectan únicamente al progreso de este servidor local.</p>
+<button id="legacy">Cargar partida v1 de prueba</button>
+<button id="broken">Cargar partida inválida de prueba</button>
+<button id="new">Empezar partida de prueba nueva</button>
+<p id="result" role="status"></p><a href="../">Abrir juego de prueba</a>
+<script>
+const key='bloom-brew-save-v2';
+document.getElementById('legacy').onclick=async()=>{const fixture=await(await fetch('./fixtures/legacy-v1.json')).json();fixture.last=Date.now();localStorage.removeItem(key);localStorage.setItem('bloom-brew-save-v1',JSON.stringify(fixture));document.getElementById('result').textContent='Partida v1 preparada';};
+document.getElementById('broken').onclick=()=>{localStorage.setItem(key,'{broken');document.getElementById('result').textContent='Partida inválida preparada';};
+document.getElementById('new').onclick=()=>{localStorage.removeItem(key);localStorage.removeItem('bloom-brew-save-v1');document.getElementById('result').textContent='Partida nueva preparada';};
+</script></html>

@@ -1,1 +1,22 @@
-const V='bloom-brew-v1',A=['./','./index.html','./game.js','./manifest.webmanifest','./icon.svg'];self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(A)));self.skipWaiting()});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==V).map(x=>caches.delete(x)))))});self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(fetch(e.request).then(r=>{if(r.ok&&new URL(e.request.url).origin===location.origin){let copy=r.clone();caches.open(V).then(c=>c.put(e.request,copy))}return r}).catch(()=>caches.match(e.request)))})
+'use strict';
+const CACHE='bloom-brew-v1.1.0';
+const ASSETS=['./','./index.html','./core.js','./scene.js','./game.js','./styles.css','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png','./apple-touch-icon.png'];
+self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS))));
+// Activate after the previous game is closed, so an open game never mixes asset versions.
+self.addEventListener('activate',event=>event.waitUntil((async()=>{
+  for(const key of await caches.keys())if(key.startsWith('bloom-brew-')&&key!==CACHE)await caches.delete(key);
+  await self.clients.claim();
+})()));
+self.addEventListener('fetch',event=>{
+  const url=new URL(event.request.url),scope=new URL(self.registration.scope);
+  if(event.request.method!=='GET'||url.origin!==scope.origin||!url.pathname.startsWith(scope.pathname))return;
+  event.respondWith((async()=>{
+    const cache=await caches.open(CACHE);
+    const cached=await cache.match(event.request,{ignoreSearch:true});
+    if(cached)return cached;
+    try{return await fetch(event.request);}catch(error){
+      if(event.request.mode==='navigate')return (await cache.match('./index.html'))||Response.error();
+      return Response.error();
+    }
+  })());
+});
