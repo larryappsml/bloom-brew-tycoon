@@ -127,6 +127,6 @@ test('business menu selects specialties, persists the choice and reports live vi
 
 test('tapping a room shows its net estimate and closes without stopping gameplay',()=>{
  const fixture=fs.readFileSync('tests/fixtures/detailed-v2.json','utf8'),ui=boot({[B.KEY]:fixture});
- ui.elements.get('cafe-zone').onclick();assert.equal(ui.elements.get('zone-panel').hidden,false);assert.match(ui.elements.get('zone-economy').innerHTML,/Cafetería/);assert.match(ui.elements.get('zone-economy').innerHTML,/\/min/);assert.match(ui.elements.get('zone-economy').innerHTML,/No incluye propinas/);
+ ui.elements.get('cafe-zone').onclick();assert.equal(ui.elements.get('zone-panel').hidden,false);assert.match(ui.elements.get('zone-economy').innerHTML,/Cafetería/);assert.match(ui.elements.get('zone-economy').innerHTML,/\/min/);assert.match(ui.elements.get('zone-economy').innerHTML,/No incluye propinas/);assert.match(ui.elements.get('zone-economy').innerHTML,/recupera su coste/);
  ui.advance(15);assert.ok(JSON.parse(ui.store.get(B.KEY)).served>180);ui.elements.get('zone-close').onclick();assert.equal(ui.elements.get('zone-panel').hidden,true);
 });

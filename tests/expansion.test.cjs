@@ -18,14 +18,14 @@ test('treatment reserves a bed, travels from the street, and pays once on comple
   assert.equal(B.startTreatment(s,'pressotherapy',()=>0),true);assert.equal(B.startTreatment(s,'pressotherapy',()=>0),true);assert.equal(B.startTreatment(s,'pressotherapy'),false);
   assert.deepEqual(s.treatments.map(t=>t.slot),[0,1]);advance(s,1);assert.equal(s.money,20);assert.equal(s.treatments[0].stage,'arrival');
   advance(s,19);assert.equal(s.money,20);assert.equal(s.treatments[0].stage,'active');
-  const events=advance(s,40);assert.equal(s.treatments.length,0);assert.equal(s.money,64);assert.equal(s.wellnessRevenue,56);assert.equal(s.expenses,12);assert.equal(s.completedServices.pressotherapy,2);assert.equal(events.filter(e=>e.type==='service').length,2);
-  advance(s,100);assert.equal(s.completedServices.pressotherapy,2);assert.equal(s.money,64);
+  const events=advance(s,40);assert.equal(s.treatments.length,0);assert.equal(s.money,176);assert.equal(s.wellnessRevenue,180);assert.equal(s.expenses,24);assert.equal(s.completedServices.pressotherapy,2);assert.equal(events.filter(e=>e.type==='service').length,2);
+  advance(s,100);assert.equal(s.completedServices.pressotherapy,2);assert.equal(s.money,176);
 });
 test('staff automates all services with bounded occupancy, salaries and finite income',()=>{
   const s=B.fresh(now);s.levels={mat:1,coach:1,wellnessWing:1,pressotherapy:2,massage:2,therapist:2,yogaWing:1,yoga:3};
   for(let i=0;i<36000;i++){B.step(s,.1,now+i*100,()=>.25);for(const service of B.SERVICES){const ts=s.treatments.filter(t=>t.service===service.id);assert.ok(ts.length<=B.serviceConfig(s,service.id).capacity);assert.equal(new Set(ts.map(t=>t.slot)).size,ts.length);}}
   for(const id of ['pressotherapy','massage','yoga'])assert.ok(s.completedServices[id]>50,id);
-  assert.ok(s.expenses>0);assert.ok(s.money<1e5);assert.ok(B.estimate(s).wellness>0);
+  assert.ok(s.expenses>0);assert.ok(s.money<20+B.estimate(s).total*3600*1.5);assert.ok(B.estimate(s).wellness>0);
   const manual=B.fresh(now);manual.levels={wellnessWing:1,pressotherapy:1};advance(manual,100);assert.equal(manual.completedServices.pressotherapy,0);
 });
 test('existing v2 saves keep investments and accept new services on export and import',()=>{

@@ -1,3 +1,10 @@
+# v1.14.0
+
+- Auditoría reproducible con escenarios de apertura y máximo, dos semillas y resultados antes/después.
+- Tarifas, salarios y costes de mejoras equilibrados para que las áreas avanzadas compensen su inversión. Mejores márgenes de recetas y sedes satélite.
+- Estimaciones calibradas con el tráfico y los tiempos reales. Previsión de ganancia incremental y amortización al tocar una mejora.
+- Costes de tratamientos capturados al comenzar. Se conservan partidas, límites de capacidad e ingresos offline.
+
 # v1.13.0
 
 - Acabados procedurales nuevos: parquet, materiales, tapizados, cerámica, arquitectura y maquinaria más detallada en las salas.

@@ -14,16 +14,16 @@ test('rush speeds an already-running cafe consumption clock by 25 percent withou
 test('rush speeds an existing pilates class and pays only once for the actual group',()=>{
   const s=B.fresh(now);s.arrival=1e6;s.levels.mat=1;B.startClass(s);until(s,()=>s.classPhase==='active');const remaining=s.classRemaining,duration=s.classDuration,count=s.classSeats;
   B.rush(s,now);B.step(s,1,now+1000,()=>0);near(s.classRemaining,remaining-1.25);assert.equal(s.classDuration,duration);
-  s.classRemaining=.5;const events=B.step(s,1,now+2000,()=>0);assert.equal(s.classRemaining,0);assert.equal(s.sessions,1);assert.equal(s.students,count);assert.equal(s.earned,count*12);assert.equal(events.filter(e=>e.type==='class').length,1);
-  for(let i=0;i<10;i++)B.step(s,1,now+3000+i*1000,()=>0);assert.equal(s.sessions,1);assert.equal(s.earned,count*12);
+  s.classRemaining=.5;const events=B.step(s,1,now+2000,()=>0);assert.equal(s.classRemaining,0);assert.equal(s.sessions,1);assert.equal(s.students,count);assert.equal(s.earned,count*40);assert.equal(events.filter(e=>e.type==='class').length,1);
+  for(let i=0;i<10;i++)B.step(s,1,now+3000+i*1000,()=>0);assert.equal(s.sessions,1);assert.equal(s.earned,count*40);
 });
 test('rush speeds active yoga, pressure and massage clocks but does not duplicate rewards',()=>{
   const s=B.fresh(now);s.arrival=1e6;s.levels={wellnessWing:1,pressotherapy:1,massage:1,yogaWing:1,yoga:1};
   for(const service of B.SERVICES)B.startTreatment(s,service.id,()=>0);until(s,()=>s.treatments.every(t=>t.stage==='active'));
   const before=s.treatments.map(t=>({id:t.id,remaining:t.remaining,duration:t.duration}));B.rush(s,now);B.step(s,1,now+1000,()=>0);
   for(const old of before){const t=s.treatments.find(t=>t.id===old.id);near(t.remaining,old.remaining-1.25);assert.equal(t.duration,old.duration);t.remaining=.5;}
-  const events=B.step(s,1,now+2000,()=>0);assert.equal(events.filter(e=>e.type==='service').length,3);assert.equal(s.earned,78);assert.equal(s.expenses,16);
-  for(let i=0;i<10;i++)B.step(s,1,now+3000+i*1000,()=>0);assert.equal(s.earned,78);assert.deepEqual(s.completedServices,{pressotherapy:1,massage:1,yoga:1});
+  const events=B.step(s,1,now+2000,()=>0);assert.equal(events.filter(e=>e.type==='service').length,3);assert.equal(s.earned,265);assert.equal(s.expenses,34);
+  for(let i=0;i<10;i++)B.step(s,1,now+3000+i*1000,()=>0);assert.equal(s.earned,265);assert.deepEqual(s.completedServices,{pressotherapy:1,massage:1,yoga:1});
 });
 test('rush keeps preparation at 50 percent faster and never consumes a drink during the walk',()=>{
   const s=B.fresh(now);s.arrival=1e6;B.spawn(s,()=>0);until(s,()=>s.queue[0]?.stage==='waiting');B.startOrder(s);const order=s.queue[0],old=order.remaining;B.rush(s,now);B.step(s,1,now+1000,()=>0);near(order.remaining,old-1.5);

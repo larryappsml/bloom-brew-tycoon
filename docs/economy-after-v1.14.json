@@ -1,0 +1,195 @@
+{
+  "warmup": 90,
+  "seconds": 480,
+  "dt": 0.25,
+  "records": [
+    {
+      "stage": "basic",
+      "seed": 1,
+      "minutes": 8,
+      "netPerMinute": {
+        "cafe": 77.65,
+        "pilates": 105,
+        "yoga": 132,
+        "wellness": 213.75,
+        "crossfit": 285,
+        "padel": 440,
+        "branches": 0
+      },
+      "estimatedPerMinute": {
+        "cafe": 74.09,
+        "pilates": 106.33,
+        "yoga": 120,
+        "wellness": 191.94,
+        "crossfit": 271.43,
+        "padel": 480,
+        "branches": 0
+      },
+      "investment": {
+        "cafe": 2274,
+        "pilates": 1470,
+        "yoga": 3500,
+        "wellness": 7250,
+        "crossfit": 8400,
+        "padel": 13300,
+        "branches": 0
+      },
+      "paybackMinutes": {
+        "cafe": 29.3,
+        "pilates": 14,
+        "yoga": 26.5,
+        "wellness": 33.9,
+        "crossfit": 29.5,
+        "padel": 30.2,
+        "branches": null
+      },
+      "completed": {
+        "coffee": 124,
+        "pilates": 7,
+        "crossfit": 7,
+        "padel": 5
+      }
+    },
+    {
+      "stage": "basic",
+      "seed": 37,
+      "minutes": 8,
+      "netPerMinute": {
+        "cafe": 80.15,
+        "pilates": 105,
+        "yoga": 132,
+        "wellness": 213.75,
+        "crossfit": 285,
+        "padel": 440,
+        "branches": 0
+      },
+      "estimatedPerMinute": {
+        "cafe": 74.09,
+        "pilates": 106.33,
+        "yoga": 120,
+        "wellness": 191.94,
+        "crossfit": 271.43,
+        "padel": 480,
+        "branches": 0
+      },
+      "investment": {
+        "cafe": 2274,
+        "pilates": 1470,
+        "yoga": 3500,
+        "wellness": 7250,
+        "crossfit": 8400,
+        "padel": 13300,
+        "branches": 0
+      },
+      "paybackMinutes": {
+        "cafe": 28.4,
+        "pilates": 14,
+        "yoga": 26.5,
+        "wellness": 33.9,
+        "crossfit": 29.5,
+        "padel": 30.2,
+        "branches": null
+      },
+      "completed": {
+        "coffee": 123,
+        "pilates": 7,
+        "crossfit": 7,
+        "padel": 5
+      }
+    },
+    {
+      "stage": "max",
+      "seed": 1,
+      "minutes": 8,
+      "netPerMinute": {
+        "cafe": 863.19,
+        "pilates": 1050,
+        "yoga": 893,
+        "wellness": 1092,
+        "crossfit": 1200,
+        "padel": 1775,
+        "branches": 1260
+      },
+      "estimatedPerMinute": {
+        "cafe": 915.46,
+        "pilates": 1050,
+        "yoga": 914.59,
+        "wellness": 1067.85,
+        "crossfit": 1175.51,
+        "padel": 1687.13,
+        "branches": 1260
+      },
+      "investment": {
+        "cafe": 30070,
+        "pilates": 48192,
+        "yoga": 20137,
+        "wellness": 37705,
+        "crossfit": 24623,
+        "padel": 22115,
+        "branches": 55650
+      },
+      "paybackMinutes": {
+        "cafe": 34.8,
+        "pilates": 45.9,
+        "yoga": 22.5,
+        "wellness": 34.5,
+        "crossfit": 20.5,
+        "padel": 12.5,
+        "branches": 44.2
+      },
+      "completed": {
+        "coffee": 293,
+        "pilates": 6,
+        "crossfit": 6,
+        "padel": 6
+      }
+    },
+    {
+      "stage": "max",
+      "seed": 37,
+      "minutes": 8,
+      "netPerMinute": {
+        "cafe": 846.89,
+        "pilates": 1075,
+        "yoga": 904.75,
+        "wellness": 1109,
+        "crossfit": 1200,
+        "padel": 1775,
+        "branches": 1260
+      },
+      "estimatedPerMinute": {
+        "cafe": 915.46,
+        "pilates": 1050,
+        "yoga": 914.59,
+        "wellness": 1067.85,
+        "crossfit": 1175.51,
+        "padel": 1687.13,
+        "branches": 1260
+      },
+      "investment": {
+        "cafe": 30070,
+        "pilates": 48192,
+        "yoga": 20137,
+        "wellness": 37705,
+        "crossfit": 24623,
+        "padel": 22115,
+        "branches": 55650
+      },
+      "paybackMinutes": {
+        "cafe": 35.5,
+        "pilates": 44.8,
+        "yoga": 22.3,
+        "wellness": 34,
+        "crossfit": 20.5,
+        "padel": 12.5,
+        "branches": 44.2
+      },
+      "completed": {
+        "coffee": 282,
+        "pilates": 6,
+        "crossfit": 6,
+        "padel": 6
+      }
+    }
+  ]
+}

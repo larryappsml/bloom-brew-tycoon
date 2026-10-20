@@ -11,15 +11,15 @@
     ['pastries','Vitrina de repostería','Desbloquea pedidos de desayunos','🥐','cafe',90,4],
     ['seats','Mesas acogedoras','Dos plazas más y más visitas','🪑','cafe',140,5],
     ['barista','Barista','Prepara pedidos automáticamente · salario por servicio','👩‍🍳','team',220,3],
-    ['matcha','Matcha y chai','Una carta de bebidas de mayor margen','🍵','cafe',390,4],
+    ['matcha','Matcha y chai','Una carta de bebidas de mayor margen','🍵','cafe',150,4],
     ['mat','Estudio de pilates','Abre el estudio y añade dos plazas por nivel','🧘','pilates',850,4],
     ['coach','Instructora de pilates','Automatiza las clases · salario por sesión','🤸','team',620,2],
     ['reformer','Pilates reformer','Equipamiento premium y mayor precio por plaza','🛏️','pilates',1600,4],
     ['terrace','Terraza botánica','Cuatro plazas y más demanda de café','🌿','cafe',2900,2],
-    ['classes','Sala de clases en grupo','Cuatro plazas extra de pilates','👯','zones',4200,2],
-    ['manager','Gerente','Mejora productividad y reduce costes variables','🧑‍💼','team',6500,2],
-    ['spa','Wellness y smoothies','Carta premium y sesiones de mayor valor','🥤','pilates',10500,2],
-    ['second','Nueva sede','Abre hasta dos sedes satélite con margen limitado','🏬','cafe',24000,2],
+    ['classes','Sala de clases en grupo','Cuatro plazas extra de pilates','👯','zones',2400,2],
+    ['manager','Gerente','Mejora productividad y reduce costes variables','🧑‍💼','team',500,2],
+    ['spa','Wellness y smoothies','Carta premium y sesiones de mayor valor','🥤','pilates',2200,2],
+    ['second','Nueva sede','Abre hasta dos sedes satélite con margen limitado','🏬','cafe',21000,2],
     ['cafeWing','Ampliar cafetería','Construye un salón lateral con nuevas mesas','🏗️','zones',1800,1],
     ['wellnessWing','Ala de recuperación','Amplía el centro con una sala wellness','🏗️','zones',3200,1],
     ['yogaWing','Sala de yoga','Construye una sala al fondo del centro','🏗️','zones',2600,1],
@@ -27,31 +27,31 @@
     ['pressureCare','Equipo de presoterapia','Mejores botas, consola y sesiones más rentables','⚙️','wellness',780,3],
     ['massage','Cabinas de masaje','Una camilla equipada por nivel · hasta dos','💆','wellness',1700,2],
     ['massageCare','Equipamiento de masaje','Calentador de toallas, aceites y mejor servicio','🕯️','wellness',920,3],
-    ['recoveryComfort','Confort de la sala','Plantas, cuadros y detalles premium','🪴','wellness',650,3],
+    ['recoveryComfort','Confort de la sala','Plantas, cuadros y detalles premium','🪴','wellness',500,3],
     ['therapist','Especialista wellness','Automatiza presoterapia y masajes','🧑‍⚕️','team',1250,2],
     ['yoga','Esterillas de yoga','Dos plazas nuevas por nivel','🧘','yoga',900,3],
     ['yogaCare','Accesorios de yoga','Bloques y accesorios para la sala','🕯️','yoga',560,3],
-    ['cafeDecor','Ambientación del café','Plantas, lámparas y decoración por nivel','🌿','cafe',310,3],
+    ['cafeDecor','Ambientación del café','Plantas, lámparas y decoración por nivel','🌿','cafe',240,3],
     ['roaster','Tostador y molinillo','Más calidad y una nueva estación de café','⚙️','cafe',720,2],
-    ['brewBar','Barra de filtrados','Drippers y jarras · café más rápido y de mayor valor','🫖','cafe',480,3],
-    ['bakeryOven','Horno de obrador','Horno y bandejas · desayunos más rápidos y rentables','🥖','cafe',640,3],
-    ['cafeLounge','Rincón de lectura','Librería y sillones · mejora la calidad de la carta','📚','cafe',720,3],
+    ['brewBar','Barra de filtrados','Drippers y jarras · café más rápido y de mayor valor','🫖','cafe',40,3],
+    ['bakeryOven','Horno de obrador','Horno y bandejas · desayunos más rápidos y rentables','🥖','cafe',55,3],
+    ['cafeLounge','Rincón de lectura','Librería y sillones · mejora la calidad de la carta','📚','cafe',120,3],
     ['tableService','Servicio de mesas','Consumos más ágiles y sillas libres antes · hasta −30 %','🍽️','cafe',180,3],
-    ['latteBar','Lattes de autor','Nueva receta con leche y estación de espumado','🥛','cafe',420,3],
-    ['cakeDisplay','Tartas artesanas','Porciones de tarta y expositor refrigerado','🍰','cafe',560,3],
-    ['toastKitchen','Tostadas de aguacate','Nueva cocina de desayunos con tostador','🥑','cafe',680,3],
+    ['latteBar','Lattes de autor','Nueva receta con leche y estación de espumado','🥛','cafe',400,3],
+    ['cakeDisplay','Tartas artesanas','Porciones de tarta y expositor refrigerado','🍰','cafe',450,3],
+    ['toastKitchen','Tostadas de aguacate','Nueva cocina de desayunos con tostador','🥑','cafe',500,3],
     ['pilatesBands','Sesiones con bandas','Bandas elásticas durante las clases · servicio premium','🎗️','pilates',640,2],
     ['soundRitual','Ritual sonoro de yoga','Cuencos sonoros durante la sesión de yoga','🔔','yoga',720,2],
     ['aromaMassage','Masaje aromático','Difusores y aceites durante el masaje','🪻','wellness',860,2],
     ['pilatesKit','Accesorios de fuerza','Pesas, pelotas y aros para cada sesión','🏋️','pilates',450,3],
-    ['studioMirror','Espejos y barras','Amplía los espejos y reduce el tiempo de clase','🪞','pilates',680,3],
+    ['studioMirror','Espejos y barras','Amplía los espejos y reduce el tiempo de clase','🪞','pilates',240,3],
     ['studioAudio','Ambiente del estudio','Altavoces e iluminación para clases premium','🎵','pilates',890,3],
     ['yogaBolsters','Cojines y mantas','Bolsters, textiles y sesiones de mayor valor','🧶','yoga',380,3],
-    ['zenGarden','Jardín zen','Bambú, piedras y bonsáis en tu sala de yoga','🎋','yoga',760,3],
+    ['zenGarden','Jardín zen','Bambú, piedras y bonsáis en tu sala de yoga','🎋','yoga',600,3],
     ['yogaTea','Rincón de infusiones','Tetera y tazas para el ritual después de yoga','🫖','yoga',950,2],
     ['pressurePump','Central de compresión','Bombas y tubos · sesiones más rápidas','🦵','wellness',980,3],
-    ['massageStones','Piedras calientes','Calentador y bandejas para un masaje premium','🪨','wellness',1150,3],
-    ['wellnessLinen','Textiles premium','Toallas y mantas de calidad para los tratamientos','🧺','wellness',540,3]
+    ['massageStones','Piedras calientes','Calentador y bandejas para un masaje premium','🪨','wellness',400,3],
+    ['wellnessLinen','Textiles premium','Toallas y mantas de calidad para los tratamientos','🧺','wellness',420,3]
     ,['crossfitWing','Box de entrenamiento aesthetic','Amplía el centro con una zona de fuerza de 48 m²','🏗️','zones',5200,1]
     ,['functionalStations','Circuito funcional','Dos estaciones con pesas por nivel · hasta seis','🏋️','crossfit',1400,3]
     ,['strengthRig','Rack y fuerza','Barras, discos y sesiones más rápidas y rentables','💪','crossfit',1100,3]
@@ -78,7 +78,7 @@
     {id:'breakfast',name:'Desayuno',icon:'🥐',price:9,cost:3,time:5.2},
     {id:'matcha',name:'Matcha',icon:'🍵',price:8,cost:2,time:4.4},
     {id:'smoothie',name:'Smoothie',icon:'🥤',price:12,cost:3.5,time:5.2},
-    {id:'latte',name:'Latte de autor',icon:'🥛',price:9,cost:2.6,time:4.8},
+    {id:'latte',name:'Latte de autor',icon:'🥛',price:11,cost:2.6,time:4.8},
     {id:'cake',name:'Tarta artesana',icon:'🍰',price:11,cost:3.8,time:4.5},
     {id:'toast',name:'Tostada de aguacate',icon:'🥑',price:14,cost:5,time:6.2}
   ];
@@ -120,8 +120,8 @@
     const arrival=(s.specialty==='brunch'?1/1.15:s.specialty==='balanced'?1:1.12)*Math.max(1.25,6.5-l('seats')*.55-l('terrace')*.95-l('matcha')*.18-l('cafeDecor')*.24)*(1.15-s.reputation/300);
     const speed=1+l('machine')*.18+l('manager')*.15+l('roaster')*.06;
     const capacity=2+l('mat')*2+l('classes')*4;
-    const classPrice=Experience.multiplier(s,'pilates')*(12+l('reformer')*5+l('spa')*3+l('pilatesKit')+l('studioAudio')+l('pilatesBands')*2);
-    return {seats,arrival,speed,baristas:l('barista'),capacity,classPrice,classTime:Math.max(25,45-l('coach')*4-l('studioMirror')),quality:1+l('machine')*.12+l('pastries')*.05+l('matcha')*.04+l('cafeDecor')*.04+l('roaster')*.08+l('cafeLounge')*.025,manager:l('manager'),branches:l('second'),area:Layout.footprint(s).area};
+    const classPrice=Experience.multiplier(s,'pilates')*(40+l('reformer')*8+l('spa')*4+l('pilatesKit')*3+l('studioAudio')*3+l('pilatesBands')*4);
+    return {seats,arrival,speed,baristas:l('barista'),capacity,classPrice,classTime:Math.max(25,45-l('coach')*4-l('studioMirror')),quality:1+l('machine')*.12+l('pastries')*.05+l('matcha')*.04+l('cafeDecor')*.04+l('roaster')*.08+l('cafeLounge')*.025+(l('pastries')?.08:0)+(l('matcha')?.14:0)+(l('latteBar')?.03:0)+(l('cakeDisplay')?.05:0),manager:l('manager'),branches:l('second'),area:Layout.footprint(s).area};
   }
   const price=(s,u)=>Math.ceil(u.base*Math.pow(1.65,level(s,u.id)));
   function requirement(s,u) {
@@ -159,9 +159,9 @@
   const unlocked=(s,u)=>!requirement(s,u);
   const SERVICES=[{id:'pressotherapy',name:'Presoterapia',icon:'🦵'},{id:'massage',name:'Masaje',icon:'💆'},{id:'yoga',name:'Yoga',icon:'🧘'}];
   function baseServiceConfig(s,id){const l=x=>Math.min(level(s,x),UPGRADES.find(u=>u.id===x).max),capacity=Layout.serviceSlots(s,id).length,comfort=l('recoveryComfort');
-    if(id==='pressotherapy')return {capacity,duration:36-l('pressureCare')*3-Math.max(0,l('therapist')-1)*2-l('pressurePump')*2,price:28+l('pressureCare')*4+comfort*2+l('pressurePump')*2+l('wellnessLinen'),cost:6,automatic:l('therapist')>0,travel:18};
-    if(id==='massage')return {capacity,duration:42-l('massageCare')*3-Math.max(0,l('therapist')-1)*2,price:36+l('massageCare')*4+comfort*2+l('massageStones')*3+l('wellnessLinen')+l('aromaMassage')*4,cost:8+l('massageStones')+l('aromaMassage'),automatic:l('therapist')>0,travel:18};
-    if(id==='yoga')return {capacity,duration:30-l('yogaCare')*2-l('yogaBolsters')-l('soundRitual'),price:14+l('yogaCare')*2+l('yogaBolsters')+l('zenGarden')+l('yogaTea')*2+l('soundRitual')*2,cost:2+l('yogaTea')*.5+l('soundRitual')*.5,automatic:l('coach')>0,travel:20};
+    if(id==='pressotherapy')return {capacity,duration:36-l('pressureCare')*3-Math.max(0,l('therapist')-1)*2-l('pressurePump')*2,price:90+l('pressureCare')*9+comfort*4+l('pressurePump')*6+l('wellnessLinen')*3,cost:12,salary:8,automatic:l('therapist')>0,travel:6};
+    if(id==='massage')return {capacity,duration:42-l('massageCare')*3-Math.max(0,l('therapist')-1)*2,price:120+l('massageCare')*12+comfort*4+l('massageStones')*8+l('wellnessLinen')*3+l('aromaMassage')*12,cost:18+l('massageStones')+l('aromaMassage'),salary:8,automatic:l('therapist')>0,travel:6};
+    if(id==='yoga')return {capacity,duration:30-l('yogaCare')*2-l('yogaBolsters')-l('soundRitual'),price:55+l('yogaCare')*5+l('yogaBolsters')*2+l('zenGarden')*3+l('yogaTea')*5+l('soundRitual')*4,cost:4+l('yogaTea')*.5+l('soundRitual')*.5,salary:3,automatic:l('coach')>0,travel:12};
     return {capacity:0,duration:1,price:0,cost:0,automatic:false,travel:0};
   }
   function serviceConfig(s,id){const c=baseServiceConfig(s,id);return {...c,price:c.price*Experience.multiplier(s,id)};}
@@ -170,7 +170,7 @@
     if(!SERVICES.some(x=>x.id===id))return false;
     const p=serviceConfig(s,id),spots=Layout.serviceSlots(s,id),taken=new Set([...s.treatments.filter(t=>t.service===id).map(t=>t.slot),...[...s.departing,...s.visits].filter(t=>t.reservedService===id).map(t=>t.reservedSlot)]);
     const slot=spots.findIndex((_,i)=>!taken.has(i));if(slot<0)return false;
-    s.treatments.push({...Traffic.create(s,spots[slot],'treatment',rng),service:id,slot,remaining:p.duration,duration:p.duration,automatic:p.automatic,price:p.price,cost:p.cost});return true;
+    s.treatments.push({...Traffic.create(s,spots[slot],'treatment',rng),service:id,slot,remaining:p.duration,duration:p.duration,automatic:p.automatic,price:p.price,cost:p.cost,salary:p.automatic?p.salary:0});return true;
   }
   function purchase(s,id) {
     const u=UPGRADES.find(u=>u.id===id);
@@ -191,7 +191,7 @@
     order.worker=false;order.stage='preparing';return true;
   }
   function orderDuration(s,id){const product=PRODUCTS.find(p=>p.id===id),recipe={latte:'latteBar',cake:'cakeDisplay',toast:'toastKitchen'}[id];return product.time/params(s).speed/(1+(recipe?Math.min(3,level(s,recipe))*.06:id==='coffee'?Math.min(3,level(s,'brewBar'))*.08:id==='breakfast'?Math.min(3,level(s,'bakeryOven'))*.1:0));}
-  function orderPrice(s,id){const product=PRODUCTS.find(p=>p.id===id),recipe={latte:'latteBar',cake:'cakeDisplay',toast:'toastKitchen'}[id];return Experience.multiplier(s,'cafe')*(product.price*params(s).quality+(recipe?Math.max(0,Math.min(3,level(s,recipe))-1)*.5:id==='coffee'?Math.min(3,level(s,'brewBar'))*.35:id==='breakfast'?Math.min(3,level(s,'bakeryOven'))*.4:0));}
+  function orderPrice(s,id){const product=PRODUCTS.find(p=>p.id===id),recipe={latte:'latteBar',cake:'cakeDisplay',toast:'toastKitchen'}[id];return Experience.multiplier(s,'cafe')*(product.price*params(s).quality+(recipe?Math.max(0,Math.min(3,level(s,recipe))-1)*6:id==='coffee'?Math.min(3,level(s,'brewBar'))*.35:id==='breakfast'?Math.min(3,level(s,'bakeryOven'))*.4:0));}
   const active=(s,now)=>now<s.boostUntil;
   function rush(s,now=Date.now()) {
     if(now<s.rushReady)return false;
@@ -245,7 +245,7 @@
         if(target){const types=menu(s),preferred=types.find(p=>p.id===(s.specialty==='brunch'?'breakfast':'matcha'))||types[0];Object.assign(a,{type:'cafe',sport:undefined,service:undefined,queueSlot:target.index,product:preferred.id,remaining:null,worker:false,stage:'arrival'});s.queue.push(a);}
       }else{
         const id=a.nextService,spots=Layout.serviceSlots(s,id),busy=new Set([...s.treatments.filter(t=>t.service===id).map(t=>t.slot),...[...s.departing,...s.visits.filter(v=>v!==a)].filter(t=>t.reservedService===id).map(t=>t.reservedSlot)]),slot=spots.findIndex((_,i)=>!busy.has(i));
-        if(slot>=0){target=spots[slot];const c=serviceConfig(s,id);Object.assign(a,{type:'treatment',sport:undefined,service:id,slot,duration:c.duration,remaining:c.duration,automatic:c.automatic,price:c.price,cost:c.cost,stage:'arrival'});s.treatments.push(a);}
+        if(slot>=0){target=spots[slot];const c=serviceConfig(s,id);Object.assign(a,{type:'treatment',sport:undefined,service:id,slot,duration:c.duration,remaining:c.duration,automatic:c.automatic,price:c.price,cost:c.cost,salary:c.automatic?c.salary:0,stage:'arrival'});s.treatments.push(a);}
       }
       if(target){Traffic.send(a,Layout.insideRoute(target),target);events.push({type:'comboNext',service:a.nextService});}
       else if(a.wait>=a.patience){Experience.rate(s,a,true);s.lost++;Traffic.exit(a);s.departing.push(a);events.push({type:'lost'});}
@@ -321,29 +321,35 @@
       if(treatment.stage==='arrival'){if(!treatment.path.length)treatment.stage='active';ongoing.push(treatment);continue;}
       treatment.remaining=Math.max(0,treatment.remaining-activityDt);
       if(treatment.remaining>0){ongoing.push(treatment);continue;}
-      const config=serviceConfig(s,treatment.service),cost=(treatment.cost??config.cost)+(treatment.automatic?(treatment.service==='yoga'?2:4):0);
+      const config=serviceConfig(s,treatment.service),cost=(treatment.cost??config.cost)+(treatment.salary??(treatment.automatic?config.salary:0));
       revenue(s,treatment.price??config.price,cost);s.wellnessRevenue+=treatment.price??config.price;s.completedServices[treatment.service]++;s.happy++;s.reputation=clamp(s.reputation+.3,20,100);
       events.push({type:'service',service:treatment.service,net:(treatment.price??config.price)-cost,first:s.completedServices[treatment.service]===1});
       treatment.reservedService=treatment.service;treatment.reservedSlot=treatment.slot;if(!finishVisit(s,treatment,treatment.service,rng))s.departing.push(treatment);
     }
     s.treatments=ongoing;
-    if(p.branches) {const gross=p.branches*dt*3,cost=gross*.65;revenue(s,gross,cost);s.satellite+=gross-cost;}
+    if(p.branches) {const gross=p.branches*dt*30,cost=gross*.65;revenue(s,gross,cost);s.satellite+=gross-cost;}
     Sports.update(s,activityDt,events,revenue,(a,id)=>finishVisit(s,a,id,rng));
     if(s.premiumEvent){events.push(s.premiumEvent);delete s.premiumEvent;}
     Progression.tick(s,dt,events,now);
     return events;
   }
   function estimate(s) {
-    const p=params(s), products=menu(s),avg=products.reduce((a,x)=>a+orderPrice(s,x.id)-x.cost-.65,0)/products.length;
+    const p=params(s), products=menu(s),avg=products.reduce((a,x)=>a+orderPrice(s,x.id)-(x.cost+.65)*(1-p.manager*.08),0)/products.length;
     const occupancyTime=products.reduce((sum,x)=>sum+consumptionTime(x.id,1.5,s),0)/products.length+9;
-    const orders=p.baristas?Math.min(1/p.arrival,p.baristas*p.speed/4.5,p.seats/occupancyTime):0;
+    const preparation=products.reduce((sum,x)=>sum+orderDuration(s,x.id),0)/products.length;
+    const orders=p.baristas?Math.min(1/p.arrival,p.baristas*p.speed/4.5,p.seats/occupancyTime,Layout.queueSlots().length/(10+preparation)):0;
     const expectedStudents=Math.min(p.capacity,22/classDemand(s)*.7);
-    const cafe=Math.max(0,avg*orders),pilates=level(s,'mat')&&level(s,'coach')?expectedStudents*(p.classPrice-5-Math.min(2,level(s,'pilatesBands'))*.5)/(p.classTime+22+14+14+4):0;
-    const services=Object.fromEntries(SERVICES.map(service=>{const c=serviceConfig(s,service.id);return [service.id,c.automatic?c.capacity*(c.price-c.cost-(service.id==='yoga'?2:4))/(c.duration+c.travel+6):0];}));
-    const sporting=Object.fromEntries(Sports.SPORTS.map(({id})=>{const c=Sports.config(s,id);return [id,c.automatic?c.capacity*(c.price-c.cost-c.salary)/(c.duration+60):0];}));
+    const cafe=Math.max(0,avg*orders),pilates=level(s,'mat')&&level(s,'coach')?expectedStudents*(p.classPrice-5-Math.min(2,level(s,'pilatesBands'))*.5)/(p.classTime+38+Math.min(16,Math.max(0,expectedStudents-4)*16/11.4)):0;
+    const services=Object.fromEntries(SERVICES.map(service=>{const c=serviceConfig(s,service.id);return [service.id,c.automatic?c.capacity*(c.price-c.cost-c.salary)/(c.duration+c.travel+6):0];}));
+    const sporting=Sports.estimateRooms(s);
     const wellness=Object.values(services).reduce((sum,n)=>sum+n,0),sports=Object.values(sporting).reduce((sum,n)=>sum+n,0);
-    const rooms={cafe,pilates,yoga:services.yoga,wellness:services.pressotherapy+services.massage,...sporting,branches:p.branches*1.05};
+    const rooms={cafe,pilates,yoga:services.yoga,wellness:services.pressotherapy+services.massage,...sporting,branches:p.branches*10.5};
     return {cafe,pilates,wellness,sports,services,rooms,total:Object.values(rooms).reduce((sum,n)=>sum+n,0)};
+  }
+  function upgradeEconomy(s,id){
+    const u=UPGRADES.find(u=>u.id===id);if(!u||level(s,id)>=u.max||requirement(s,u))return null;
+    const next={...s,levels:{...s.levels,[id]:level(s,id)+1}},delta=Math.max(0,(estimate(next).total-estimate(s).total)*60);
+    return {deltaPerMinute:delta,cost:price(s,u),paybackMinutes:delta>1e-6?price(s,u)/delta:null};
   }
   function roomEconomy(s,upgradeId){
     const upgrade=UPGRADES.find(u=>u.id===upgradeId);if(!upgrade)return null;
@@ -376,5 +382,5 @@
   const journeyMetrics=s=>({served:s.served,sessions:s.sessions,wellness:s.completedServices.pressotherapy+s.completedServices.massage,yoga:s.completedServices.yoga,menu:menu(s).length,crossfit:s.sportSessions.crossfit,padel:s.sportSessions.padel,area:Layout.footprint(s).area});
   const chapterStatus=s=>Progression.status(s,journeyMetrics(s));
   const claimChapter=s=>Progression.claimChapter(s,journeyMetrics(s));
-  return {SPECIALTIES:Experience.SPECIALTIES,specialtyRequirement:Experience.requirement,selectSpecialty:Experience.select,SPORTS:Sports.SPORTS,sportConfig:Sports.config,startSport:Sports.start,CHAPTERS:Progression.CHAPTERS,CAMPAIGNS:Progression.CAMPAIGNS,chapterStatus,claimChapter,campaignStatus:Progression.campaignStatus,campaignRequirement:Progression.requirement,startCampaign:Progression.startCampaign,claimCampaign:Progression.claimCampaign,cancelCampaign:Progression.cancelCampaign,VERSION,KEY,LEGACY_KEY,UPGRADES,GOALS,PRODUCTS,SERVICES,fresh,validate,params,level,price,requirement,unlocked,purchase,menu,spawn,startOrder,orderDuration,orderPrice,consumptionTime,startClass,startTreatment,serviceConfig,serviceOccupancy,rush,step,estimate,roomEconomy,offline,value,claim,claimDaily};
+  return {SPECIALTIES:Experience.SPECIALTIES,specialtyRequirement:Experience.requirement,selectSpecialty:Experience.select,SPORTS:Sports.SPORTS,sportConfig:Sports.config,startSport:Sports.start,CHAPTERS:Progression.CHAPTERS,CAMPAIGNS:Progression.CAMPAIGNS,chapterStatus,claimChapter,campaignStatus:Progression.campaignStatus,campaignRequirement:Progression.requirement,startCampaign:Progression.startCampaign,claimCampaign:Progression.claimCampaign,cancelCampaign:Progression.cancelCampaign,VERSION,KEY,LEGACY_KEY,UPGRADES,GOALS,PRODUCTS,SERVICES,fresh,validate,params,level,price,requirement,unlocked,purchase,menu,spawn,startOrder,orderDuration,orderPrice,consumptionTime,startClass,startTreatment,serviceConfig,serviceOccupancy,rush,step,estimate,roomEconomy,upgradeEconomy,offline,value,claim,claimDaily};
 });

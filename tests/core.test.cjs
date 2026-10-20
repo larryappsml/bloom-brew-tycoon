@@ -25,7 +25,7 @@ test('purchase locks and limits enforced in simulation',()=>{
 test('pilates pays once, counts completed classes, charges instructor salary',()=>{
   const s=B.fresh(now);assert.equal(B.startClass(s),false);s.levels.mat=1;assert.equal(B.startClass(s),true);
   assert.equal(B.startClass(s),false);for(let i=0;i<900&&s.classPhase!=='active';i++)B.step(s,.1,now+i*100,()=>.25);const seats=s.classSeats;assert.ok(seats>0);advance(s,46);
-  assert.equal(s.sessions,1);assert.equal(s.students,seats);assert.equal(s.earned,seats*12);assert.equal(s.expenses,seats*2);
+  assert.equal(s.sessions,1);assert.equal(s.students,seats);assert.equal(s.earned,seats*B.params(s).classPrice);assert.equal(s.expenses,seats*2);
   s.levels.coach=1;advance(s,180);assert.ok(s.sessions>=3);assert.ok(s.expenses>seats*2);
 });
 test('offline rewards capped at four hours and cannot be claimed twice',()=>{

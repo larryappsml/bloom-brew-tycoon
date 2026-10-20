@@ -20,8 +20,8 @@ test('new recipes require their equipment and become real orders with ingredient
 test('premium activities charge materials and preserve capacity with finite margins',()=>{
   const s=B.fresh(now);s.money=100000;s.levels={mat:1,wellnessWing:1,massage:1,yogaWing:1,yoga:1};const price=B.params(s).classPrice,yoga=B.serviceConfig(s,'yoga'),massage=B.serviceConfig(s,'massage');
   for(const id of ['pilatesBands','soundRitual','aromaMassage']){while(B.purchase(s,id)){}assert.equal(s.levels[id],2);}
-  assert.equal(B.params(s).classPrice,price+4);assert.equal(B.params(s).capacity,4);assert.equal(B.serviceConfig(s,'yoga').price,yoga.price+4);assert.equal(B.serviceConfig(s,'yoga').cost,yoga.cost+1);assert.equal(B.serviceConfig(s,'massage').price,massage.price+8);assert.equal(B.serviceConfig(s,'massage').cost,massage.cost+2);
-  s.arrival=1e6;B.startClass(s);until(s,()=>s.classPhase==='active');const n=s.classSeats;until(s,()=>s.sessions===1);assert.equal(s.students,n);assert.equal(s.expenses,n*3);assert.equal(s.earned,n*16);
+  assert.equal(B.params(s).classPrice,price+8);assert.equal(B.params(s).capacity,4);assert.equal(B.serviceConfig(s,'yoga').price,yoga.price+8);assert.equal(B.serviceConfig(s,'yoga').cost,yoga.cost+1);assert.equal(B.serviceConfig(s,'massage').price,massage.price+24);assert.equal(B.serviceConfig(s,'massage').cost,massage.cost+2);
+  s.arrival=1e6;B.startClass(s);until(s,()=>s.classPhase==='active');const n=s.classSeats;until(s,()=>s.sessions===1);assert.equal(s.students,n);assert.equal(s.expenses,n*3);assert.equal(s.earned,n*48);
 });
 test('all seven serving models use shared finite geometry within two draw meshes',async()=>{
   const {buildServing}=await import('../scene3d.mjs');const THREE=await import('../vendor/three.module.min.mjs');

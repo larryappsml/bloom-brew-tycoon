@@ -1,6 +1,6 @@
 # Bloom & Brew Tycoon 🌿☕🧘
 
-**v1.13.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
+**v1.14.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
 
 **[Jugar](https://larryappsml.github.io/bloom-brew-tycoon/)**
 
@@ -171,3 +171,7 @@ Al tocar una sala, el panel muestra su neto automático estimado por minuto, pue
 Arte procedural original: parquet con veta compartida, cerámica moldeada, materiales con distintos acabados, tapizados, arcos y herrajes en barra, cafetera, pilates, wellness, yoga y deportes. Exterior con bancos y fachada más detallada. Caras, peinados, orejas y gestos al consumir más cuidados. Sombras de contacto suaves con una textura de 32 px y luz cálida.
 
 Los personajes conservan sus articulaciones, pero las piezas iguales se dibujan con instancing entre visitantes y empleados. Se mantienen el límite de resolución móvil, los modelos compartidos, los iconos de actividad y el guardado existente. El modo Canvas también actualiza su parquet y caras. Las métricas de dibujo se verifican en navegador; la fluidez en un iPhone físico requiere prueba en ese dispositivo.
+
+### v1.14.0 — Economía y rentabilidad
+
+Reequilibradas las tarifas y mejoras de pilates, yoga, recuperación, crossfit y pádel. Se revisan los costes de mejoras poco rentables, el margen del latte y las sedes satélite. Los paneles usan estimaciones calibradas y muestran el incremento previsto de cada mejora y su amortización. La partida conserva dinero, niveles y estadísticas. [Resultados, escenarios y criterios](docs/economy-v1.14.md).

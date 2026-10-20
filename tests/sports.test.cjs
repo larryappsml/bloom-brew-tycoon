@@ -14,8 +14,8 @@ test('padel recruits four real players, waits for their arrival, pays once and e
   const s=sporty();assert.equal(B.startSport(s,'padel'),true);assert.equal(s.sportsGroups.padel.guests.length,0);assert.equal(s.sportsGroups.padel.remaining,0);assert.equal(B.startSport(s,'padel'),false);
   B.step(s,1,now,()=>.25);const guest=s.sportsGroups.padel.guests[0];assert.equal(guest.stage,'arrival');assert.ok(guest.position.z>8);assert.equal(s.earned,0);
   until(s,()=>s.sportsGroups.padel.phase==='active');const g=s.sportsGroups.padel,ids=g.guests.map(a=>a.id);assert.equal(g.guests.length,4);assert.ok(g.guests.every(a=>a.stage==='playing'&&a.path.length===0));assert.equal(new Set(g.guests.map(a=>a.slot)).size,4);assert.equal(B.startSport(s,'padel'),false);
-  until(s,()=>g.phase==='leaving');assert.equal(s.sportSessions.padel,1);assert.equal(s.sportVisits.padel,4);assert.equal(s.earned,140);assert.equal(s.expenses,32);assert.equal(s.money,128);assert.ok(g.guests.every(a=>a.stage==='exiting'));
-  until(s,()=>s.sportsGroups.padel===null);assert.equal(s.earned,140);until(s,()=>s.sportsCooldown.padel===0);assert.equal(B.startSport(s,'padel'),true);B.step(s,1,now,()=>.25);assert.ok(!ids.includes(s.sportsGroups.padel.guests[0].id));
+  until(s,()=>g.phase==='leaving');assert.equal(s.sportSessions.padel,1);assert.equal(s.sportVisits.padel,4);assert.equal(s.earned,1040);assert.equal(s.expenses,96);assert.equal(s.money,964);assert.ok(g.guests.every(a=>a.stage==='exiting'));
+  until(s,()=>s.sportsGroups.padel===null);assert.equal(s.earned,1040);until(s,()=>s.sportsCooldown.padel===0);assert.equal(B.startSport(s,'padel'),true);B.step(s,1,now,()=>.25);assert.ok(!ids.includes(s.sportsGroups.padel.guests[0].id));
 });
 test('padel cannot charge a partial booking or an empty court',()=>{
   const s=sporty();B.startSport(s,'padel');let attempts=0;const rng=()=>attempts++<4?.25:.99;
@@ -23,11 +23,11 @@ test('padel cannot charge a partial booking or an empty court',()=>{
   const empty=sporty();B.startSport(empty,'padel');until(empty,()=>empty.sportsGroups.padel===null,40,()=>.99);assert.equal(empty.earned,0);assert.equal(empty.sportVisits.padel,0);
 });
 test('functional groups use only real attendees and hired coaches automate both sports with salaries',()=>{
-  const s=sporty();B.startSport(s,'crossfit');until(s,()=>s.sportsGroups.crossfit.phase==='active');const n=s.sportsGroups.crossfit.guests.length;assert.equal(n,6);until(s,()=>s.sportSessions.crossfit===1);assert.equal(s.sportVisits.crossfit,n);assert.equal(s.earned,n*31);assert.equal(s.expenses,n*5);
+  const s=sporty();B.startSport(s,'crossfit');until(s,()=>s.sportsGroups.crossfit.phase==='active');const n=s.sportsGroups.crossfit.guests.length;assert.equal(n,6);until(s,()=>s.sportSessions.crossfit===1);assert.equal(s.sportVisits.crossfit,n);assert.equal(s.earned,n*278);assert.equal(s.expenses,n*18);
   const auto=sporty();auto.levels.functionalCoach=1;auto.levels.padelCoach=1;until(auto,()=>auto.sportSessions.crossfit>=2&&auto.sportSessions.padel>=2,300);assert.ok(auto.expenses>0);assert.ok(auto.sportsRevenue>0);assert.ok(B.estimate(auto).sports>0);assert.ok(T.agents(auto).length<40);
 });
 test('rush accelerates an existing sporting session without changing its duration or multiplying fees',()=>{
-  const s=sporty();B.startSport(s,'padel');until(s,()=>s.sportsGroups.padel.phase==='active');const g=s.sportsGroups.padel,before=g.remaining,total=g.duration;B.rush(s,now);B.step(s,1,now+1000,()=>.25);assert.ok(Math.abs(g.remaining-(before-1.25))<1e-8);assert.equal(g.duration,total);g.remaining=.1;B.step(s,1,now+2000,()=>.25);assert.equal(s.earned,140);assert.equal(s.sportSessions.padel,1);assert.equal(C.iconFor('padel'),'🎾');assert.equal(C.iconFor('crossfit'),'🏋️');
+  const s=sporty();B.startSport(s,'padel');until(s,()=>s.sportsGroups.padel.phase==='active');const g=s.sportsGroups.padel,before=g.remaining,total=g.duration;B.rush(s,now);B.step(s,1,now+1000,()=>.25);assert.ok(Math.abs(g.remaining-(before-1.25))<1e-8);assert.equal(g.duration,total);g.remaining=.1;B.step(s,1,now+2000,()=>.25);assert.equal(s.earned,1040);assert.equal(s.sportSessions.padel,1);assert.equal(C.iconFor('padel'),'🎾');assert.equal(C.iconFor('crossfit'),'🏋️');
 });
 test('sport statistics and old chapter rewards survive import while active groups reset safely',()=>{
   const s=sporty();s.sportSessions={crossfit:4,padel:3};s.sportVisits={crossfit:20,padel:12};s.sportsRevenue=900;s.chapters=B.CHAPTERS.slice(0,6).map(c=>c.id);B.startSport(s,'padel');const restored=B.validate(JSON.parse(JSON.stringify(s)),now);assert.deepEqual(restored.sportSessions,s.sportSessions);assert.deepEqual(restored.sportVisits,s.sportVisits);assert.equal(restored.sportsRevenue,900);assert.equal(restored.sportsGroups.padel,null);assert.equal(restored.chapters.length,6);assert.equal(B.chapterStatus(restored).id,'strength');
