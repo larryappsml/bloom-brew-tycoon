@@ -151,3 +151,5 @@ La v1.2 cambia la presentación por un local 3D con modelos propios, conservando
 ### Demo avanzada
 
 [Centro completo con pádel y crossfit](https://larryappsml.github.io/bloom-brew-tycoon/?demo=club). Incluye 45.000 € y servicios abiertos. Guardado independiente: vuelve a la URL sin parámetros para recuperar tu partida normal.
+
+En el mapa, las salas y parcelas muestran sus nombres y mejoras al tocarlas, sin carteles flotantes permanentes.

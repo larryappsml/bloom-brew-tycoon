@@ -6,7 +6,7 @@ function worker(){
   const handlers={},deleted=[],added=[];
   const cache={addAll:async urls=>added.push(...urls),match:async()=>undefined};
   const self={registration:{scope:'https://example.com/bloom-brew-tycoon/'},clients:{claim:async()=>{}},addEventListener(name,fn){handlers[name]=fn;}};
-  vm.runInNewContext(fs.readFileSync('sw.js','utf8'),{self,URL,Response,caches:{open:async()=>cache,keys:async()=>['bloom-brew-v1','another-app-cache','bloom-brew-v1.11.1'],delete:async key=>deleted.push(key)},fetch:async()=>{throw Error('offline');}});
+  vm.runInNewContext(fs.readFileSync('sw.js','utf8'),{self,URL,Response,caches:{open:async()=>cache,keys:async()=>['bloom-brew-v1','another-app-cache','bloom-brew-v1.11.2'],delete:async key=>deleted.push(key)},fetch:async()=>{throw Error('offline');}});
   return {handlers,deleted,added,cache};
 }
 test('worker precaches every game asset with relative URLs',async()=>{

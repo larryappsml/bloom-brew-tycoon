@@ -88,7 +88,6 @@ export function buildWorld(state){
   // Divider is low so that the studio remains legible on a phone.
   for(const [z,d]of [[-3.1,4.7],[.95,1],[2.95,.6]])box(root,.65,.28,z,.12,.5,d,palette.white);for(const z of [-4.8,-1.1,3.15])plant(root,.65,z,.63);
   const studioGroup=group(root,3.85,0,-.3,'mat');targets.mat=studioGroup;
-  label(studioGroup,studio?'ESTUDIO PILATES':'PRÓXIMA APERTURA',0,2.35,-3.7,3.8,studio?'#326b55':'#687b70',studio?'#e8f8da':'#edf0e4');
   const students=[];
   if(studio){
     for(const spot of Layout.pilates(state)){reformer(root,spot.x,spot.z,spot.premium);students.push(spot);}
@@ -99,7 +98,6 @@ export function buildWorld(state){
     const lock=group(studioGroup,0,.5,.1);box(lock,0,.35,0,1.3,.95,.45,palette.gold);const hoop=mesh(lock,geometry('lock',()=>new THREE.TorusGeometry(.43,.1,8,16,Math.PI)),0xe8b245,0,.85,0);hoop.rotation.z=0;box(lock,0,.4,.24,.1,.3,.03,0x9f7c2b);
     for(const z of [-2.4,2.5]){box(studioGroup,0,.7,z,4.8,.18,.12,0xf4d875);for(const x of [-2.1,2.1])box(studioGroup,x,.35,z,.1,.7,.1,palette.dark);}
     for(let i=0;i<3;i++)box(studioGroup,1.25,.18+i*.18,1.5,1.4,.17,.5,0xbda78b);
-    label(studioGroup,'ABRIR · 850 €',0,1.08,1.3,3,'#795d20','#fff0b8');
   }
   const serviceSpots=buildExpansions(root,state);
   // A continuous street and pavement connect arriving guests to the front door.
@@ -109,16 +107,15 @@ export function buildWorld(state){
   for(let i=0;i<5;i++)box(root,-1.6+i*.62,-.13,10.7,.36,.015,1.9,palette.white);
   for(const x of [-17,17]){plant(root,x,7.8,1.7);cylinder(root,x,1.7,9.2,.06,3.6,palette.dark);ball(root,x,3.55,9.2,.26,palette.gold);const car=group(root,x,0,12.3);box(car,0,.32,0,2.9,.6,1.3,palette.sage);box(car,0,.83,0,1.4,.55,1.15,palette.sky);for(const a of [-.9,.9])for(const b of [-.65,.65]){const wheel=cylinder(car,a,.1,b,.24,.13,palette.ink);wheel.rotation.x=Math.PI/2;}}
   for(const x of [-15,15])for(const z of [-4.7,1.6,5.5])plant(root,x,z,1.5);
-  const entrance=group(root,-.4,0,5.95);for(const x of [-1.85,1.85])box(entrance,x,1.1,0,.13,2.2,.13,palette.dark);box(entrance,0,2.32,0,4.2,.22,.8,palette.sage);for(let i=0;i<8;i++)box(entrance,-1.84+i*.52,2.44,0,.48,.06,.83,i%2?palette.cream:palette.sage);label(entrance,'CAFÉ · WELLNESS',0,2.12,.18,3.3,'#fff9e4','#356c56');
+  const entrance=group(root,-.4,0,5.95);for(const x of [-1.85,1.85])box(entrance,x,1.1,0,.13,2.2,.13,palette.dark);box(entrance,0,2.32,0,4.2,.22,.8,palette.sage);for(let i=0;i<8;i++)box(entrance,-1.84+i*.52,2.44,0,.48,.06,.83,i%2?palette.cream:palette.sage);
   if(levels.terrace){for(const x of (levels.terrace>1?[-10,-4.8,3.8,10]:[-4.8,3.8])){table(root,x,7.1);cylinder(root,x,1.55,7.1,.035,3.1,palette.wood);mesh(root,geometry('parasol',()=>new THREE.ConeGeometry(1.35,.45,8)),palette.cream,x,3.1,7.1);}plant(root,-6.4,7.25,.8);}
-  if(levels.second)label(root,`${1+Math.min(2,levels.second)} LOCALES · EMPIRE`,4.8,3.2,4,3.8,'#76551c','#fff0b4');
   const kit={box,cylinder,ball,group,plant,label,cup,geometry,mesh,palette};buildSports(root,state,kit);
   const detailFeatures=dressWorld(root,state,kit);
   return {root,targets,students,tablePositions,tableCount,bar,studio,serviceSpots,footprint,detailFeatures};
 }
 function buildExpansions(root,s){const z=Layout.zones(s),l=id=>Math.min(s.levels?.[id]||0,6),spots=[];
-  function room(x,back,w,d,color,title,zone){const g=group(root,x,0,back+d/2,zone);box(g,0,-.25,0,w,.55,d,0xa4b39c);box(g,0,.04,0,w-.1,.1,d-.1,color);box(g,0,1.15,-d/2,w,2.4,.15,palette.cream);if(zone==='wellnessWing'){box(g,-w/2,1.15,-3.3,.15,2.4,5.1,palette.cream);box(g,-w/2,1.15,4.7,.15,2.4,2.1,palette.cream);}else box(g,-w/2,1.15,0,.15,2.4,d,palette.cream);label(g,title,0,2.7,-d/2+.3,w*.73);return g;}
-  function plot(x,back,w,d,id,title){const g=group(root,x,0,back+d/2,id);box(g,0,-.35,0,w,.16,d,0xa9c49b);for(const a of [-1,1])for(const b of [-1,1])box(g,a*(w/2-.2),.23,b*(d/2-.2),.12,.6,.12,palette.white);box(g,0,.08,0,1.15,.08,1.15,palette.sage);box(g,0,.14,0,.65,.07,.14,palette.white);box(g,0,.14,0,.14,.07,.65,palette.white);label(g,title,0,.9,0,w*.65,'#4b7051','#e5f0d8');}
+  function room(x,back,w,d,color,title,zone){const g=group(root,x,0,back+d/2,zone);box(g,0,-.25,0,w,.55,d,0xa4b39c);box(g,0,.04,0,w-.1,.1,d-.1,color);box(g,0,1.15,-d/2,w,2.4,.15,palette.cream);if(zone==='wellnessWing'){box(g,-w/2,1.15,-3.3,.15,2.4,5.1,palette.cream);box(g,-w/2,1.15,4.7,.15,2.4,2.1,palette.cream);}else box(g,-w/2,1.15,0,.15,2.4,d,palette.cream);return g;}
+  function plot(x,back,w,d,id,title){const g=group(root,x,0,back+d/2,id);box(g,0,-.35,0,w,.16,d,0xa9c49b);for(const a of [-1,1])for(const b of [-1,1])box(g,a*(w/2-.2),.23,b*(d/2-.2),.12,.6,.12,palette.white);box(g,0,.08,0,1.15,.08,1.15,palette.sage);box(g,0,.14,0,.65,.07,.14,palette.white);box(g,0,.14,0,.14,.07,.65,palette.white);}
   if(z.cafe){room(-10.7,-6.2,6.6,12.4,0xf3d5ab,'SALÓN BOTÁNICO','cafeWing');plant(root,-13,-4.8,1.2);plant(root,-13,5,1.1);}else plot(-10.7,-6.2,6.6,12.4,'cafeWing','AMPLIAR CAFÉ');
   if(z.studio)room(3.9,-12.6,7,6.4,0xc9e3d3,'PILATES · GRUPOS','classes');
   if(z.yoga){room(-3.9,-12.6,7,6.4,0xe8d3c6,'YOGA & CALMA','yogaWing');for(const spot of Layout.serviceSlots(s,'yoga')){const g=group(root,spot.x,0,spot.z,'yoga');box(g,0,.08,0,.85,.12,1.8,palette.rose);for(let i=0;i<l('yogaCare');i++)box(g,.65,.15,-.5+i*.4,.23,.26,.3,[palette.mint,palette.oak,palette.cream][i]);spots.push(spot);}plant(root,-6.6,-11.7,1.2);}else plot(-3.9,-12.6,7,6.4,'yogaWing','SALA YOGA');
@@ -131,8 +128,8 @@ function buildExpansions(root,s){const z=Layout.zones(s),l=id=>Math.min(s.levels
       spots.push(spot);
     }
     for(let i=0;i<l('recoveryComfort');i++){plant(root,13.2,-4.8+i*4.2,.85+i*.13);box(root,8.5+i*2,2.3,-6.05,1.25,.5,.1,[palette.rose,palette.gold,palette.mint][i]);}
-    if(!l('pressotherapy')){const g=group(root,10.5,0,-2.7,'pressotherapy');box(g,0,.1,0,2,.12,1.6,palette.mint);label(g,'+ PRESOTERAPIA',0,1.2,0,3);}
-    if(!l('massage')){const g=group(root,10.5,0,2.6,'massage');box(g,0,.1,0,2,.12,1.6,palette.rose);label(g,'+ MASAJE',0,1.2,0,2.8);}
+    if(!l('pressotherapy')){const g=group(root,10.5,0,-2.7,'pressotherapy');box(g,0,.1,0,2,.12,1.6,palette.mint);}
+    if(!l('massage')){const g=group(root,10.5,0,2.6,'massage');box(g,0,.1,0,2,.12,1.6,palette.rose);}
   }else plot(10.7,-6.2,6.6,12.4,'wellnessWing','AMPLIAR WELLNESS');
   return spots;
 }

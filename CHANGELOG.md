@@ -1,3 +1,7 @@
+# v1.11.2
+
+- Retirados los carteles flotantes permanentes de las salas y parcelas. Sus nombres, niveles y mejoras siguen disponibles al tocar cada zona.
+
 # v1.11.1
 
 - Demo avanzada pública con pádel y crossfit y guardado independiente.
