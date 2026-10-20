@@ -1,8 +1,8 @@
 (function (root, factory) {
-  const api = factory();
+  const api = factory(typeof module==='object'&&module.exports?require('./layout.js'):root.BloomLayout);
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.Bloom = api;
-})(typeof globalThis === 'undefined' ? this : globalThis, function () {
+})(typeof globalThis === 'undefined' ? this : globalThis, function (Layout) {
   'use strict';
   const VERSION = 2;
   const KEY = 'bloom-brew-save-v2', LEGACY_KEY = 'bloom-brew-save-v1';
@@ -16,10 +16,23 @@
     ['coach','Instructora de pilates','Automatiza las clases · salario por sesión','🤸','team',620,2],
     ['reformer','Pilates reformer','Equipamiento premium y mayor precio por plaza','🛏️','pilates',1600,4],
     ['terrace','Terraza botánica','Cuatro plazas y más demanda de café','🌿','cafe',2900,2],
-    ['classes','Sala de clases en grupo','Cuatro plazas extra de pilates','👯','pilates',4200,2],
+    ['classes','Sala de clases en grupo','Cuatro plazas extra de pilates','👯','zones',4200,2],
     ['manager','Gerente','Mejora productividad y reduce costes variables','🧑‍💼','team',6500,2],
     ['spa','Wellness y smoothies','Carta premium y sesiones de mayor valor','🥤','pilates',10500,2],
-    ['second','Nueva sede','Abre hasta dos sedes satélite con margen limitado','🏬','cafe',24000,2]
+    ['second','Nueva sede','Abre hasta dos sedes satélite con margen limitado','🏬','cafe',24000,2],
+    ['cafeWing','Ampliar cafetería','Construye un salón lateral con nuevas mesas','🏗️','zones',1800,1],
+    ['wellnessWing','Ala de recuperación','Amplía el centro con una sala wellness','🏗️','zones',3200,1],
+    ['yogaWing','Sala de yoga','Construye una sala al fondo del centro','🏗️','zones',2600,1],
+    ['pressotherapy','Tumbonas de presoterapia','Una tumbona con botas por nivel · hasta dos','🦵','wellness',1100,2],
+    ['pressureCare','Equipo de presoterapia','Mejores botas, consola y sesiones más rentables','⚙️','wellness',780,3],
+    ['massage','Cabinas de masaje','Una camilla equipada por nivel · hasta dos','💆','wellness',1700,2],
+    ['massageCare','Equipamiento de masaje','Calentador de toallas, aceites y mejor servicio','🕯️','wellness',920,3],
+    ['recoveryComfort','Confort de la sala','Plantas, cuadros y detalles premium','🪴','wellness',650,3],
+    ['therapist','Especialista wellness','Automatiza presoterapia y masajes','🧑‍⚕️','team',1250,2],
+    ['yoga','Esterillas de yoga','Dos plazas nuevas por nivel','🧘','pilates',900,3],
+    ['yogaCare','Accesorios de yoga','Bloques y accesorios para la sala','🕯️','pilates',560,3],
+    ['cafeDecor','Ambientación del café','Plantas, lámparas y decoración por nivel','🌿','cafe',310,3],
+    ['roaster','Tostador y molinillo','Más calidad y una nueva estación de café','⚙️','cafe',720,2]
   ].map(([id,name,desc,emoji,cat,base,max])=>({id,name,desc,emoji,cat,base,max}));
   const GOALS = [
     ['first','Tu primer turno','Sirve 10 pedidos',10,'served',45,'☕'],
@@ -27,7 +40,9 @@
     ['passive','Un equipo de confianza','Contrata un barista',1,'barista',150,'👩‍🍳'],
     ['pilates','Respira y crece','Abre el estudio de pilates',1,'mat',180,'🧘'],
     ['growth','Una comunidad wellness','Completa 10 clases',10,'sessions',350,'✨'],
-    ['empire','El siguiente capítulo','Abre una segunda sede',1,'second',1500,'🏬']
+    ['empire','El siguiente capítulo','Abre una segunda sede',1,'second',1500,'🏬'],
+    ['recovery','Un centro para cuidarse','Completa 8 sesiones de presoterapia o masaje',8,'wellness',300,'🌿'],
+    ['yogaCommunity','Encuentra tu equilibrio','Completa 12 sesiones de yoga',12,'yogaSessions',240,'🧘']
   ].map(([id,title,desc,target,key,reward,emoji])=>({id,title,desc,target,key,reward,emoji}));
   const PRODUCTS = [
     {id:'coffee',name:'Café',icon:'☕',price:5,cost:1.2,time:3.6},
@@ -37,13 +52,13 @@
   ];
   const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
   const level=(s,id)=>s.levels[id]||0;
-  const fresh=(now=Date.now())=>({version:VERSION,money:20,earned:0,expenses:0,rewards:0,served:0,happy:0,lost:0,sessions:0,students:0,levels:{},claimed:[],last:now,seconds:0,reputation:75,tutorial:0,boostUntil:0,rushReady:0,classRemaining:0,classSeats:0,nextId:1,arrival:0.5,daily:{day:new Date(now).toISOString().slice(0,10),count:0,claimed:false},queue:[],seated:[],satellite:0});
+  const fresh=(now=Date.now())=>({version:VERSION,money:20,earned:0,expenses:0,rewards:0,served:0,happy:0,lost:0,sessions:0,students:0,levels:{},claimed:[],last:now,seconds:0,reputation:75,tutorial:0,boostUntil:0,rushReady:0,classRemaining:0,classSeats:0,nextId:1,arrival:0.5,daily:{day:new Date(now).toISOString().slice(0,10),count:0,claimed:false},queue:[],seated:[],satellite:0,treatments:[],treatmentArrival:2,completedServices:{pressotherapy:0,massage:0,yoga:0},wellnessRevenue:0});
   function validate(data, now=Date.now()) {
     if (!data || typeof data!=='object' || Array.isArray(data)) throw Error('Partida inválida');
     if (data.version!==undefined && data.version!==1 && data.version!==2) throw Error('Versión de partida incompatible');
     if (!Number.isFinite(data.money)||data.money<0 || !data.levels || typeof data.levels!=='object' || Array.isArray(data.levels)) throw Error('Datos de partida inválidos');
     const s=fresh(now), migrating=data.version!==VERSION;
-    for(const key of ['money','earned','expenses','rewards','served','happy','lost','sessions','students','seconds','satellite']) {
+    for(const key of ['money','earned','expenses','rewards','served','happy','lost','sessions','students','seconds','satellite','wellnessRevenue']) {
       if(data[key]!==undefined && (!Number.isFinite(data[key])||data[key]<0||data[key]>1e15)) throw Error('Valor inválido: '+key);
       if(data[key]!==undefined) s[key]=data[key];
     }
@@ -53,6 +68,7 @@
     }
     if(data.claimed!==undefined && (!Array.isArray(data.claimed)||data.claimed.some(id=>!GOALS.some(g=>g.id===id)))) throw Error('Objetivos inválidos');
     s.claimed=[...new Set(data.claimed||[])];
+    if(data.completedServices!==undefined){if(!data.completedServices||typeof data.completedServices!=='object'||Array.isArray(data.completedServices))throw Error('Servicios inválidos');for(const [key,n]of Object.entries(data.completedServices)){if(!['pressotherapy','massage','yoga'].includes(key)||!Number.isInteger(n)||n<0||n>1e12)throw Error('Servicios inválidos');s.completedServices[key]=n;}}
     for(const key of ['last','boostUntil','rushReady']) if(Number.isFinite(data[key])) s[key]=clamp(data[key],0,now+180000);
     s.reputation=migrating?75:clamp(Number.isFinite(data.reputation)?data.reputation:75,20,100);
     s.tutorial=clamp(Number.isInteger(data.tutorial)?data.tutorial:0,0,4);
@@ -66,19 +82,34 @@
   }
   function params(s) {
     const l=id=>Math.min(level(s,id),UPGRADES.find(u=>u.id===id).max);
-    const seats=3+l('seats')*2+l('terrace')*4;
+    const seats=3+l('seats')*2+l('terrace')*4+(Layout.zones(s).cafe?6:0);
     const arrival=Math.max(1.4,6.5-l('seats')*.22-l('terrace')*.7-l('matcha')*.12)*(1.15-s.reputation/300);
-    const speed=1+l('machine')*.18+l('manager')*.15;
+    const speed=1+l('machine')*.18+l('manager')*.15+l('roaster')*.06;
     const capacity=2+l('mat')*2+l('classes')*4;
     const classPrice=12+l('reformer')*5+l('spa')*3;
-    return {seats,arrival,speed,baristas:l('barista'),capacity,classPrice,classTime:Math.max(25,45-l('coach')*4),quality:1+l('machine')*.12+l('pastries')*.05+l('matcha')*.04,manager:l('manager'),branches:l('second')};
+    return {seats,arrival,speed,baristas:l('barista'),capacity,classPrice,classTime:Math.max(25,45-l('coach')*4),quality:1+l('machine')*.12+l('pastries')*.05+l('matcha')*.04+l('cafeDecor')*.04+l('roaster')*.08,manager:l('manager'),branches:l('second'),area:Layout.footprint(s).area};
   }
   const price=(s,u)=>Math.ceil(u.base*Math.pow(1.65,level(s,u.id)));
-  function unlocked(s,u) {
-    if(['coach','reformer','classes','spa'].includes(u.id))return level(s,'mat')>0;
-    if(['manager','second'].includes(u.id))return s.sessions>=10;
-    return true;
+  function requirement(s,u) {
+    if(['coach','reformer','classes','spa','wellnessWing','yogaWing'].includes(u.id)&&!level(s,'mat'))return 'Abre el estudio de pilates primero';
+    if(['manager','second'].includes(u.id)&&s.sessions<10)return 'Completa 10 clases primero';
+    if(u.id==='cafeWing'&&s.served<40)return 'Sirve 40 pedidos para ampliar';
+    if(['pressotherapy','massage','recoveryComfort','therapist'].includes(u.id)&&!Layout.zones(s).wellness)return 'Construye el ala de recuperación primero';
+    if(u.id==='pressureCare'&&!level(s,'pressotherapy'))return 'Instala una tumbona de presoterapia';
+    if(u.id==='massageCare'&&!level(s,'massage'))return 'Instala una camilla de masaje';
+    if(['yoga','yogaCare'].includes(u.id)&&!Layout.zones(s).yoga)return 'Construye la sala de yoga primero';
+    if(u.id==='seats'&&level(s,'seats')>=3&&!Layout.zones(s).cafe)return 'Amplía la cafetería para añadir más mesas';
+    return '';
   }
+  const unlocked=(s,u)=>!requirement(s,u);
+  const SERVICES=[{id:'pressotherapy',name:'Presoterapia',icon:'🦵'},{id:'massage',name:'Masaje',icon:'💆'},{id:'yoga',name:'Yoga',icon:'🧘'}];
+  function serviceConfig(s,id){const l=x=>Math.min(level(s,x),UPGRADES.find(u=>u.id===x).max),capacity=Layout.serviceSlots(s,id).length,comfort=l('recoveryComfort');
+    if(id==='pressotherapy')return {capacity,duration:36-l('pressureCare')*3-Math.max(0,l('therapist')-1)*2,price:28+l('pressureCare')*4+comfort*2,cost:6,automatic:l('therapist')>0,travel:18};
+    if(id==='massage')return {capacity,duration:42-l('massageCare')*3-Math.max(0,l('therapist')-1)*2,price:36+l('massageCare')*4+comfort*2,cost:8,automatic:l('therapist')>0,travel:18};
+    if(id==='yoga')return {capacity,duration:30-l('yogaCare')*2,price:14+l('yogaCare')*2,cost:2,automatic:l('coach')>0,travel:20};
+    return {capacity:0,duration:1,price:0,cost:0,automatic:false,travel:0};
+  }
+  function startTreatment(s,id,rng=Math.random){if(!SERVICES.some(x=>x.id===id))return false;const p=serviceConfig(s,id);const taken=s.treatments.filter(t=>t.service===id).map(t=>t.slot);const slot=Array.from({length:p.capacity},(_,i)=>i).find(i=>!taken.includes(i));if(slot===undefined)return false;s.treatments.push({id:s.nextId++,service:id,slot,stage:'arrival',travel:p.travel,remaining:p.duration,kind:Math.min(3,Math.floor(rng()*4)),automatic:p.automatic});return true;}
   function purchase(s,id) {
     const u=UPGRADES.find(u=>u.id===id);
     if(!u||!unlocked(s,u)||level(s,id)>=u.max)return false;
@@ -130,7 +161,7 @@
         const product=PRODUCTS.find(x=>x.id===o.product),gross=product.price*p.quality;
         const cost=(product.cost+(o.worker?.65:0))*(1-p.manager*.08);
         revenue(s,gross,cost);s.served++;s.happy++;s.daily.count++;s.reputation=clamp(s.reputation+.5,20,100);
-        s.seated.push({id:o.id,kind:o.kind,remaining:7,product:o.product});
+        s.seated.push({id:o.id,kind:o.kind,remaining:18,product:o.product});
         events.push({type:'sale',net:gross-cost,product:product.name});
       } else if(o.remaining===null&&o.wait>o.patience) {s.lost++;s.reputation=clamp(s.reputation-1.5,20,100);events.push({type:'lost'});}
       else pending.push(o);
@@ -145,6 +176,18 @@
       }
     }
     if(level(s,'coach')&&s.classRemaining===0)startClass(s,now);
+    s.treatmentArrival-=dt;
+    if(s.treatmentArrival<=0){for(const service of SERVICES)if(serviceConfig(s,service.id).automatic)startTreatment(s,service.id,rng);s.treatmentArrival=6;}
+    const ongoing=[];
+    for(const treatment of s.treatments){
+      if(treatment.stage==='arrival'){treatment.travel=Math.max(0,treatment.travel-dt);if(treatment.travel===0)treatment.stage='active';ongoing.push(treatment);continue;}
+      treatment.remaining=Math.max(0,treatment.remaining-dt);
+      if(treatment.remaining>0){ongoing.push(treatment);continue;}
+      const config=serviceConfig(s,treatment.service),cost=config.cost+(treatment.automatic?(treatment.service==='yoga'?2:4):0);
+      revenue(s,config.price,cost);s.wellnessRevenue+=config.price;s.completedServices[treatment.service]++;s.happy++;s.reputation=clamp(s.reputation+.3,20,100);
+      events.push({type:'service',service:treatment.service,net:config.price-cost,first:s.completedServices[treatment.service]===1});
+    }
+    s.treatments=ongoing;
     if(p.branches) {const gross=p.branches*dt*3,cost=gross*.65;revenue(s,gross,cost);s.satellite+=gross-cost;}
     return events;
   }
@@ -152,7 +195,8 @@
     const p=params(s), products=menu(s),avg=products.reduce((a,x)=>a+x.price*p.quality-x.cost-.65,0)/products.length;
     const orders=p.baristas?Math.min(1/p.arrival,p.baristas*p.speed/4.5):0;
     const cafe=Math.max(0,avg*orders),pilates=level(s,'mat')&&level(s,'coach')?Math.floor(p.capacity*.85)*(p.classPrice-5)/p.classTime:0;
-    return {cafe,pilates,total:cafe+pilates+p.branches*1.05};
+    const wellness=SERVICES.reduce((sum,service)=>{const c=serviceConfig(s,service.id);return sum+(c.automatic?c.capacity*(c.price-c.cost-(service.id==='yoga'?2:4))/(c.duration+c.travel+6):0);},0);
+    return {cafe,pilates,wellness,total:cafe+pilates+wellness+p.branches*1.05};
   }
   function offline(s,now=Date.now()) {
     const duration=clamp((now-s.last)/1000,0,4*3600), net=estimate(s).total*duration*.35;
@@ -162,7 +206,7 @@
     revenue(s,net/0.65,net/0.65-net);
     return {duration,net};
   }
-  const value=(s,g)=>g.key==='served'?s.served:g.key==='earned'?s.earned:g.key==='sessions'?s.sessions:level(s,g.key);
+  const value=(s,g)=>g.key==='served'?s.served:g.key==='earned'?s.earned:g.key==='sessions'?s.sessions:g.key==='wellness'?s.completedServices.pressotherapy+s.completedServices.massage:g.key==='yogaSessions'?s.completedServices.yoga:level(s,g.key);
   function claim(s,id) {
     const g=GOALS.find(g=>g.id===id);if(!g||s.claimed.includes(id)||value(s,g)<g.target)return 0;
     s.money+=g.reward;s.rewards+=g.reward;s.claimed.push(id);return g.reward;
@@ -171,5 +215,5 @@
     daily(s,now);if(s.daily.claimed||s.daily.count<30)return 0;
     s.daily.claimed=true;s.money+=80;s.rewards+=80;return 80;
   }
-  return {VERSION,KEY,LEGACY_KEY,UPGRADES,GOALS,PRODUCTS,fresh,validate,params,level,price,unlocked,purchase,menu,spawn,startOrder,startClass,rush,step,estimate,offline,value,claim,claimDaily};
+  return {VERSION,KEY,LEGACY_KEY,UPGRADES,GOALS,PRODUCTS,SERVICES,fresh,validate,params,level,price,requirement,unlocked,purchase,menu,spawn,startOrder,startClass,startTreatment,serviceConfig,rush,step,estimate,offline,value,claim,claimDaily};
 });

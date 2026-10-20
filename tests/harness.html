@@ -3,11 +3,13 @@
 <p>Estas acciones afectan únicamente al progreso de este servidor local.</p>
 <button id="legacy">Cargar partida v1 de prueba</button>
 <button id="advanced">Cargar partida avanzada de prueba</button>
+<button id="expanded">Cargar centro ampliado de prueba</button>
 <button id="broken">Cargar partida inválida de prueba</button>
 <button id="new">Empezar partida de prueba nueva</button>
 <p id="result" role="status"></p><a href="../">Abrir juego de prueba</a>
 <script>
 const key='bloom-brew-save-v2';
+document.getElementById('expanded').onclick=async()=>{const fixture=await(await fetch('./fixtures/expanded-v2.json')).json();fixture.last=Date.now();localStorage.setItem(key,JSON.stringify(fixture));document.getElementById('result').textContent='Centro ampliado preparado';};
 document.getElementById('legacy').onclick=async()=>{const fixture=await(await fetch('./fixtures/legacy-v1.json')).json();fixture.last=Date.now();localStorage.removeItem(key);localStorage.setItem('bloom-brew-save-v1',JSON.stringify(fixture));document.getElementById('result').textContent='Partida v1 preparada';};
 document.getElementById('advanced').onclick=async()=>{const fixture=await(await fetch('./fixtures/advanced-v2.json')).json();fixture.last=Date.now();localStorage.setItem(key,JSON.stringify(fixture));document.getElementById('result').textContent='Partida avanzada preparada';};
 document.getElementById('broken').onclick=()=>{localStorage.setItem(key,'{broken');document.getElementById('result').textContent='Partida inválida preparada';};

@@ -1,5 +1,17 @@
 # Historial
 
+## v1.4.0 — 20 octubre 2026
+
+- Ampliaciones físicas del salón de café, ala wellness, yoga y sala de grupos de pilates. Superficie de 72 a 184 m²; terrenos comprables y acceso Ampliar.
+- Calle, acera, paso peatonal, coches y árboles; clientes con rutas desde el exterior a las puertas y salas.
+- Presoterapia con hasta dos tumbonas y pacientes con botas animadas; masaje con hasta dos camillas y yoga con seis plazas.
+- Reservas de plazas, tiempos de llegada, cobro al finalizar, materiales y salarios; especialistas para automatizar servicios.
+- Trece nuevas inversiones con precios progresivos y límites: zonas, equipos, personal, decoración y tostador. Vitrina acristalada con bollos por nivel, mesas y accesorios visibles.
+- Todos los alumnos de pilates disponen de equipamiento visible; ampliar grupos añade una sala trasera.
+- Servicios y acceso Ver sala en Turno; estadísticas de superficie y sesiones; dos hitos nuevos.
+- Nuevos datos opcionales compatibles con partidas v2; exportación/importación y límite offline conservados. También se amplía el modo gráfico Canvas.
+- Pruebas de aforo, ingresos, costes, migración, compras y movimiento del paciente con botas; se mantiene el negocio en marcha detrás de menús.
+
 ## v1.3.1 — 20 octubre 2026
 
 - Los clientes, el personal y las animaciones siguen activos detrás de todos los menús, tanto en 3D como en el modo Canvas.

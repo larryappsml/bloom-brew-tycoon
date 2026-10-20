@@ -10,7 +10,7 @@ function boot(initial={}) {
   for(const id of html.matchAll(/id="([^"]+)"/g)){const element=make();element.id=id[1];elements.set(id[1],element);}
   const views=['home','operations','shop','goals','reports'].map(id=>elements.get(id));
   const navButtons=views.map(view=>{const button=make();button.dataset.view=view.id;return button;});
-  const filters=['all','cafe','pilates','team'].map(filter=>{const button=make();button.dataset.filter=filter;return button;});
+  const filters=['all','cafe','pilates','team','zones','wellness'].map(filter=>{const button=make();button.dataset.filter=filter;return button;});
   const document={getElementById(id){assert.ok(elements.has(id),'Missing UI element: '+id);return elements.get(id);},querySelectorAll(selector){return selector==='.view'?views:selector==='.nav-btn'?navButtons:selector==='#filter-tabs button'?filters:[];},createElement:make,addEventListener(name,fn){events[name]=fn;},hidden:false};
   const ctx={window:{Bloom:B,VenueScene:function(){},addEventListener(){},scrollTo(){}},document,localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},Date,Intl,console,URL,Blob,performance:{now:()=>now},setInterval(fn,ms){timers.push({fn,ms});},setTimeout(){},clearTimeout(){},navigator:{},location:{hostname:'127.0.0.1'},confirm:()=>true};
   vm.runInNewContext(fs.readFileSync('game.js','utf8'),ctx);
@@ -74,4 +74,15 @@ test('sales and pilates continue while every management menu stays open',()=>{
   ui.elements.get('staff-menu').onclick();const before=JSON.parse(ui.store.get(B.KEY));ui.advance(100);
   assert.ok(JSON.parse(ui.store.get(B.KEY)).served>before.served);
   assert.equal(ui.elements.get('shop-title').textContent,'Tu equipo');
+});
+test('expansion menu builds a room and manual wellness sessions run behind the panel',()=>{
+  const s=B.fresh();s.levels={mat:1};s.money=20000;s.served=50;s.last=Date.now();
+  const ui=boot({[B.KEY]:JSON.stringify(s)});ui.elements.get('expand-menu').onclick();
+  assert.equal(ui.elements.get('shop-title').textContent,'Amplía tu centro');
+  assert.ok(ui.elements.get('shop-list').innerHTML.includes('Ala de recuperación'));
+  const click=dataset=>ui.events.click({target:{closest:()=>({dataset})}});
+  click({buy:'wellnessWing'});click({buy:'pressotherapy'});click({service:'pressotherapy'});
+  let saved=JSON.parse(ui.store.get(B.KEY));assert.equal(saved.levels.wellnessWing,1);assert.equal(saved.treatments.length,1);
+  ui.advance(65);saved=JSON.parse(ui.store.get(B.KEY));assert.equal(saved.completedServices.pressotherapy,1);assert.equal(saved.treatments.length,0);
+  assert.equal(ui.elements.get('shop').classList.contains('active'),true);assert.ok(!ui.elements.get('shop-list').innerHTML.includes('undefined'));
 });

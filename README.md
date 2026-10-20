@@ -1,6 +1,6 @@
 # Bloom & Brew Tycoon 🌿☕🧘
 
-**v1.3.1** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
+**v1.4.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
 
 **[Jugar](https://larryappsml.github.io/bloom-brew-tycoon/)**
 
@@ -14,7 +14,19 @@ El mapa ocupa toda la pantalla: arrastra para moverte, pellizca para acercar o u
 
 El estudio cuesta 850 €. Puedes iniciar clases sin instructora; contratarla permite automatizarlas. Añade esterillas, reformers y salas de grupo. Tras completar diez clases, se desbloquean el gerente y la expansión a sedes satélite. Estas sedes producen un margen fijo limitado; aún no tienen mapa propio.
 
-- Seis hitos con recompensas únicas y objetivo diario de 30 pedidos (día UTC).
+En **Ampliar** construyes zonas reales: salón botánico (1.800 €, tras 40 pedidos), ala de recuperación (3.200 €, con pilates abierto) y sala de yoga (2.600 €, con pilates abierto). El centro pasa de 72 a 184 m² con las cuatro ampliaciones, incluida la sala de grupos de pilates. Los terrenos disponibles tienen un marcador + que también permite comprar la zona. La calle, la acera y el paso peatonal permanecen fuera del centro; los clientes de café y wellness llegan por ella.
+
+En **Mejoras → Wellness** instala hasta dos tumbonas de presoterapia y dos camillas de masaje. Los pacientes caminan hasta la plaza reservada, se tumban y, en presoterapia, llevan botas con cámaras de compresión animadas. La sala de yoga admite seis plazas. En **Turno → Servicios** puedes recibir clientes manualmente o usar **Ver sala** para acercar la cámara. Contrata especialistas wellness para automatizar presoterapia y masajes; la instructora automatiza yoga. Una plaza sigue ocupada durante el trayecto y la sesión; solo se cobra al finalizar. Cada servicio descuenta materiales y, si está automatizado, salario por atención.
+
+| Servicio | Equipamiento inicial | Sesión base | Tarifa base | Coste manual / automático |
+| --- | --- | --- | --- | --- |
+| Presoterapia | 1.100 € por primera tumbona | 36 s + 18 s de llegada | 28 € | 6 € / 10 € |
+| Masaje | 1.700 € por primera camilla | 42 s + 18 s de llegada | 36 € | 8 € / 12 € |
+| Yoga | 900 € por dos primeras plazas | 30 s + 20 s de llegada | 14 € | 2 € / 4 € |
+
+Las mejoras de equipo reducen tiempos y suben tarifas. Cada nivel añade elementos visibles: controles, aceites, accesorios, plantas, cuadros, maquinaria y mesas. La vitrina de bollería tiene cristal y bandejas de bollos que crecen al mejorarla. Los siguientes niveles mantienen el multiplicador de coste 1,65 y límites de compra. Las inversiones antiguas en mesas superiores al nivel tres conservan sus mesas y reciben el salón lateral para evitar perder capacidad.
+
+- Ocho hitos con recompensas únicas y objetivo diario de 30 pedidos (día UTC).
 - Hora punta de 20 s: más visitas y preparación rápida; descanso de tres minutos.
 - Reputación, facturación, costes, beneficio, pedidos, abandonos y clases reales.
 - Local 3D de estilo low-poly con iluminación, sombras, muebles, empleados, clientes y alumnos.
@@ -35,7 +47,7 @@ La verificación visual se realiza con navegador de escritorio a tamaños móvil
 
 Autoguardado cada cinco segundos, al ocultar la app y al salir. El formato v2 valida las partidas y migra la clave v1 sin borrarla: conserva dinero, inversiones y recompensas. Las métricas antiguas que eran estimaciones no se convierten en clientes o clases reales. Los niveles heredados superiores a los nuevos máximos se conservan, pero su efecto se limita al máximo de compra actual.
 
-En **Negocio** puedes exportar JSON, importar con confirmación y respaldo, o restaurar una copia local. Una partida corrupta o de una versión futura no se sobrescribe automáticamente. Los pedidos y clases en curso se reinician al recargar, sin cobrar ni descontar importes adicionales.
+En **Negocio** puedes exportar JSON, importar con confirmación y respaldo, o restaurar una copia local. Una partida corrupta o de una versión futura no se sobrescribe automáticamente. Los pedidos, clases y tratamientos en curso se reinician al recargar, sin cobrar ni descontar importes adicionales. Las partidas v2 anteriores reciben valores iniciales para los nuevos servicios; se mantienen las inversiones, el dinero y las estadísticas completadas.
 
 Los ingresos offline son una estimación conservadora: **35 % del beneficio automático estimado, hasta cuatro horas**, y solo con personal contratado o sedes. No generan pedidos ni clases ficticios. Al reanudar una pestaña oculta se aplica la misma regla. Exporta una copia antes de cambiar de dispositivo o borrar los datos del navegador.
 
@@ -54,6 +66,7 @@ También puedes ejecutar directamente `node --test tests/*.test.cjs`, `node scri
 | Archivo | Responsabilidad |
 | --- | --- |
 | `core.js` | Economía, pedidos, mejoras, clases, validación y offline; comprobable en Node |
+| `layout.js` | Zonas, superficie, capacidad física, posiciones de equipos y rutas por puertas; compartido entre simulación y mapa |
 | `scene.js` | Carga del renderizador 3D y recuperación con Canvas 2D si WebGL no está disponible |
 | `scene3d.mjs` | Modelos y animaciones 3D, cámara ortográfica y selección de zonas con raycasting |
 | `scene2d.js` | Alternativa gráfica 2D para dispositivos sin WebGL |

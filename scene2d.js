@@ -40,6 +40,14 @@
       const c=this.ctx,B=window.Bloom,l=id=>B.level(s,id),p=B.params(s);
       c.clearRect(0,0,360,270);
       const gradient=c.createLinearGradient(0,0,0,270);gradient.addColorStop(0,'#e4e8dc');gradient.addColorStop(1,'#f2e6d1');c.fillStyle=gradient;c.fillRect(0,0,360,270);
+      c.save();c.translate(180,135);c.scale(.68,.68);c.translate(-180,-135);
+      const zones=window.BloomLayout.zones(s);
+      this.tile(-5,8.8,17,2.1,0,'#78868a');this.tile(-5,7.5,17,1.3,1,'#e3dfd0');
+      for(let i=-4;i<11;i+=3)this.tile(i,9.75,1.3,.08,1,'#fff4cf');
+      if(zones.cafe){this.box(-3.3,0,3.3,7,5,'#edcda7');for(let i=0;i<Math.min(6,2+Math.max(0,l('seats')-3)*2);i++)this.box(-2.8+(i%2)*1.5,.7+Math.floor(i/2)*2,.8,.8,13);}
+      if(zones.wellness){this.box(7,0,3.4,7,5,'#d4e4da');for(const id of ['pressotherapy','massage'])for(let i=0;i<Math.min(2,l(id));i++){const x=7.35+i*1.45,y=id==='pressotherapy'?1:4.3;this.box(x,y,1,1.8,12,id==='pressotherapy'?'#92bfa8':'#d4aca0');this.tile(x+.1,y+.1,.8,.35,15,'#fff0d4');const t=(s.treatments||[]).find(t=>t.service===id&&t.slot===i&&t.stage==='active');if(t){const [px,py]=this.point(x+.5,y+.65,16);this.ellipse(px,py,4,4,colors[t.kind]);c.fillStyle='#54765e';c.fillRect(px-3,py+3,6,12);if(id==='pressotherapy'){c.fillStyle='#a1d4be';c.fillRect(px-6,py+12,5,10);c.fillRect(px+1,py+12,5,10);}}}}
+      if(zones.yoga){this.box(0,-3.4,3.7,3.4,5,'#e5cab9');for(let i=0;i<Math.min(6,l('yoga')*2);i++)this.tile(.3+(i%3)*1.1,-2.9+Math.floor(i/3)*1.5,.7,1.1,7,'#c797a1');}
+      if(zones.studio)this.box(3.7,-3.4,3.3,3.4,5,'#c7dfcf');
       this.ellipse(180,241,155,27,'#b09b7a20');
       // A continuous 2.5D floor and two back walls; no external image assets.
       this.box(0,0,7,7,5,'#d8bd97','#b99a76');
@@ -103,6 +111,7 @@
         if(o){const [px,py]=this.point(person.x,person.y,36);this.ellipse(px,py,9,7,'#fffaf0');this.text(B.PRODUCTS.find(p=>p.id===o.product).icon,px,py+3,'#536a4b',9);}
       });
       if(l('second')) {this.text(`${1+Math.min(l('second'),2)} LOCALES · TU COMUNIDAD CRECE`,180,262,'#667a5f',8);}
+      c.restore();
     }
     frame(now) {
       requestAnimationFrame(this.frame);
