@@ -1,6 +1,6 @@
 # Bloom & Brew Tycoon 🌿☕🧘
 
-**v1.12.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
+**v1.12.1** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
 
 **[Jugar](https://larryappsml.github.io/bloom-brew-tycoon/)**
 
@@ -163,3 +163,5 @@ En el mapa, las salas y parcelas muestran sus nombres y mejoras al tocarlas, sin
 - Especialidad en Negocio: equilibrado, brunch, club deportivo o recuperación. +12 % en el sector elegido y −8 % en los demás; modifica la demanda. Cambio gratis con 120 segundos de juego de espera, guardados entre sesiones.
 - Premium con traje: primera oportunidad tras 90 segundos, después cada 180–300 segundos activos, cuando hay barista y hueco en la cola. Propina al terminar el café: 75 % del neto automático estimado por minuto, mínimo 15 €. No hay propinas offline ni al abandonar.
 - Guardados v1/v2 compatibles; conserva dinero, mejoras y estadísticas. Los visitantes en curso se regeneran al cargar para evitar cobros duplicados.
+
+Al tocar una sala, el panel muestra su neto automático estimado por minuto, puesto entre las zonas y porcentaje del centro. Recuperación desglosa presoterapia y masaje. Descuenta materiales y salarios; excluye premios y propinas. Las zonas manuales se identifican sin atribuirles ingresos automáticos. Es una estimación de producción, no una medición histórica ni un retorno sobre la inversión.

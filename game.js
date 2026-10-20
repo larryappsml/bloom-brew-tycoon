@@ -53,6 +53,8 @@
     const cost=B.price(s,u),max=B.level(s,u.id)>=u.max,reason=lockedReason(u);
     $('zone-title').textContent=u.name;$('zone-level').textContent='NIVEL '+B.level(s,u.id);
     $('zone-description').textContent=reason||benefit(u);
+    const economy=B.roomEconomy(s,u.id);
+    $('zone-economy').innerHTML=economy?'<small>'+economy.name+' · neto automático aprox.</small><strong>'+fmt(economy.perMinute)+'/min</strong><p>'+(economy.rank?'Puesto '+economy.rank+' en beneficio/min · '+Math.round(economy.share)+' % del centro':'Sin producción automática')+'</p>'+(economy.breakdown.length?'<p>'+economy.breakdown.map(d=>d.name+' '+fmt(d.perMinute)+'/min').join(' · ')+'</p>':'')+'<small>'+economy.note+' No incluye propinas ni premios.</small>':'';
     $('zone-buy').disabled=!!reason||max||s.money<cost;$('zone-buy').textContent=max?'✓ Nivel máximo':reason?'Zona bloqueada':`Mejorar · ${fmt(cost)}`;
   }
   function selectZone(id){

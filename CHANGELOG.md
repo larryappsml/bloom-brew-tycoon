@@ -1,3 +1,8 @@
+# v1.12.1
+
+- Panel de sala con beneficio automático estimado por minuto, porcentaje y puesto respecto a otras zonas. Recuperación desglosa sus dos servicios.
+- Avisos para zonas sin equipamiento o con atención manual; panel adaptable a pantallas pequeñas. Sin cambios de economía ni guardados.
+
 # v1.12.0
 
 - Clientes con planes combinados reales entre deporte, wellness y cafetería. Recepción con aforo y paciencia limitada.

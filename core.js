@@ -339,8 +339,22 @@
     const orders=p.baristas?Math.min(1/p.arrival,p.baristas*p.speed/4.5,p.seats/occupancyTime):0;
     const expectedStudents=Math.min(p.capacity,22/classDemand(s)*.7);
     const cafe=Math.max(0,avg*orders),pilates=level(s,'mat')&&level(s,'coach')?expectedStudents*(p.classPrice-5-Math.min(2,level(s,'pilatesBands'))*.5)/(p.classTime+22+14+14+4):0;
-    const wellness=SERVICES.reduce((sum,service)=>{const c=serviceConfig(s,service.id);return sum+(c.automatic?c.capacity*(c.price-c.cost-(service.id==='yoga'?2:4))/(c.duration+c.travel+6):0);},0);
-    const sports=Sports.estimate(s);return {cafe,pilates,wellness,sports,total:cafe+pilates+wellness+sports+p.branches*1.05};
+    const services=Object.fromEntries(SERVICES.map(service=>{const c=serviceConfig(s,service.id);return [service.id,c.automatic?c.capacity*(c.price-c.cost-(service.id==='yoga'?2:4))/(c.duration+c.travel+6):0];}));
+    const sporting=Object.fromEntries(Sports.SPORTS.map(({id})=>{const c=Sports.config(s,id);return [id,c.automatic?c.capacity*(c.price-c.cost-c.salary)/(c.duration+60):0];}));
+    const wellness=Object.values(services).reduce((sum,n)=>sum+n,0),sports=Object.values(sporting).reduce((sum,n)=>sum+n,0);
+    const rooms={cafe,pilates,yoga:services.yoga,wellness:services.pressotherapy+services.massage,...sporting,branches:p.branches*1.05};
+    return {cafe,pilates,wellness,sports,services,rooms,total:Object.values(rooms).reduce((sum,n)=>sum+n,0)};
+  }
+  function roomEconomy(s,upgradeId){
+    const upgrade=UPGRADES.find(u=>u.id===upgradeId);if(!upgrade)return null;
+    const special={barista:'cafe',manager:'cafe',coach:'pilates',therapist:'wellness',functionalCoach:'crossfit',padelCoach:'padel',cafeWing:'cafe',crossfitWing:'crossfit',padelWing:'padel',wellnessWing:'wellness',yogaWing:'yoga',classes:'pilates',second:'branches'};
+    const id=special[upgradeId]||upgrade.cat,names={cafe:'Cafetería',pilates:'Pilates',yoga:'Yoga',wellness:'Recuperación',crossfit:'Entrenamiento funcional',padel:'Pádel',branches:'Sedes satélite'};
+    if(!names[id])return null;
+    const e=estimate(s),rate=e.rooms[id],rank=rate>0?1+Object.values(e.rooms).filter(n=>n>rate+1e-9).length:0;
+    const available=id==='cafe'||id==='branches'&&level(s,'second')>0||id==='pilates'&&level(s,'mat')>0||id==='wellness'&&['pressotherapy','massage'].some(x=>serviceConfig(s,x).capacity>0)||id==='yoga'&&serviceConfig(s,'yoga').capacity>0||['crossfit','padel'].includes(id)&&Sports.config(s,id).capacity>0;
+    return {id,name:names[id],perMinute:rate*60,share:e.total>0?rate/e.total*100:0,rank,
+      note:!available?'Instala el equipamiento de esta zona para generar ingresos.':rate<=0?'Atención manual: cobras al atender. Contrata personal para generar ingresos automáticos.':'Estimación automática tras materiales y salarios. La ocupación real puede variar.',
+      breakdown:id==='wellness'?[{name:'Presoterapia',perMinute:e.services.pressotherapy*60},{name:'Masaje',perMinute:e.services.massage*60}]:[]};
   }
   function offline(s,now=Date.now()) {
     const duration=clamp((now-s.last)/1000,0,4*3600), net=estimate(s).total*duration*.35;
@@ -362,5 +376,5 @@
   const journeyMetrics=s=>({served:s.served,sessions:s.sessions,wellness:s.completedServices.pressotherapy+s.completedServices.massage,yoga:s.completedServices.yoga,menu:menu(s).length,crossfit:s.sportSessions.crossfit,padel:s.sportSessions.padel,area:Layout.footprint(s).area});
   const chapterStatus=s=>Progression.status(s,journeyMetrics(s));
   const claimChapter=s=>Progression.claimChapter(s,journeyMetrics(s));
-  return {SPECIALTIES:Experience.SPECIALTIES,specialtyRequirement:Experience.requirement,selectSpecialty:Experience.select,SPORTS:Sports.SPORTS,sportConfig:Sports.config,startSport:Sports.start,CHAPTERS:Progression.CHAPTERS,CAMPAIGNS:Progression.CAMPAIGNS,chapterStatus,claimChapter,campaignStatus:Progression.campaignStatus,campaignRequirement:Progression.requirement,startCampaign:Progression.startCampaign,claimCampaign:Progression.claimCampaign,cancelCampaign:Progression.cancelCampaign,VERSION,KEY,LEGACY_KEY,UPGRADES,GOALS,PRODUCTS,SERVICES,fresh,validate,params,level,price,requirement,unlocked,purchase,menu,spawn,startOrder,orderDuration,orderPrice,consumptionTime,startClass,startTreatment,serviceConfig,serviceOccupancy,rush,step,estimate,offline,value,claim,claimDaily};
+  return {SPECIALTIES:Experience.SPECIALTIES,specialtyRequirement:Experience.requirement,selectSpecialty:Experience.select,SPORTS:Sports.SPORTS,sportConfig:Sports.config,startSport:Sports.start,CHAPTERS:Progression.CHAPTERS,CAMPAIGNS:Progression.CAMPAIGNS,chapterStatus,claimChapter,campaignStatus:Progression.campaignStatus,campaignRequirement:Progression.requirement,startCampaign:Progression.startCampaign,claimCampaign:Progression.claimCampaign,cancelCampaign:Progression.cancelCampaign,VERSION,KEY,LEGACY_KEY,UPGRADES,GOALS,PRODUCTS,SERVICES,fresh,validate,params,level,price,requirement,unlocked,purchase,menu,spawn,startOrder,orderDuration,orderPrice,consumptionTime,startClass,startTreatment,serviceConfig,serviceOccupancy,rush,step,estimate,roomEconomy,offline,value,claim,claimDaily};
 });

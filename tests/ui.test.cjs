@@ -12,7 +12,7 @@ function boot(initial={},search='') {
   const navButtons=views.map(view=>{const button=make();button.dataset.view=view.id;return button;});
   const filters=['all','cafe','pilates','yoga','team','zones','wellness'].map(filter=>{const button=make();button.dataset.filter=filter;return button;});
   const document={getElementById(id){assert.ok(elements.has(id),'Missing UI element: '+id);return elements.get(id);},querySelectorAll(selector){return selector==='.view'?views:selector==='.nav-btn'?navButtons:selector==='#filter-tabs button'?filters:[];},createElement:make,addEventListener(name,fn){events[name]=fn;},hidden:false};
-  const ctx={window:{Bloom:B,VenueScene:function(){},addEventListener(){},scrollTo(){}},document,localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},Date,Intl,console,URL,Blob,performance:{now:()=>now},setInterval(fn,ms){timers.push({fn,ms});},setTimeout(){},clearTimeout(){},navigator:{},location:{hostname:'127.0.0.1',search},confirm:()=>true};
+  const ctx={window:{Bloom:B,VenueScene:function(){this.select=()=>{};},addEventListener(){},scrollTo(){}},document,localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},Date,Intl,console,URL,Blob,performance:{now:()=>now},setInterval(fn,ms){timers.push({fn,ms});},setTimeout(){},clearTimeout(){},navigator:{},location:{hostname:'127.0.0.1',search},confirm:()=>true};
   vm.runInNewContext(fs.readFileSync('demo.js','utf8'),ctx);
   vm.runInNewContext(fs.readFileSync('game.js','utf8'),ctx);
   return {store,elements,events,timers,document,navButtons,advance(seconds){for(let i=0;i<seconds*10;i++){now+=100;timers.find(t=>t.ms===100).fn();}timers.find(t=>t.ms===5000).fn();}};
@@ -123,4 +123,10 @@ test('business menu selects specialties, persists the choice and reports live vi
  assert.equal(JSON.parse(store.get(B.KEY)).specialty,'recovery');assert.ok(elements.get('specialty-list').innerHTML.includes('Elegida'));
  advance(5);assert.ok(elements.get('client-status').textContent.includes('Satisfacción'));assert.ok(elements.get('premium-status').textContent.includes('propinas'));
  assert.ok(Math.abs(JSON.parse(store.get(B.KEY)).specialtyCooldown-115)<1e-8);
+});
+
+test('tapping a room shows its net estimate and closes without stopping gameplay',()=>{
+ const fixture=fs.readFileSync('tests/fixtures/detailed-v2.json','utf8'),ui=boot({[B.KEY]:fixture});
+ ui.elements.get('cafe-zone').onclick();assert.equal(ui.elements.get('zone-panel').hidden,false);assert.match(ui.elements.get('zone-economy').innerHTML,/Cafetería/);assert.match(ui.elements.get('zone-economy').innerHTML,/\/min/);assert.match(ui.elements.get('zone-economy').innerHTML,/No incluye propinas/);
+ ui.advance(15);assert.ok(JSON.parse(ui.store.get(B.KEY)).served>180);ui.elements.get('zone-close').onclick();assert.equal(ui.elements.get('zone-panel').hidden,true);
 });
