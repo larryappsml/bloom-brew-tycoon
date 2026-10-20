@@ -186,7 +186,7 @@
   }
   function step(s,dt,now=Date.now(),rng=Math.random) {
     dt=clamp(Number.isFinite(dt)?dt:0,0,1);
-    const events=[],p=params(s); daily(s,now); s.seconds+=dt;s.classCooldown=Math.max(0,s.classCooldown-dt);
+    const events=[],p=params(s),activityDt=dt*(active(s,now)?1.25:1); daily(s,now); s.seconds+=dt;s.classCooldown=Math.max(0,s.classCooldown-dt);
     s.arrival-=dt*(active(s,now)?1.6:1);
     if(s.arrival<=0){spawn(s,rng);s.arrival=p.arrival;}
     if(level(s,'coach')&&s.classPhase==='idle'&&s.classCooldown===0)startClass(s,now);
@@ -204,7 +204,7 @@
     const sitting=[];
     for(const guest of s.seated){
       if(guest.stage==='walkingToSeat'){if(!guest.path.length)guest.stage='consuming';sitting.push(guest);continue;}
-      guest.remaining=Math.max(0,guest.remaining-dt);
+      guest.remaining=Math.max(0,guest.remaining-activityDt);
       if(guest.remaining>0){sitting.push(guest);continue;}
       guest.reservedSeat=guest.seat.key;Traffic.exit(guest);s.departing.push(guest);
     }
@@ -231,7 +231,7 @@
       if(s.classGuests.length)beginClass(s);else{s.classPhase='idle';s.classCooldown=4;}
     }
     if(s.classPhase==='active') {
-      s.classRemaining=Math.max(0,s.classRemaining-dt);
+      s.classRemaining=Math.max(0,s.classRemaining-activityDt);
       if(s.classRemaining===0) {
         const gross=s.classSeats*p.classPrice,cost=s.classSeats*(2+(s.classAuto?3:0));
         revenue(s,gross,cost);s.sessions++;s.students+=s.classSeats;s.reputation=clamp(s.reputation+1,20,100);
@@ -242,7 +242,7 @@
     const ongoing=[];
     for(const treatment of s.treatments){
       if(treatment.stage==='arrival'){if(!treatment.path.length)treatment.stage='active';ongoing.push(treatment);continue;}
-      treatment.remaining=Math.max(0,treatment.remaining-dt);
+      treatment.remaining=Math.max(0,treatment.remaining-activityDt);
       if(treatment.remaining>0){ongoing.push(treatment);continue;}
       const config=serviceConfig(s,treatment.service),cost=config.cost+(treatment.automatic?(treatment.service==='yoga'?2:4):0);
       revenue(s,config.price,cost);s.wellnessRevenue+=config.price;s.completedServices[treatment.service]++;s.happy++;s.reputation=clamp(s.reputation+.3,20,100);

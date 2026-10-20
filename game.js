@@ -119,7 +119,7 @@
   function chime(){if(muted)return;try{audio=audio||new(window.AudioContext||window.webkitAudioContext)();audio.resume().catch(()=>{});const o=audio.createOscillator(),g=audio.createGain();o.connect(g);g.connect(audio.destination);o.frequency.setValueAtTime(660,audio.currentTime);o.frequency.exponentialRampToValueAtTime(990,audio.currentTime+.12);g.gain.setValueAtTime(.025,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.2);o.start();o.stop(audio.currentTime+.22);}catch{}}
   $('sound').onclick=()=>{muted=!muted;$('sound').textContent=muted?'🔈':'🔊';$('sound').setAttribute('aria-pressed',String(!muted));if(!muted)chime();};
   $('serve').onclick=()=>{if(B.startOrder(s)){chime();render();}};
-  $('rush').onclick=()=>{if(B.rush(s)){toast('Hora punta · más visitas y preparación rápida durante 20 s');save();render();}};
+  $('rush').onclick=()=>{if(B.rush(s)){toast('Hora punta · relojes +25 %, preparación +50 % y más visitas durante 20 s');save();render();}};
   $('class-start').onclick=()=>{if(!B.level(s,'mat')){filter='pilates';document.querySelectorAll('#filter-tabs button').forEach(x=>x.classList.toggle('active',x.dataset.filter===filter));nav('shop');return;}if(B.startClass(s)){save();render();}};
   $('claim').onclick=()=>{const g=B.GOALS.find(g=>!s.claimed.includes(g.id));const reward=g&&B.claim(s,g.id);if(reward){toast('Recompensa · +'+fmt(reward));save();dirty=true;render();}};
   $('daily-claim').onclick=()=>{if(B.claimDaily(s)){toast('Turno completado · +80 €');save();dirty=true;render();}};

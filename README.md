@@ -1,8 +1,10 @@
 # Bloom & Brew Tycoon 🌿☕🧘
 
-**v1.7.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
+**v1.8.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
 
 **[Jugar](https://larryappsml.github.io/bloom-brew-tycoon/)**
+
+La v1.8 hace que **Hora punta** acelere un 25 % los relojes de consumo de cafetería, pilates, yoga, presoterapia y masaje durante 20 segundos, incluidas las actividades ya iniciadas. La preparación conserva su aceleración del 50 % y llegan más visitas. No cambia la duración original del círculo, no acelera los trayectos ni multiplica las tarifas, y al terminar el impulso los relojes recuperan su velocidad normal. El descanso sigue siendo de tres minutos.
 
 La v1.7 añade **Servicio de mesas** en **Mejoras → Cafetería**, disponible tras contratar un barista. Sus tres niveles cuestan 180 €, 297 € y 491 € y reducen el tiempo de consumo un 10 %, 20 % y 30 % en total, para café, desayunos, matcha y smoothies. Un café base pasa de 26 a 18,2 segundos al máximo; un desayuno, de 38 a 26,6 segundos. La variación entre tipos de cliente también recibe la misma reducción.
 
@@ -50,7 +52,7 @@ En **Mejoras → Wellness** instala hasta dos tumbonas de presoterapia y dos cam
 Las mejoras de equipo reducen tiempos y suben tarifas. Cada nivel añade elementos visibles: controles, aceites, accesorios, plantas, cuadros, maquinaria y mesas. La vitrina de bollería tiene cristal y bandejas de bollos que crecen al mejorarla. Los siguientes niveles mantienen el multiplicador de coste 1,65 y límites de compra. Las inversiones antiguas en mesas superiores al nivel tres conservan sus mesas y reciben el salón lateral para evitar perder capacidad.
 
 - Ocho hitos con recompensas únicas y objetivo diario de 30 pedidos (día UTC).
-- Hora punta de 20 s: más visitas y preparación rápida; descanso de tres minutos.
+- Hora punta de 20 s: más visitas, preparación +50 % y relojes de consumo, clases y tratamientos +25 %; descanso de tres minutos.
 - Reputación, facturación, costes, beneficio, pedidos, abandonos y clases reales.
 - Local 3D de estilo low-poly con iluminación, sombras, muebles, empleados, clientes y alumnos.
 - Toca la barra, mesas o equipamiento para abrir su panel de mejora. También puedes usar Mejoras.

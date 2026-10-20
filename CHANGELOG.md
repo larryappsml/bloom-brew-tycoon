@@ -1,5 +1,12 @@
 # Historial
 
+## v1.8.0 — 20 octubre 2026
+
+- Hora punta acelera un 25 % el progreso de las actividades en curso: consumo de cafetería, pilates, yoga, presoterapia y masajes.
+- Conserva los 20 segundos de efecto, preparación +50 %, más demanda y descanso de tres minutos. No cambia las tarifas, duplica cobros ni acelera las llegadas.
+- Los círculos mantienen su duración original y avanzan más rápido durante el impulso; recuperan el ritmo normal al expirar. Mensaje del botón actualizado.
+- Pruebas de cada actividad, efecto sobre relojes iniciados, expiración, llegadas y cobros únicos.
+
 ## v1.7.0 — 20 octubre 2026
 
 - Servicio de mesas: tres niveles de 180/297/491 €, disponibles con un barista, para reducir el consumo de todos los productos de cafetería un 10/20/30 %.
