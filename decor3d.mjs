@@ -27,7 +27,8 @@ export function dressWorld(root,state,kit){
   for(let i=0;i<4;i++){box(cafe,-2.64,1.96-i*.19,-5.34,.77-i*.06,.025,.01,0xe8e3c5);box(cafe,-2,1.96-i*.19,-5.34,.12,.025,.01,P.gold);}
   for(let i=0;i<4;i++){cup(cafe,-5.6+i*.27,1.51,-3.15);bottle(cafe,-3.15+i*.15,1.5,-3.12,[P.rose,P.sage,P.gold,P.cream][i]);}
   box(cafe,-.55,.5,-4.75,.56,1,.54,P.oak);for(let j=0;j<3;j++)towel(cafe,-.55,1.05+j*.09,-4.75);
-  if(levels.pastries)for(const [x,z]of L.tables(state)){cylinder(cafe,x-.27,1.065,z+.23,.19,.025,P.cream);const bun=ball(cafe,x-.27,1.14,z+.23,.11,0xd8944d,1,.6,.7);bun.rotation.y=.4;}
+  // Empty settings stay empty: dishes belong to real orders in the live renderer.
+  for(const [x,z]of L.tables(state)){cylinder(cafe,x,1.058,z,.58,.012,0xe6cda8,24);for(const side of [-1,1]){box(cafe,x+side*.34,1.072,z+.15,.34,.012,.43,0xf8ebd5);box(cafe,x+side*.5,1.086,z+.14,.025,.018,.26,P.gold);box(cafe,x+side*.53,1.086,z+.14,.025,.018,.26,P.gold);box(cafe,x+side*1.01,.605,z+.08,.42,.05,.44,side<0?0xd8aa8f:0xbad6b9);}}
   picture(cafe,-6.2,-5.4);sconce(cafe,-.2,-5.45);
   if(zones.cafe){roomTrim(-14,-7.5,-6.1,6);picture(root,-10.7,-5.9,P.rose);const side=shelf(root,-12.6,-5.55,1.8);for(let i=0;i<4;i++)bottle(side,-.55+i*.33,1.8,0,[P.rose,P.sage,P.cream,P.gold][i]);}
 
@@ -46,6 +47,9 @@ export function dressWorld(root,state,kit){
     for(let i=0;i<n;i++){const z=-.22+i*.22;for(let j=0;j<3;j++)cylinder(g,0,.98+j*.035,z,.16,.025,P.white);box(g,.19,1.01,z,.09,.16,.13,[P.sage,P.rose,P.gold][i]);}
     if(n>1)towel(g,0,.55,0,P.mint);if(n>2)bottle(g,0,1.08,-.23,P.sage);
   }
+  if(level('latteBar')){const g=feature('latteBar',-5.1,-5);box(g,0,.55,0,.78,1.1,.65,P.oak);box(g,0,1.15,0,.84,.08,.72,P.cream);for(let i=0;i<level('latteBar');i++){const x=-.25+i*.24;cylinder(g,x,1.3,0,.09,.25,P.white);box(g,x,1.47,0,.12,.04,.14,P.sage);cup(g,x,1.2,.2);}box(g,-.22,1.46,-.2,.045,.55,.04,P.gold);}
+  if(level('cakeDisplay')){const g=feature('cakeDisplay',-1.7,-5);box(g,0,.55,0,.85,1.1,.68,P.sage);box(g,0,1.12,0,.94,.08,.76,P.cream);for(let j=0;j<level('cakeDisplay');j++){cylinder(g,0,1.22+j*.27,0,.26,.04,P.gold,16);cylinder(g,0,1.32+j*.27,0,.22,.15,[0xce9c86,0xe6b8c3,0xad926b][j],16);for(let i=0;i<5;i++)ball(g,Math.sin(i*1.26)*.15,1.42+j*.27,Math.cos(i*1.26)*.15,.04,0xc85068);}box(g,0,2.06,0,1,.06,.8,P.dark);for(const x of [-.44,.44])box(g,x,1.6,0,.035,.9,.7,P.gold);}
+  if(level('toastKitchen')){const g=feature('toastKitchen',-6.65,5.6);box(g,0,.5,0,.6,1,.65,P.oak);box(g,0,1.05,0,.68,.08,.73,P.cream);box(g,0,1.25,0,.48,.32,.4,P.dark);for(let i=0;i<level('toastKitchen');i++){box(g,-.16+i*.16,1.43,0,.09,.16,.3,0xdbad6c);ball(g,-.18+i*.16,1.16,.25,.08,P.sage,.7,.6,1);}box(g,0,.8,.34,.4,.04,.04,P.gold);}
   // Pilates: wall mirror, towel station, articulated reformer details and equipment.
   if(levels.mat){const g=group(root,0,0,0,'mat');g.name='detail:pilates';features.push('detail:pilates');
     const rear=zones.studio?-12.38:-5.6;
@@ -59,6 +63,7 @@ export function dressWorld(root,state,kit){
   }
   if(level('studioMirror')){const g=feature('studioMirror',0,zones.studio?-12.33:-5.55);for(let i=0;i<level('studioMirror');i++){const x=1.4+i*1.9;box(g,x,1.4,0,1.65,1.7,.08,P.oak);box(g,x,1.4,.05,1.5,1.55,.02,0xb7d5d3);box(g,x,1.02,.32,1.65,.05,.06,P.oak);for(const dx of [-.65,.65])box(g,x+dx,1.02,.2,.035,.05,.3,P.gold);}}
   if(level('studioAudio')){const g=feature('studioAudio',0,zones.studio?-12.1:-5.3);for(let i=0;i<level('studioAudio');i++){const x=1+i*2.35;box(g,x,.5,0,.4,1,.4,P.dark);for(const y of [.28,.65]){const speaker=cylinder(g,x,y,.22,.13,.035,0x7e9a8e);speaker.rotation.x=Math.PI/2;}box(g,x,2.29,-.16,1.65,.055,.06,0xe5c885);}}
+  if(level('pilatesBands')){const g=feature('pilatesBands',6.65,2.8);box(g,0,.45,0,.5,.9,.45,P.oak);for(let i=0;i<level('pilatesBands')*2;i++){const band=mesh(g,geometry('bandRack',()=>new THREE.TorusGeometry(.14,.035,6,16)),i%2?P.rose:P.sage,-.1+(i%2)*.2,1+Math.floor(i/2)*.3,0);band.rotation.y=.35;}}
   // Yoga: woven carpet, wall art, candle niche and purchased rituals.
   if(zones.yoga){const g=group(root,0,0,0,'yogaCare');g.name='detail:yoga';features.push('detail:yoga');roomTrim(-7.3,-.5,-12.5,-6.3);
     picture(g,-4,-12.3,0xb6a175);for(let i=0;i<3;i++){cylinder(g,-6.65+i*.22,.5,-11.9,.07,.3+i*.1,P.cream);ball(g,-6.65+i*.22,.7+i*.1,-11.9,.025,P.gold);}
@@ -67,6 +72,7 @@ export function dressWorld(root,state,kit){
   if(level('yogaBolsters')){const g=feature('yogaBolsters',0,0);for(const spot of L.serviceSlots(state,'yoga'))for(let i=0;i<level('yogaBolsters');i++){const bolster=cylinder(g,spot.x+.65,.23,spot.z-.5+i*.48,.15,.42,[P.rose,P.mint,P.gold][i]);bolster.rotation.z=Math.PI/2;box(g,spot.x+.65,.1,spot.z-.5+i*.48,.45,.08,.36,0xe5d1bc);}}
   if(level('zenGarden')){const g=feature('zenGarden',-6.55,-7.25);box(g,0,.3,0,.9,.6,1.4,P.wood);box(g,0,.64,0,.8,.08,1.3,0xece0bf);for(let i=0;i<level('zenGarden');i++){ball(g,-.15+i*.15,.77,-.4+i*.4,.13,0x879184,1,.6,.75);cylinder(g,.15,1.15+i*.15,-.45+i*.4,.035,1,P.sage,6);}if(level('zenGarden')>1)plant(g,0,.35,.5);}
   if(level('yogaTea')){const g=feature('yogaTea',-3.65,-11.95);box(g,0,.48,0,1.5,.95,.55,P.oak);box(g,0,1,0,1.6,.08,.65,P.cream);ball(g,-.4,1.2,0,.21,P.sage,1,.9,1);cylinder(g,-.4,1.41,0,.1,.04,P.gold);for(let i=0;i<level('yogaTea')*2;i++)cup(g,.02+i*.25,1.05,.05);}
+  if(level('soundRitual')){const g=feature('soundRitual',-1.1,-7.2);box(g,0,.18,0,.65,.28,.6,P.oak);for(let i=0;i<level('soundRitual');i++){const x=-.17+i*.34;cylinder(g,x,.4,0,.14,.15,P.gold);cylinder(g,x,.48,0,.11,.015,0x6e553a);box(g,x,.48,.23,.2,.025,.035,P.wood);}}
   // Recovery: privacy screen, stonewash rugs, towels, controls and tubing.
   if(zones.wellness){const g=group(root,0,0,0,'recoveryComfort');g.name='detail:wellness';features.push('detail:wellness');roomTrim(7.5,14,-6.1,6);picture(g,10.7,-5.9,P.sage);
     for(const id of ['pressotherapy','massage'])for(const spot of L.serviceSlots(state,id)){box(g,spot.x,.105,spot.z,1.9,.025,2.85,id==='massage'?0xc9b9ad:0xafc7bc);towel(g,spot.x+.4,.79,spot.z-.85);const side=shelf(g,spot.x+.8,spot.z+.65,.42);bottle(side,0,1.8,0,P.cream);
@@ -78,6 +84,7 @@ export function dressWorld(root,state,kit){
   if(level('pressurePump')){const g=feature('pressurePump',13.4,-4.6);for(let i=0;i<level('pressurePump');i++){box(g,0,.42,i*.72,.65,.84,.6,P.dark);cylinder(g,0,.94,i*.72,.21,.22,0x9cb8b0);box(g,0,.63,i*.72+.31,.38,.2,.025,P.sky);ball(g,.22,.25,i*.72+.31,.05,P.gold);}}
   if(level('massageStones')){const g=feature('massageStones',0,0);for(const spot of L.serviceSlots(state,'massage')){box(g,spot.x+.74,.62,spot.z-1,.48,1.2,.6,P.oak);box(g,spot.x+.74,1.25,spot.z-1,.5,.12,.64,P.dark);for(let i=0;i<level('massageStones')*2;i++)ball(g,spot.x+.62+i%2*.22,1.36,spot.z-1.2+Math.floor(i/2)*.2,.07,0x646c69,1,.5,.7);}}
   if(level('wellnessLinen')){const g=feature('wellnessLinen',13.5,.1),s=shelf(g,0,0,.7);for(let i=0;i<level('wellnessLinen')*3;i++)towel(s,0,.45+Math.floor(i/3)*.7+(i%3)*.1,0,i%2?P.mint:P.white);for(const spot of L.serviceSlots(state,'massage'))box(g,spot.x,.72,spot.z+.65,.92,.07,.52,[P.cream,P.mint,P.rose][level('wellnessLinen')-1]);}
+  if(level('aromaMassage')){const g=feature('aromaMassage',13.3,3.4);box(g,0,.45,0,.6,.9,.7,P.oak);for(let i=0;i<level('aromaMassage');i++){const z=-.17+i*.34;ball(g,0,1.02,z,.14,P.cream,1,.8,1);cylinder(g,0,1.14,z,.045,.06,P.gold);bottle(g,.19,.93,z,P.rose);}for(const spot of L.serviceSlots(state,'massage')){ball(g,spot.x+.66,.97,spot.z,.12,P.cream);cylinder(g,spot.x+.66,1.1,spot.z,.025,.035,P.gold);}}
   // Street furniture ties the miniature to its surroundings.
   const street=group(root,0,0,0);street.name='detail:street';features.push('detail:street');
   for(const x of [-6.8,6.8]){box(street,x,.4,8,.9,.8,.5,P.wood);for(let i=0;i<3;i++){ball(street,x-.28+i*.28,.92,8,.15,0x6fa36b);ball(street,x-.28+i*.28,1.05,8,.07,[P.rose,P.gold,P.white][i]);}}

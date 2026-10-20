@@ -1,5 +1,14 @@
 # Historial
 
+## v1.9.0 — 20 octubre 2026
+
+- Iconos de producto o actividad en el centro de los círculos, sin cuenta atrás.
+- Consumiciones 3D por pedido: café, croissant, matcha, smoothie, latte, tarta y tostada. Barra durante preparación, transporte y posición individual en mesa; se retiran al acabar. Vapor en bebidas calientes y retirada de comidas estáticas de mesas vacías.
+- Seis inversiones nuevas: lattes, tartas y tostadas (tres niveles), bandas de pilates, ritual sonoro y masaje aromático (dos niveles). Requisitos, costes progresivos y márgenes con materiales.
+- Estaciones físicas por nivel, bandas durante clases, cuencos con ondas y vapor de difusores durante sesiones activas.
+- Más detalle en mesas, cubiertos, cojines y personajes; cámaras de cafetería/pilates desde Turno. Alternativa Canvas actualizada.
+- Partidas v2 conservadas; pruebas de iconos, recetas, cobros, modelos, ciclo de consumiciones y elementos activos.
+
 ## v1.8.0 — 20 octubre 2026
 
 - Hora punta acelera un 25 % el progreso de las actividades en curso: consumo de cafetería, pilates, yoga, presoterapia y masajes.

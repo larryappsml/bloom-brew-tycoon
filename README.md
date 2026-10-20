@@ -1,8 +1,14 @@
 # Bloom & Brew Tycoon 🌿☕🧘
 
-**v1.8.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
+**v1.9.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
 
 **[Jugar](https://larryappsml.github.io/bloom-brew-tycoon/)**
+
+La v1.9 añade **lattes de autor, tartas artesanas y tostadas de aguacate**, con estaciones comprables, tres niveles y pedidos reales. Bandas de pilates, ritual sonoro de yoga y masaje aromático tienen dos niveles, requisitos y costes de materiales. El catálogo llega a 45 mejoras. Cada inversión incorpora objetos físicos al local: jarras, tartas por pisos, tostador y aguacates, bandas, cuencos y difusores.
+
+Los relojes muestran ahora un **icono de lo que se está completando**, sin números. Cada pedido tiene un modelo propio: taza con café, croissant, matcha verde, smoothie con pajita, latte con espuma, porción de tarta o tostada con aguacate. Aparece en la barra durante la preparación, acompaña al cliente y se coloca en su lado de la mesa durante el consumo; se retira al terminar. Las mesas vacías no mantienen cafés ni bollos decorativos. Las bebidas calientes tienen vapor, las clases con bandas muestran la goma y los servicios premium muestran ondas sonoras o aromáticas solo mientras se realizan. El modo Canvas también representa los productos y las nuevas actividades.
+
+Manteles individuales, cubiertos, cojines y más rasgos de los personajes completan el detalle. En Turno, **Ver cafetería / Ver pilates** acerca la cámara. Se mantienen los límites de aforo, los cobros únicos, Servicio de mesas, Hora punta y las partidas v2 anteriores.
 
 La v1.8 hace que **Hora punta** acelere un 25 % los relojes de consumo de cafetería, pilates, yoga, presoterapia y masaje durante 20 segundos, incluidas las actividades ya iniciadas. La preparación conserva su aceleración del 50 % y llegan más visitas. No cambia la duración original del círculo, no acelera los trayectos ni multiplica las tarifas, y al terminar el impulso los relojes recuperan su velocidad normal. El descanso sigue siendo de tres minutos.
 
@@ -18,7 +24,7 @@ La simulación comparte posiciones y rutas con ambos renderizadores. Los visitan
 
 La v1.5 añade modelos con bordes suaves y veta de madera, suelos con juntas, marcos y apliques, menús de pizarra, estantes, toallas, accesorios de trabajo y doce mejoras nuevas. Las salas tienen una identidad propia y sus inversiones añaden piezas visibles. Todo el arte se genera localmente; no se descargan texturas ni modelos externos.
 
-Los mini relojes sobre cada cliente muestran únicamente un círculo que se llena, sin cifras ni símbolos en el centro: preparación del pedido (ámbar), consumo de café o repostería (verde), pilates (lila) y tratamientos/yoga (colores de su servicio). El café se cobra al entregar el pedido; el reloj de consumo marca la estancia, sin duplicar la venta. Las clases y tratamientos se cobran al terminar. Los tiempos se fijan al iniciar cada actividad: mejorar un equipo no reinicia un reloj en marcha. Los relojes acompañan al personaje al mover o acercar el mapa, siguen avanzando con los menús abiertos y también existen en el modo Canvas.
+Los mini relojes sobre cada cliente muestran un círculo que se llena, con un icono de la receta o servicio en el centro, sin cifras: preparación del pedido (ámbar), consumo de café o repostería (verde), pilates (lila) y tratamientos/yoga (colores de su servicio). El café se cobra al entregar el pedido; el reloj de consumo marca la estancia, sin duplicar la venta. Las clases y tratamientos se cobran al terminar. Los tiempos se fijan al iniciar cada actividad: mejorar un equipo no reinicia un reloj en marcha. Los relojes acompañan al personaje al mover o acercar el mapa, siguen avanzando con los menús abiertos y también existen en el modo Canvas.
 
 | Sala | Nuevas inversiones de v1.5 |
 | --- | --- |
@@ -27,7 +33,7 @@ Los mini relojes sobre cada cliente muestran únicamente un círculo que se llen
 | Yoga | Cojines y mantas, jardín zen con bambú y rincón de infusiones |
 | Wellness | Central de compresión, piedras calientes y textiles premium |
 
-Estas mejoras tienen dos o tres niveles, requisitos de sala y el multiplicador de coste 1,65. Mejoran tiempos o márgenes con límites; piedras calientes e infusiones también añaden costes de materiales. El catálogo completo tiene 39 mejoras, con filtro propio para Yoga.
+Estas mejoras tienen dos o tres niveles, requisitos de sala y el multiplicador de coste 1,65. Mejoran tiempos o márgenes con límites; piedras calientes e infusiones también añaden costes de materiales. El catálogo completo tiene 45 mejoras, con filtro propio para Yoga.
 
 ## Cómo jugar
 

@@ -9,8 +9,8 @@ const context2D=()=>new Proxy({createLinearGradient:()=>({addColorStop(){}})}, {
 test('clock fill advances from zero to full and handles invalid or completed times',()=>{
   assert.equal(C.progress(30,30),0);assert.equal(C.progress(15,30),.5);assert.equal(C.progress(0,30),1);assert.equal(C.progress(-1,30),1);assert.equal(C.progress(50,30),0);assert.equal(C.progress(1,0),0);assert.equal(C.progress(NaN,30),0);
   const ctx=context2D(),arcs=[],text=[];ctx.arc=(...v)=>arcs.push(v);ctx.fillText=value=>text.push(value);
-  assert.equal(C.drawClock(ctx,20,30,15,30,'pilates'),true);assert.ok(Math.abs(arcs.at(-1)[4]-Math.PI/2)<1e-9);assert.equal(text.length,0);
-  C.drawClock(ctx,20,30,-1,30,'prepare');assert.equal(text.length,0);assert.equal(C.drawClock(ctx,20,30,NaN,30,'prepare'),false);
+  assert.equal(C.drawClock(ctx,20,30,15,30,'pilates'),true);assert.ok(Math.abs(arcs.at(-1)[4]-Math.PI/2)<1e-9);assert.deepEqual(text,['🧘']);
+  C.drawClock(ctx,20,30,-1,30,'prepare');assert.deepEqual(text,['🧘','☕']);assert.equal(C.drawClock(ctx,20,30,NaN,30,'prepare'),false);
 });
 test('buying faster equipment does not reset the duration of an ongoing service',()=>{
   const s=B.fresh(now);s.money=1e5;s.levels={machine:1,mat:1,wellnessWing:1,pressotherapy:1};s.arrival=1000;

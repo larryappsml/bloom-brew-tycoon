@@ -37,6 +37,12 @@
     ['bakeryOven','Horno de obrador','Horno y bandejas · desayunos más rápidos y rentables','🥖','cafe',640,3],
     ['cafeLounge','Rincón de lectura','Librería y sillones · mejora la calidad de la carta','📚','cafe',720,3],
     ['tableService','Servicio de mesas','Consumos más ágiles y sillas libres antes · hasta −30 %','🍽️','cafe',180,3],
+    ['latteBar','Lattes de autor','Nueva receta con leche y estación de espumado','🥛','cafe',420,3],
+    ['cakeDisplay','Tartas artesanas','Porciones de tarta y expositor refrigerado','🍰','cafe',560,3],
+    ['toastKitchen','Tostadas de aguacate','Nueva cocina de desayunos con tostador','🥑','cafe',680,3],
+    ['pilatesBands','Sesiones con bandas','Bandas elásticas durante las clases · servicio premium','🎗️','pilates',640,2],
+    ['soundRitual','Ritual sonoro de yoga','Cuencos sonoros durante la sesión de yoga','🔔','yoga',720,2],
+    ['aromaMassage','Masaje aromático','Difusores y aceites durante el masaje','🪻','wellness',860,2],
     ['pilatesKit','Accesorios de fuerza','Pesas, pelotas y aros para cada sesión','🏋️','pilates',450,3],
     ['studioMirror','Espejos y barras','Amplía los espejos y reduce el tiempo de clase','🪞','pilates',680,3],
     ['studioAudio','Ambiente del estudio','Altavoces e iluminación para clases premium','🎵','pilates',890,3],
@@ -61,7 +67,10 @@
     {id:'coffee',name:'Café',icon:'☕',price:5,cost:1.2,time:3.6},
     {id:'breakfast',name:'Desayuno',icon:'🥐',price:9,cost:3,time:5.2},
     {id:'matcha',name:'Matcha',icon:'🍵',price:8,cost:2,time:4.4},
-    {id:'smoothie',name:'Smoothie',icon:'🥤',price:12,cost:3.5,time:5.2}
+    {id:'smoothie',name:'Smoothie',icon:'🥤',price:12,cost:3.5,time:5.2},
+    {id:'latte',name:'Latte de autor',icon:'🥛',price:9,cost:2.6,time:4.8},
+    {id:'cake',name:'Tarta artesana',icon:'🍰',price:11,cost:3.8,time:4.5},
+    {id:'toast',name:'Tostada de aguacate',icon:'🥑',price:14,cost:5,time:6.2}
   ];
   const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
   const level=(s,id)=>s.levels[id]||0;
@@ -99,7 +108,7 @@
     const arrival=Math.max(1.25,6.5-l('seats')*.55-l('terrace')*.95-l('matcha')*.18-l('cafeDecor')*.24)*(1.15-s.reputation/300);
     const speed=1+l('machine')*.18+l('manager')*.15+l('roaster')*.06;
     const capacity=2+l('mat')*2+l('classes')*4;
-    const classPrice=12+l('reformer')*5+l('spa')*3+l('pilatesKit')+l('studioAudio');
+    const classPrice=12+l('reformer')*5+l('spa')*3+l('pilatesKit')+l('studioAudio')+l('pilatesBands')*2;
     return {seats,arrival,speed,baristas:l('barista'),capacity,classPrice,classTime:Math.max(25,45-l('coach')*4-l('studioMirror')),quality:1+l('machine')*.12+l('pastries')*.05+l('matcha')*.04+l('cafeDecor')*.04+l('roaster')*.08+l('cafeLounge')*.025,manager:l('manager'),branches:l('second'),area:Layout.footprint(s).area};
   }
   const price=(s,u)=>Math.ceil(u.base*Math.pow(1.65,level(s,u.id)));
@@ -116,6 +125,11 @@
     if(u.id==='bakeryOven'&&!level(s,'pastries'))return 'Instala una vitrina de repostería';
     if(u.id==='cafeLounge'&&!Layout.zones(s).cafe)return 'Amplía la cafetería primero';
     if(u.id==='tableService'&&!level(s,'barista'))return 'Contrata un barista primero';
+    if(u.id==='latteBar'&&!level(s,'machine'))return 'Mejora la cafetera primero';
+    if(['cakeDisplay','toastKitchen'].includes(u.id)&&!level(s,'pastries'))return 'Instala una vitrina de repostería';
+    if(u.id==='pilatesBands'&&!level(s,'mat'))return 'Abre el estudio de pilates primero';
+    if(u.id==='soundRitual'&&!level(s,'yoga'))return 'Instala esterillas de yoga primero';
+    if(u.id==='aromaMassage'&&!level(s,'massage'))return 'Instala una camilla de masaje';
     if(['pilatesKit','studioMirror','studioAudio'].includes(u.id)&&!level(s,'mat'))return 'Abre el estudio de pilates primero';
     if(['yogaBolsters','yogaTea'].includes(u.id)&&!level(s,'yoga'))return 'Instala esterillas de yoga primero';
     if(u.id==='zenGarden'&&!Layout.zones(s).yoga)return 'Construye la sala de yoga primero';
@@ -128,8 +142,8 @@
   const SERVICES=[{id:'pressotherapy',name:'Presoterapia',icon:'🦵'},{id:'massage',name:'Masaje',icon:'💆'},{id:'yoga',name:'Yoga',icon:'🧘'}];
   function serviceConfig(s,id){const l=x=>Math.min(level(s,x),UPGRADES.find(u=>u.id===x).max),capacity=Layout.serviceSlots(s,id).length,comfort=l('recoveryComfort');
     if(id==='pressotherapy')return {capacity,duration:36-l('pressureCare')*3-Math.max(0,l('therapist')-1)*2-l('pressurePump')*2,price:28+l('pressureCare')*4+comfort*2+l('pressurePump')*2+l('wellnessLinen'),cost:6,automatic:l('therapist')>0,travel:18};
-    if(id==='massage')return {capacity,duration:42-l('massageCare')*3-Math.max(0,l('therapist')-1)*2,price:36+l('massageCare')*4+comfort*2+l('massageStones')*3+l('wellnessLinen'),cost:8+l('massageStones'),automatic:l('therapist')>0,travel:18};
-    if(id==='yoga')return {capacity,duration:30-l('yogaCare')*2-l('yogaBolsters'),price:14+l('yogaCare')*2+l('yogaBolsters')+l('zenGarden')+l('yogaTea')*2,cost:2+l('yogaTea')*.5,automatic:l('coach')>0,travel:20};
+    if(id==='massage')return {capacity,duration:42-l('massageCare')*3-Math.max(0,l('therapist')-1)*2,price:36+l('massageCare')*4+comfort*2+l('massageStones')*3+l('wellnessLinen')+l('aromaMassage')*4,cost:8+l('massageStones')+l('aromaMassage'),automatic:l('therapist')>0,travel:18};
+    if(id==='yoga')return {capacity,duration:30-l('yogaCare')*2-l('yogaBolsters')-l('soundRitual'),price:14+l('yogaCare')*2+l('yogaBolsters')+l('zenGarden')+l('yogaTea')*2+l('soundRitual')*2,cost:2+l('yogaTea')*.5+l('soundRitual')*.5,automatic:l('coach')>0,travel:20};
     return {capacity:0,duration:1,price:0,cost:0,automatic:false,travel:0};
   }
   function serviceOccupancy(s,id){return s.treatments.filter(t=>t.service===id).length+s.departing.filter(t=>t.reservedService===id).length;}
@@ -145,7 +159,7 @@
     const cost=price(s,u); if(s.money<cost)return false;
     s.money-=cost; s.levels[id]=level(s,id)+1; return true;
   }
-  function menu(s) {return PRODUCTS.filter(p=>p.id==='coffee'||p.id==='breakfast'&&level(s,'pastries')||p.id==='matcha'&&level(s,'matcha')||p.id==='smoothie'&&level(s,'spa'));}
+  function menu(s) {const unlock={breakfast:'pastries',matcha:'matcha',smoothie:'spa',latte:'latteBar',cake:'cakeDisplay',toast:'toastKitchen'};return PRODUCTS.filter(p=>p.id==='coffee'||level(s,unlock[p.id]));}
   function spawn(s,rng=Math.random) {
     const slots=Layout.queueSlots(),used=new Set(s.queue.map(o=>o.queueSlot)),slot=slots.find(p=>!used.has(p.index));if(!slot)return false;
     const types=menu(s),product=types[Math.min(types.length-1,Math.floor(rng()*types.length))];
@@ -157,8 +171,8 @@
     order.remaining=orderDuration(s,order.product);order.duration=order.remaining;
     order.worker=false;order.stage='preparing';return true;
   }
-  function orderDuration(s,id){const product=PRODUCTS.find(p=>p.id===id);return product.time/params(s).speed/(1+(id==='coffee'?Math.min(3,level(s,'brewBar'))*.08:id==='breakfast'?Math.min(3,level(s,'bakeryOven'))*.1:0));}
-  function orderPrice(s,id){const product=PRODUCTS.find(p=>p.id===id);return product.price*params(s).quality+(id==='coffee'?Math.min(3,level(s,'brewBar'))*.35:id==='breakfast'?Math.min(3,level(s,'bakeryOven'))*.4:0);}
+  function orderDuration(s,id){const product=PRODUCTS.find(p=>p.id===id),recipe={latte:'latteBar',cake:'cakeDisplay',toast:'toastKitchen'}[id];return product.time/params(s).speed/(1+(recipe?Math.min(3,level(s,recipe))*.06:id==='coffee'?Math.min(3,level(s,'brewBar'))*.08:id==='breakfast'?Math.min(3,level(s,'bakeryOven'))*.1:0));}
+  function orderPrice(s,id){const product=PRODUCTS.find(p=>p.id===id),recipe={latte:'latteBar',cake:'cakeDisplay',toast:'toastKitchen'}[id];return product.price*params(s).quality+(recipe?Math.max(0,Math.min(3,level(s,recipe))-1)*.5:id==='coffee'?Math.min(3,level(s,'brewBar'))*.35:id==='breakfast'?Math.min(3,level(s,'bakeryOven'))*.4:0);}
   const active=(s,now)=>now<s.boostUntil;
   function rush(s,now=Date.now()) {
     if(now<s.rushReady)return false;
@@ -172,7 +186,7 @@
   }
   function classDemand(s){return Math.max(1,4.8-Math.min(4,level(s,'mat'))*.35-Math.min(4,level(s,'reformer'))*.25-Math.min(3,level(s,'studioAudio'))*.2-Math.min(2,level(s,'spa'))*.1-s.reputation/150);}
   function beginClass(s){s.classPhase='active';s.classSeats=s.classGuests.length;s.classDuration=params(s).classTime;s.classRemaining=s.classDuration;s.classAuto=!!level(s,'coach');s.classGuests.forEach(g=>g.stage='exercising');}
-  function consumptionTime(id,kind=0,s=null){const base=({coffee:26,breakfast:38,matcha:30,smoothie:32}[id]||26)+kind*2;return base*(1-.1*Math.min(3,s?level(s,'tableService'):0));}
+  function consumptionTime(id,kind=0,s=null){const base=({coffee:26,breakfast:38,matcha:30,smoothie:32,latte:32,cake:40,toast:42}[id]||26)+kind*2;return base*(1-.1*Math.min(3,s?level(s,'tableService'):0));}
   function freeSeat(s){
     const seats=Layout.cafeSeats(s),busy=new Set([...s.seated.map(g=>g.seat.key),...s.departing.map(g=>g.reservedSeat).filter(Boolean)]),available=seats.filter(p=>!busy.has(p.key));
     const tables=Layout.tables(s).length,load=table=>seats.filter(p=>p.table===table&&busy.has(p.key)).length;
@@ -233,7 +247,7 @@
     if(s.classPhase==='active') {
       s.classRemaining=Math.max(0,s.classRemaining-activityDt);
       if(s.classRemaining===0) {
-        const gross=s.classSeats*p.classPrice,cost=s.classSeats*(2+(s.classAuto?3:0));
+        const gross=s.classSeats*p.classPrice,cost=s.classSeats*(2+(s.classAuto?3:0)+Math.min(2,level(s,'pilatesBands'))*.5);
         revenue(s,gross,cost);s.sessions++;s.students+=s.classSeats;s.reputation=clamp(s.reputation+1,20,100);
         events.push({type:'class',net:gross-cost});s.classSeats=0;s.classPhase='leaving';s.classGuests.forEach(Traffic.exit);
       }
@@ -258,7 +272,7 @@
     const occupancyTime=products.reduce((sum,x)=>sum+consumptionTime(x.id,1.5,s),0)/products.length+9;
     const orders=p.baristas?Math.min(1/p.arrival,p.baristas*p.speed/4.5,p.seats/occupancyTime):0;
     const expectedStudents=Math.min(p.capacity,22/classDemand(s)*.7);
-    const cafe=Math.max(0,avg*orders),pilates=level(s,'mat')&&level(s,'coach')?expectedStudents*(p.classPrice-5)/(p.classTime+22+14+14+4):0;
+    const cafe=Math.max(0,avg*orders),pilates=level(s,'mat')&&level(s,'coach')?expectedStudents*(p.classPrice-5-Math.min(2,level(s,'pilatesBands'))*.5)/(p.classTime+22+14+14+4):0;
     const wellness=SERVICES.reduce((sum,service)=>{const c=serviceConfig(s,service.id);return sum+(c.automatic?c.capacity*(c.price-c.cost-(service.id==='yoga'?2:4))/(c.duration+c.travel+6):0);},0);
     return {cafe,pilates,wellness,total:cafe+pilates+wellness+p.branches*1.05};
   }

@@ -72,6 +72,9 @@
       if(l('brewBar'))for(let i=0;i<Math.min(3,l('brewBar'));i++)this.box(.5+i*.42,.35,.3,.25,23,'#f6e8cf','#a28b5d');
       if(l('bakeryOven')){this.box(3.2,.15,.7,.7,27,'#627a6d','#435b54');for(let i=0;i<Math.min(3,l('bakeryOven'));i++)this.text('—',...this.point(3.6,.8,9+i*6),'#e4b570',9);}
       if(l('tableService')){this.box(.15,5.4,.35,.5,17,'#d6b68b','#8b7254');for(let i=0;i<Math.min(3,l('tableService'));i++)this.box(.18,5.43+i*.12,.27,.09,20,'#fff5df','#d6cbb5');}
+      if(l('latteBar')){this.box(.7,.3,.65,.5,24,'#d6ab83','#657b64');this.text('🥛',...this.point(1,.5,30),'#668660',12);}
+      if(l('cakeDisplay')){this.box(2,.3,.65,.5,23,'#b7d5be','#a78060');this.text('🍰',...this.point(2.3,.5,30),'#668660',12);}
+      if(l('toastKitchen')){this.box(.2,6.2,.4,.45,19,'#dab98b','#785744');this.text('🥑',...this.point(.4,6.4,25),'#668660',11);}
       if(l('cafeLounge'))this.box(-2.5,5.8,2,.6,15,'#d8a098','#b57e6f');
       this.plant(.35,.4,1.2);this.plant(.3,6.3,1.3);
       const map=p=>({x:(p.x+7.35)/2.1,y:(p.z+6.2)/1.77});
@@ -97,10 +100,13 @@
         if(agent.stage==='consuming'){activity=agent;kind='consume';}
         if(agent.type==='pilates'&&agent.stage==='exercising'){activity={remaining:s.classRemaining,duration:s.classDuration};kind='pilates';}
         if(agent.type==='treatment'&&agent.stage==='active'){activity=agent;kind=agent.service;}
-        if(activity){const [px,py]=this.point(q.x,q.y,45);clocks.push({x:px,y:py,remaining:activity.remaining,duration:activity.duration,kind});}
+        if(agent.type==='cafe'&&agent.stage==='consuming'){const seat=agent.seat,table=seat?.table>=0?window.BloomLayout.tables(s)[seat.table]:null;if(table){const at=map({x:table[0]+(seat.x<table[0]?-.34:.34),z:table[1]+.22});const [px,py]=this.point(at.x,at.y,14);this.ellipse(px,py,5,2,'#fff9ec');this.text(B.PRODUCTS.find(p=>p.id===agent.product)?.icon||'☕',px,py+2,'#37684d',10);}}
+        if(agent.type==='pilates'&&agent.stage==='exercising'&&l('pilatesBands')){const [px,py]=this.point(q.x,q.y,14);c.strokeStyle='#bf78a0';c.lineWidth=2;c.beginPath();c.moveTo(px-7,py);c.lineTo(px+7,py);c.stroke();}
+        if(agent.type==='treatment'&&agent.stage==='active'&&((agent.service==='yoga'&&l('soundRitual'))||(agent.service==='massage'&&l('aromaMassage'))))this.text(agent.service==='yoga'?'🔔':'🪻',...this.point(q.x+.35,q.y,18),'#668660',10);
+        if(activity){const [px,py]=this.point(q.x,q.y,45);clocks.push({x:px,y:py,remaining:activity.remaining,duration:activity.duration,kind,product:agent.type==='cafe'?agent.product:null});}
       }
       if(l('second')) {this.text(`${1+Math.min(l('second'),2)} LOCALES · TU COMUNIDAD CRECE`,180,262,'#667a5f',8);}
-      for(const clock of clocks)window.BloomClocks.drawClock(c,clock.x,clock.y,clock.remaining,clock.duration,clock.kind,11);
+      for(const clock of clocks)window.BloomClocks.drawClock(c,clock.x,clock.y,clock.remaining,clock.duration,clock.kind,11,clock.product);
       c.restore();
     }
     frame(now) {
