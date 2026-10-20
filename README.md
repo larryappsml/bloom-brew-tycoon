@@ -1,8 +1,10 @@
 # Bloom & Brew Tycoon 🌿☕🧘
 
-**v1.11.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
+**v1.12.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
 
 **[Jugar](https://larryappsml.github.io/bloom-brew-tycoon/)**
+
+La v1.12 añade planes combinados, satisfacción, especialidades y clientes premium. Consulta los detalles al final de este documento.
 
 La v1.11 amplía el centro con **Bloom Strength**, un box de entrenamiento funcional de estética cálida y cuidada, y **Bloom Pádel**, una pista con red, líneas, cerramientos y focos. El centro completo alcanza **312 m²**. El box cuesta 5.200 € y se desbloquea al terminar seis clases de pilates; el club de pádel cuesta 9.000 € y requiere diez clases. Construir la zona no instala gratis su equipamiento.
 
@@ -153,3 +155,11 @@ La v1.2 cambia la presentación por un local 3D con modelos propios, conservando
 [Centro completo con pádel y crossfit](https://larryappsml.github.io/bloom-brew-tycoon/?demo=club). Incluye 45.000 € y servicios abiertos. Guardado independiente: vuelve a la URL sin parámetros para recuperar tu partida normal.
 
 En el mapa, las salas y parcelas muestran sus nombres y mejoras al tocarlas, sin carteles flotantes permanentes.
+
+### v1.12.0 — Visitas y especialidad
+
+- Planes de dos paradas: pilates/yoga/wellness → cafetería; deporte o café → recuperación si hay terapeuta y equipamiento. El mismo cliente camina entre zonas conservando su vestimenta. Hasta seis visitantes esperan en recepción; los planes no generan pagos extra: cada servicio se cobra por sus reglas normales.
+- Satisfacción calculada con la espera real y los abandonos. La cola de café también pierde paciencia si una bebida preparada no encuentra mesa. Consulta satisfacción y planes en Turno.
+- Especialidad en Negocio: equilibrado, brunch, club deportivo o recuperación. +12 % en el sector elegido y −8 % en los demás; modifica la demanda. Cambio gratis con 120 segundos de juego de espera, guardados entre sesiones.
+- Premium con traje: primera oportunidad tras 90 segundos, después cada 180–300 segundos activos, cuando hay barista y hueco en la cola. Propina al terminar el café: 75 % del neto automático estimado por minuto, mínimo 15 €. No hay propinas offline ni al abandonar.
+- Guardados v1/v2 compatibles; conserva dinero, mejoras y estadísticas. Los visitantes en curso se regeneran al cargar para evitar cobros duplicados.

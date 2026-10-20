@@ -116,3 +116,11 @@ test('top income indicator shows estimated net earnings per minute',()=>{
  const expected=B.estimate(B.validate(JSON.parse(fixture))).total*60;
  assert.equal(elements.get('income').textContent,new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:expected>=100?0:2}).format(expected));
 });
+
+test('business menu selects specialties, persists the choice and reports live visitor satisfaction',()=>{
+ const fixture=fs.readFileSync('tests/fixtures/detailed-v2.json','utf8');const {elements,store,advance}=boot({[B.KEY]:fixture});
+ elements.get('specialty-list').onclick({target:{closest:()=>({dataset:{specialty:'recovery'}})}});
+ assert.equal(JSON.parse(store.get(B.KEY)).specialty,'recovery');assert.ok(elements.get('specialty-list').innerHTML.includes('Elegida'));
+ advance(5);assert.ok(elements.get('client-status').textContent.includes('Satisfacción'));assert.ok(elements.get('premium-status').textContent.includes('propinas'));
+ assert.ok(Math.abs(JSON.parse(store.get(B.KEY)).specialtyCooldown-115)<1e-8);
+});

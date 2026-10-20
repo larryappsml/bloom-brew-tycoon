@@ -1,7 +1,7 @@
 (function(root,factory){const api=factory(typeof module==='object'&&module.exports?require('./layout.js'):root.BloomLayout);if(typeof module==='object'&&module.exports)module.exports=api;else root.BloomTraffic=api;})(typeof globalThis==='undefined'?this:globalThis,function(Layout){
   'use strict';
   const GAP=.52,SPEED=3.2;
-  const agents=s=>[...(s.departing||[]),...Object.values(s.sportsGroups||{}).flatMap(g=>g?.guests||[]),...(s.classGuests||[]),...(s.queue||[]),...(s.seated||[]),...(s.treatments||[])];
+  const agents=s=>[...(s.visits||[]),...(s.departing||[]),...Object.values(s.sportsGroups||{}).flatMap(g=>g?.guests||[]),...(s.classGuests||[]),...(s.queue||[]),...(s.seated||[]),...(s.treatments||[])];
   const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
   function create(s,target,type,rng=Math.random){const id=s.nextId++,others=agents(s);let position;
     for(let i=0;i<24;i++){const candidate={x:(id%2?1:-1)*(13+(i%12)*.7),z:9.25};if(others.every(a=>!a.position||distance(candidate,a.position)>=GAP)){position=candidate;break;}}

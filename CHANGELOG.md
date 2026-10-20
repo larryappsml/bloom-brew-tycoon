@@ -1,3 +1,12 @@
+# v1.12.0
+
+- Clientes con planes combinados reales entre deporte, wellness y cafetería. Recepción con aforo y paciencia limitada.
+- Satisfacción y estadísticas de planes/abandonos. La espera por mesa también consume paciencia.
+- Cuatro especialidades con cambios de tarifas, demanda y enfriamiento persistente.
+- Clientes premium con traje y propinas proporcionales al beneficio automático estimado por minuto.
+- Tarifas de clases y tratamientos fijadas al comenzar para evitar cambios retroactivos.
+- Migración compatible de partidas existentes y nuevos recursos disponibles offline.
+
 # v1.11.3
 
 - El indicador superior muestra el beneficio automático estimado por minuto, después de gastos, en lugar de por segundo.

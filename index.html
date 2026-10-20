@@ -107,6 +107,7 @@
 </i>
 </div>
 </div>
+<div class="card"><h3>🤍 Experiencia de los clientes</h3><p id="client-status"></p><p class="muted">La espera reduce la satisfacción. Amplía plazas o mejora la rapidez para evitar abandonos.</p><div id="visits-list"></div></div>
 <div class="card"><h3>🌿 Servicios del centro</h3><p class="service-intro">Los clientes llegan desde la calle. Cobra al terminar cada sesión.</p><div id="service-list"></div></div>
 <div class="card"><h3>🏋️ Deportes del centro</h3><p class="service-intro">Los grupos llegan desde la calle. Pádel requiere cuatro jugadores; el circuito acepta grupos pequeños.</p><div id="sports-list"></div></div>
 <p class="clock-legend"><span>🟡 Preparando</span><span>🟢 Disfrutando</span><span>🟣 Clase o tratamiento</span></p>
@@ -177,8 +178,9 @@
 </section>
 <section id="reports" class="view">
 <div class="section-head">
-<h2>Tu negocio en cifras 📊</h2>
-</div>
+<h2>Tu negocio en cifras 📊</h2></div>
+<div class="card"><h3>🌿 Especialidad del centro</h3><p class="muted">Elige qué público atraer. Cambiar es gratis; espera dos minutos de juego antes de volver a elegir.</p><div id="specialty-list"></div></div>
+<div class="card"><h3>🤵 Visitas premium</h3><p id="premium-status"></p><p class="muted">Llega un cliente con traje cada 3–5 minutos de juego si tienes barista. Al terminar su café deja el 75 % del neto automático estimado por minuto (mínimo 15 €). Sin propinas offline.</p></div>
 <div class="report">
 <div class="card">
 <small>Facturación bruta</small>
@@ -241,7 +243,7 @@
 <input type="file" id="import-file" accept="application/json" hidden>
 </div>
 <div class="report"><div class="card"><small>Sesiones deportivas</small><strong id="sports-completed">0</strong></div><div class="card"><small>Participaciones deportivas</small><strong id="sports-attendance">0</strong></div></div>
-<div class="footer-note">BLOOM & BREW TYCOON · VERSIÓN 1.11.3 · SIN ANUNCIOS NI COMPRAS</div>
+<div class="footer-note">BLOOM & BREW TYCOON · VERSIÓN 1.12.0 · SIN ANUNCIOS NI COMPRAS</div>
 </section>
 </main>
 <aside id="zone-panel" class="zone-panel" hidden aria-label="Mejorar zona del negocio">
@@ -268,6 +270,7 @@
 <script src="progression.js"></script>
 <script src="sports.js"></script>
 <script src="clocks.js"></script>
+<script src="experience.js"></script>
 <script src="core.js">
 </script>
 <script src="scene.js">
