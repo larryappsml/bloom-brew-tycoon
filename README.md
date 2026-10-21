@@ -1,6 +1,6 @@
 # Bloom & Brew Tycoon 🌿☕🧘
 
-**v1.22.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
+**v1.23.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
 
 **[Jugar](https://larryappsml.github.io/bloom-brew-tycoon/)**
 
@@ -233,3 +233,16 @@ Golf reparte seis posiciones por el recorrido continuo; cada jugador se desplaza
 Piscina incorpora mosaicos, duchas, tumbonas, toallas, reflejos y una estela de natación más detallada. Los nadadores alternan brazos y piernas y suavizan los giros. Baile recibe parquet, vestuario, bancos, altavoces y zona de instructor; sus animaciones alternan pasos laterales, brazos elevados y giros. Movimiento reducido mantiene poses estables.
 
 Se amplía la acera y se añade recuperación de ruta para salidas exteriores que no avanzan, incluidos clientes que oscilaban alrededor de un obstáculo. Caminan por un tramo alternativo y desaparecen al completar la salida; no se eliminan dentro de una sala ni se vuelven a cobrar servicios. Se conservan partidas, reformas y especializaciones. Verificación: 148 pruebas, acera con 48 salidas simultáneas y obstáculos, varias oleadas, aforos, pago único, modelos finitos y presupuesto estático para móvil.
+
+
+## v1.23.0 — Auditoría de experiencia y correcciones
+
+Se corrigen la inclinación residual de personajes al salir de piscina o tratamientos, la ropa de clientes con planes combinados, la reconstrucción innecesaria de botones del panel y los paneles de sala que podían abrirse detrás de otro menú. Mientras se mantiene pulsado un botón se evita reconstruir la interfaz; la simulación continúa.
+
+El cierre de sala permanece visible al hacer scroll. En horizontal, los menús se distribuyen en dos columnas para no tapar el zoom. Se amplían objetivos táctiles, se redondean tiempos mostrados y se abrevian importes grandes sin cambiar el dinero guardado. Las nuevas reformas y cambios de especialización dejan de mezclarse con costes operativos; se conserva el histórico anterior.
+
+El modo Canvas 2D adapta resolución y proporciones a la pantalla, permite enfoque, zoom y selección táctil de salas. Se puede solicitar con renderer=2d en la URL; también se activa automáticamente si no inicia WebGL.
+
+Validación: 155 pruebas automáticas; 20 comprobaciones de interfaz en cuatro tamaños CSS; dos partidas simuladas de diez minutos con todas las salas, reformas y personal activos, sin solapamientos ni salidas inmóviles en las muestras. Se conservan guardados v2 y se comprueban migración, importación, exportación, copias, ingresos offline y funcionamiento con menús abiertos. Estas pruebas en Chromium no sustituyen una prueba de Safari en iPhone real.
+
+Resultados: [auditoría completa](docs/audit-v1.23.md), [tráfico del centro](docs/centre-audit-v1.23.json) y [pantallas](docs/responsive-audit-v1.23.json).

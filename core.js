@@ -232,7 +232,7 @@
     const target=!a.comboSteps&&s.visits.length<6?visitTarget(s,source,rng):null;
     if(target){
       const slots=Array.from({length:6},(_,i)=>({x:2.1+i*.72,z:5.7,index:i})),taken=new Set(s.visits.map(v=>v.lobbySlot)),spot=slots.find(v=>!taken.has(v.index));
-      a.outfit=a.outfit||a.sport||(a.type==='pilates'?'pilates':a.service==='yoga'?'yoga':a.type==='treatment'?'wellness':'cafe');
+      a.outfit=a.outfit||a.sport||(a.type==='pilates'?'pilates':a.service==='pool'?'swim':['golf','dance','cycling','boxing','yoga'].includes(a.service)?a.service:a.service==='cowork'?'premium':['nails','beauty'].includes(a.service)?'cafe':a.type==='treatment'?'wellness':'cafe');
       a.comboSteps=1;a.nextService=target;a.lobbySlot=spot.index;a.stage='transfer';a.wait=0;a.patience=55+Math.min(3,level(s,'recoveryComfort'))*5;a.reservationOrigin={...a.position};
       const route=Layout.exitRoute({...a.position,sport:a.sport,activity:a.destination?.activity},1).slice(0,-1).concat(Layout.entryRoute(spot));Traffic.send(a,route,spot);s.visits.push(a);return true;
     }

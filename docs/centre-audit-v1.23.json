@@ -1,0 +1,60 @@
+[
+  {
+    "seed": 1,
+    "seconds": 600,
+    "served": 290,
+    "classes": 7,
+    "sports": {
+      "crossfit": 5,
+      "padel": 7
+    },
+    "services": {
+      "pressotherapy": 28,
+      "massage": 21,
+      "yoga": 96,
+      "cycling": 43,
+      "nails": 58,
+      "beauty": 36,
+      "thermal": 48,
+      "boxing": 37,
+      "cold": 46,
+      "cowork": 30,
+      "pool": 36,
+      "golf": 23,
+      "dance": 45
+    },
+    "peakAgents": 163,
+    "remainingDepartures": 26,
+    "longestStationaryExitSampleSeconds": 0,
+    "net": 525017.6850249674
+  },
+  {
+    "seed": 37,
+    "seconds": 600,
+    "served": 295,
+    "classes": 7,
+    "sports": {
+      "crossfit": 5,
+      "padel": 7
+    },
+    "services": {
+      "pressotherapy": 28,
+      "massage": 20,
+      "yoga": 95,
+      "cycling": 44,
+      "nails": 55,
+      "beauty": 36,
+      "thermal": 45,
+      "boxing": 39,
+      "cold": 48,
+      "cowork": 30,
+      "pool": 36,
+      "golf": 23,
+      "dance": 44
+    },
+    "peakAgents": 164,
+    "remainingDepartures": 24,
+    "longestStationaryExitSampleSeconds": 0,
+    "net": 524979.968824951
+  }
+]

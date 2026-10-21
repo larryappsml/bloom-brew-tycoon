@@ -253,7 +253,7 @@ export class Venue3D {
       this.people.set(id,p);this.scene.add(p.root);
     }
     for(const [id,p]of this.people){const target=targets.get(id);if(!target){if(p.serving)disposeGroup(p.serving);if(p.taskEffect)disposeGroup(p.taskEffect);disposeGroup(p.root);this.people.delete(id);continue;}const current=p.root.position,agent=target.agent,moving=agent.moving;
-      const previous=p.poseReady?snapshot(p):null;p.poseReady=true;p.activity=target;p.body.rotation.x=0;p.root.rotation.x=0;current.y=0;const blend=moving?Math.min(1,dt*18):1;current.x+=(target.x-current.x)*blend;current.z+=(target.z-current.z)*blend;
+      const previous=p.poseReady?snapshot(p):null;p.poseReady=true;p.activity=target;p.body.rotation.set(0,0,0);p.root.rotation.x=0;p.root.rotation.z=0;current.y=0;const blend=moving?Math.min(1,dt*18):1;current.x+=(target.x-current.x)*blend;current.z+=(target.z-current.z)*blend;
       p.root.rotation.y=moving?(agent.heading||0):(target.guest?.seat.facing??(Layout.ROOMS.some(r=>r.id===target.service)?0:Math.PI));p.knees.forEach(k=>{k.rotation.x=0;k.scale.y=1;});p.arms.forEach(a=>a.rotation.z=0);
       const gait=this.reduced?0:Math.sin(this.time*11+id)*.5*(moving?1:.08);p.legs[0].rotation.x=gait;p.legs[1].rotation.x=-gait;p.arms[0].rotation.x=-gait*.7;p.arms[1].rotation.x=gait*.7;
       p.body.position.y=.47+(moving&&!this.reduced?Math.abs(Math.sin(this.time*11+id))*.025:0);

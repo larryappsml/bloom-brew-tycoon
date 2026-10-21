@@ -2,13 +2,18 @@
   'use strict';
   const colors=['#9c6e57','#b98469','#674d44','#d0a581'];
   class VenueScene {
-    constructor(canvas,getState) {
+    constructor(canvas,getState,onSelect=()=>{}) {
       this.canvas=canvas;this.ctx=canvas.getContext('2d');this.getState=getState;
-      this.people=new Map();this.time=0;this.last=0;
+      this.people=new Map();this.time=0;this.last=0;this.cameraZoom=1;this.cameraTarget=null;this.hits=[];
+      canvas.addEventListener?.('pointerup',event=>{if(!this.view)return;const r=canvas.getBoundingClientRect(),x=((event.clientX-r.left)/r.width*360-180)/this.view.scale+this.view.x,y=((event.clientY-r.top)/r.width*360-(this.logicalHeight||270)/2)/this.view.scale+this.view.y;const hit=this.hits.find(h=>this.contains(h.points,x,y));if(hit)onSelect(hit.zone);});
       this.reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-      this.resize=()=>{const dpr=Math.min(devicePixelRatio||1,2);canvas.width=360*dpr;canvas.height=270*dpr;this.ctx.setTransform(dpr,0,0,dpr,0,0);};
-      this.resize();this.frame=this.frame.bind(this);requestAnimationFrame(this.frame);
+      this.resize=()=>{const r=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,1.75),w=Math.max(240,r.width),h=Math.max(160,r.height),scale=w/360;this.logicalHeight=h/scale;canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);this.ctx.setTransform(dpr*scale,0,0,dpr*scale,0,0);};
+      this.resize();window.addEventListener?.('resize',this.resize);this.frame=this.frame.bind(this);requestAnimationFrame(this.frame);
     }
+    contains(points,x,y){let sign=0;for(let i=0;i<points.length;i++){const a=points[i],b=points[(i+1)%points.length],cross=(b[0]-a[0])*(y-a[1])-(b[1]-a[1])*(x-a[0]);if(Math.abs(cross)<.001)continue;const next=Math.sign(cross);if(sign&&next!==sign)return false;sign=next;}return true;}
+    changeZoom(delta){this.cameraZoom=Math.max(.5,Math.min(8,this.cameraZoom+delta*2));}
+    focus(id){const r=window.BloomLayout.ROOMS.find(r=>r.id===id),legacy={cafe:[-3,0],pilates:[3.8,0],wellness:[10.6,0],pressotherapy:[10.6,-2.7],massage:[10.6,2.6],yoga:[-3,-9.5],crossfit:[-10.5,-10.7],padel:[11.1,-11.5]},at=r?[r.x,r.z]:legacy[id];this.cameraTarget=at?this.point((at[0]+7.35)/2.1,(at[1]+6.2)/1.77):null;this.cameraZoom=at?(r?.id==='golf'?1.25:r?.id==='pool'?2.5:window.BloomLayout.ROOMS.some(r=>this.getState().levels[r.id+'Wing'])?5:1.4):1;}
+    select(id){this.focus(window.Bloom.roomEconomy(this.getState(),id)?.id||id);}
     point(x,y,z=0){const c=window.BloomCampus;if(c){x=(c.x(x*2.1-7.35)+7.35)/2.1;y=(c.z(y*1.77-6.2)+6.2)/1.77;}return [180+(x-y)*21,42+(x+y)*13-z];}
     poly(points,fill,stroke) {const c=this.ctx;c.beginPath();points.forEach((p,i)=>i?c.lineTo(...p):c.moveTo(...p));c.closePath();c.fillStyle=fill;c.fill();if(stroke){c.strokeStyle=stroke;c.lineWidth=1;c.stroke();}}
     tile(x,y,w,d,z,color) {this.poly([this.point(x,y,z),this.point(x+w,y,z),this.point(x+w,y+d,z),this.point(x,y+d,z)],color);}
@@ -41,9 +46,13 @@
     text(text,x,y,color='#68725c',size=9) {const c=this.ctx;c.fillStyle=color;c.font=`600 ${size}px system-ui`;c.textAlign='center';c.fillText(text,x,y);}
     draw(s,t,dt) {
       const c=this.ctx,B=window.Bloom,l=id=>B.level(s,id),p=B.params(s),clocks=[];
-      c.clearRect(0,0,360,270);
-      const gradient=c.createLinearGradient(0,0,0,270);gradient.addColorStop(0,'#e4e8dc');gradient.addColorStop(1,'#f2e6d1');c.fillStyle=gradient;c.fillRect(0,0,360,270);
-      c.save();const expanded=window.BloomLayout.ROOMS.some(r=>l(r.id+'Wing'));if(expanded){const f=window.BloomLayout.footprint(s),points=[[f.left,f.back],[f.right,f.back],[f.left,10],[f.right,10]].map(([x,z])=>this.point((x+7.35)/2.1,(z+6.2)/1.77)),xs=points.map(p=>p[0]),ys=points.map(p=>p[1]),scale=Math.min(.68,320/(Math.max(...xs)-Math.min(...xs)),220/(Math.max(...ys)-Math.min(...ys)));c.translate(180,140);c.scale(scale,scale);c.translate(-(Math.min(...xs)+Math.max(...xs))/2,-(Math.min(...ys)+Math.max(...ys))/2);}else{c.translate(180,135);c.scale(.68,.68);c.translate(-180,-135);}
+      c.clearRect(0,0,360,this.logicalHeight||270);
+      const gradient=c.createLinearGradient(0,0,0,this.logicalHeight||270);gradient.addColorStop(0,'#e4e8dc');gradient.addColorStop(1,'#f2e6d1');c.fillStyle=gradient;c.fillRect(0,0,360,this.logicalHeight||270);
+      c.save();const expanded=window.BloomLayout.ROOMS.some(r=>l(r.id+'Wing'));let cx=180,cy=135,scale=Math.min(.68,Math.max(70,(this.logicalHeight||270)-80)/230);
+      if(expanded){const f=window.BloomLayout.footprint(s),points=[[f.left,f.back],[f.right,f.back],[f.left,10],[f.right,10]].map(([x,z])=>this.point((x+7.35)/2.1,(z+6.2)/1.77)),xs=points.map(p=>p[0]),ys=points.map(p=>p[1]);scale=Math.min(.68,320/(Math.max(...xs)-Math.min(...xs)),Math.max(70,(this.logicalHeight||270)-80)/(Math.max(...ys)-Math.min(...ys)));cx=(Math.min(...xs)+Math.max(...xs))/2;cy=(Math.min(...ys)+Math.max(...ys))/2;}
+      if(this.cameraTarget)[cx,cy]=this.cameraTarget;scale*=this.cameraZoom||1;this.view={x:cx,y:cy,scale};c.translate(180,(this.logicalHeight||270)/2);c.scale(scale,scale);c.translate(-cx,-cy);
+      this.hits=[];const hit=(zone,x,z,w,d)=>this.hits.push({zone,points:[[x,z],[x+w,z],[x+w,z+d],[x,z+d]].map(([a,b])=>this.point((a+7.35)/2.1,(b+6.2)/1.77))});
+      hit('machine',-7.4,-5.8,7.5,11.6);if(l('mat'))hit('mat',.8,-5.8,6,11.6);if(l('wellnessWing')){hit('pressotherapy',8.1,-5.8,6,4.6);hit('massage',8.1,1.2,6,4.6);}if(l('yogaWing'))hit('yoga',-7.4,-12.6,7.5,6);if(l('crossfitWing'))hit('functionalStations',-14.1,-14.6,7,8);if(l('padelWing'))hit('padelCourt',7.9,-16.6,7.5,10.6);for(const r of window.BloomLayout.ROOMS)if(l(r.id+'Wing'))hit(r.id,r.x-r.width/2,r.z-r.depth/2,r.width,r.depth);
       const zones=window.BloomLayout.zones(s);
       const roomColors={cycling:'#344b55',nails:'#f5dfd9',beauty:'#e9b77a',thermal:'#b7c4ad',boxing:'#344b55',cold:'#dcebed',cowork:'#e9b77a',pool:'#b1deea',golf:'#86bd7d',dance:'#e9a998'};
       if(expanded)for(const [x,z,w,d]of [[3,-17.7,40,2],[-2,-28.7,30,2],[-7,-23.2,2,13],[3,-23.2,2,13],[13,-23.2,2,13],[-15.35,-4.1,2.15,27]])this.tile((x-w/2+7.35)/2.1,(z-d/2+6.2)/1.77,w/2.1,d/1.77,2,'#fff3d7');

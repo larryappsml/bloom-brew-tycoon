@@ -138,3 +138,15 @@ test('room style and reform controls persist their choices while live services c
  ui.elements.get('zone-economy').onclick({target:{closest:selector=>selector==='[data-room-style]'?{dataset:{roomStyle:'premium'}}:null}});assert.equal(JSON.parse(ui.store.get(B.KEY)).roomStyles.cafe,'premium');
  ui.elements.get('zone-economy').onclick({target:{closest:selector=>selector==='[data-renovate]'?{dataset:{renovate:'cafe'}}:null}});assert.equal(JSON.parse(ui.store.get(B.KEY)).renovations.cafe,1);assert.match(ui.elements.get('zone-economy').innerHTML,/Reforma · Boutique/);ui.advance(15);assert.ok(JSON.parse(ui.store.get(B.KEY)).served>400);
 });
+
+test('unchanged room panels retain markup and pressing a button never pauses the simulation',()=>{
+ const fixture=fs.readFileSync('tests/fixtures/detailed-v2.json','utf8'),ui=boot({[B.KEY]:fixture});ui.elements.get('cafe-zone').onclick();const panel=ui.elements.get('zone-economy');let writes=0,html=panel.innerHTML;Object.defineProperty(panel,'innerHTML',{get:()=>html,set:value=>{writes++;html=value;}});ui.elements.get('cafe-zone').onclick();assert.equal(writes,0);ui.events.pointerdown({target:{closest:()=>({})}});const before=JSON.parse(ui.store.get(B.KEY)).served;ui.advance(20);assert.ok(JSON.parse(ui.store.get(B.KEY)).served>before);assert.equal(writes,0);ui.events.pointerup();ui.advance(1);assert.ok(writes>0);
+});
+
+test('large cash totals use compact HUD figures while saving the exact amount',()=>{
+ const s=B.fresh();s.money=12345678900;const ui=boot({[B.KEY]:JSON.stringify(s)});assert.ok(ui.elements.get('money').textContent.length<15);assert.equal(JSON.parse(ui.store.get(B.KEY)).money,s.money);
+});
+
+test('selecting a room from an exposed map edge closes other menus before opening its panel',()=>{
+ const ui=boot();ui.navButtons.find(b=>b.dataset.view==='reports').onclick();assert.ok(ui.elements.get('app').classList.contains('menu-open'));ui.elements.get('cafe-zone').onclick();assert.equal(ui.elements.get('app').classList.contains('menu-open'),false);assert.equal(ui.elements.get('zone-panel').hidden,false);assert.ok(ui.elements.get('home').classList.contains('active'));
+});

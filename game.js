@@ -3,6 +3,11 @@
   const demo=/(?:[?&])demo=(?:club|expansion|leisure)(?:&|$)/.test(location.search||'');
   const B=demo?{...window.Bloom,KEY:(location.search||'').includes('demo=leisure')?'bloom-brew-leisure-v1':(location.search||'').includes('demo=expansion')?'bloom-brew-expansion-v1':'bloom-brew-demo-v2',LEGACY_KEY:'bloom-brew-demo-v1',fresh:()=>window.Bloom.validate(window.BloomDemo)}:window.Bloom;
   const $=id=>document.getElementById(id),fmt=n=>new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:n>=100?0:2}).format(n);
+  const hud=n=>n>=1e6?new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',notation:'compact',maximumFractionDigits:2}).format(n):fmt(n);
+  let pointerHeld=false;const markupCache=new Map();
+  function markup(id,html){if(markupCache.get(id)===html)return;const el=$(id),active=document.activeElement,inside=active&&el.contains?.(active),key=inside?['data-buy','data-zone','data-room-style','data-renovate'].find(k=>active.hasAttribute?.(k)):null,value=key&&active.getAttribute(key),scroll=el.scrollTop;el.innerHTML=html;markupCache.set(id,html);if(key)el.querySelector?.('['+key+'="'+value+'"]')?.focus({preventScroll:true});if(Number.isFinite(scroll))el.scrollTop=scroll;}
+  document.addEventListener('pointerdown',event=>{if(event.target.closest?.('button'))pointerHeld=true;});
+  for(const name of ['pointerup','pointercancel'])document.addEventListener(name,()=>{pointerHeld=false;});
   let s=B.fresh(),filter='all',toastTimer,dirty=true,loadWarning='',readOnly=false,selectedZone=null,venueScene,serviceMarkup='';
   function toast(text){$('toast').textContent=text;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3200);}
   function celebrate(){for(let i=0;i<12;i++){const star=document.createElement('span');star.className='celebration-star';star.textContent=i%3?'✦':'🌿';star.style.left=(12+i*6.5)+'%';star.style.top=(36+(i%4)*8)+'%';star.style.animationDelay=i*.025+'s';$('app').append(star);setTimeout(()=>star.remove(),2100);}}
@@ -54,15 +59,17 @@
     $('zone-title').textContent=u.name;$('zone-level').textContent='NIVEL '+B.level(s,u.id);
     $('zone-description').textContent=reason||benefit(u);
     const economy=B.roomEconomy(s,u.id);
-    $('zone-economy').innerHTML=economy?'<small>'+economy.name+' · neto automático aprox.</small><strong>'+fmt(economy.perMinute)+'/min</strong><p>'+(economy.rank?'Puesto '+economy.rank+' en beneficio/min · '+Math.round(economy.share)+' % del centro':'Sin producción automática')+'</p>'+(economy.breakdown.length?'<p>'+economy.breakdown.map(d=>d.name+' '+fmt(d.perMinute)+'/min').join(' · ')+'</p>':'')+'<small>'+economy.note+' No incluye propinas ni premios.</small>':'';
+    let zoneHTML=economy?'<small>'+economy.name+' · neto automático aprox.</small><strong>'+fmt(economy.perMinute)+'/min</strong><p>'+(economy.rank?'Puesto '+economy.rank+' en beneficio/min · '+Math.round(economy.share)+' % del centro':'Sin producción automática')+'</p>'+(economy.breakdown.length?'<p>'+economy.breakdown.map(d=>d.name+' '+fmt(d.perMinute)+'/min').join(' · ')+'</p>':'')+'<small>'+economy.note+' No incluye propinas ni premios.</small>':'';
     const investment=B.upgradeEconomy(s,u.id);
-    const room=window.BloomLayout?.ROOMS.find(r=>u.id.startsWith(r.id));if(room)$('zone-economy').innerHTML+='<div class=service-actions>'+B.UPGRADES.filter(v=>v.id.startsWith(room.id)).map(v=>'<button class=tab data-zone="'+v.id+'">'+v.name+' · Nv. '+B.level(s,v.id)+'</button>').join('')+'</div>';
-    if(investment)$('zone-economy').innerHTML+='<p class="highlight">'+(investment.paybackMinutes!==null?'Mejora: +'+fmt(investment.deltaPerMinute)+'/min al centro · recupera su coste en ~'+Math.ceil(investment.paybackMinutes)+' min':'La demanda o el equipo limitan el ingreso: esta mejora no aumenta ahora el neto automático estimado.')+'</p>';
-    if(economy){const q=B.evolutionStatus(s,economy.id);if(q){const forecast=choice=>B.estimate({...s,roomStyles:{...s.roomStyles,[q.id]:choice}}).rooms[q.id]*60;$('zone-economy').innerHTML+='<section class="room-evolution"><h3>Especialización de la sala</h3><small>Se aplica a próximas sesiones. Cambiar: '+fmt(q.changeCost)+' · descanso de 2 min de juego.</small>'+B.ROOM_STYLES.map(o=>'<div class="style-option '+(o.id===q.style?'chosen':'')+'"><div><b>'+o.icon+' '+o.name+'</b><small>'+o.desc+'</small><small>~'+fmt(forecast(o.id))+'/min automático</small></div><button class="tab" data-room-style="'+o.id+'" '+(q.reason||q.cooldown>0||o.id===q.style||s.money<q.changeCost?'disabled':'')+'>'+(o.id===q.style?'Elegida':'Elegir')+'</button></div>').join('')+'<small>'+(q.reason||(q.cooldown>0?'Disponible en '+Math.ceil(q.cooldown)+' s de juego':''))+'</small><h3>Reforma · '+q.tierName+'</h3><p>'+(q.nextName?'Próxima: '+q.nextName+' · '+q.visits+'/'+q.goal+' clientes · +6 % a la tarifa base por etapa. Nuevos acabados, iluminación y decoración.':'Has completado las tres reformas de esta sala.')+'</p><button class="zone-buy" data-renovate="'+q.id+'" '+(q.reformReason||s.money<q.cost?'disabled':'')+'>'+(q.reformReason||'Reformar a '+q.nextName+' · '+fmt(q.cost))+'</button></section>';}}
+    const room=window.BloomLayout?.ROOMS.find(r=>u.id.startsWith(r.id));if(room)zoneHTML+='<div class=service-actions>'+B.UPGRADES.filter(v=>v.id.startsWith(room.id)).map(v=>'<button class=tab data-zone="'+v.id+'">'+v.name+' · Nv. '+B.level(s,v.id)+'</button>').join('')+'</div>';
+    if(investment)zoneHTML+='<p class="highlight">'+(investment.paybackMinutes!==null?'Mejora: +'+fmt(investment.deltaPerMinute)+'/min al centro · recupera su coste en ~'+Math.ceil(investment.paybackMinutes)+' min':'La demanda o el equipo limitan el ingreso: esta mejora no aumenta ahora el neto automático estimado.')+'</p>';
+    if(economy){const q=B.evolutionStatus(s,economy.id);if(q){const forecast=choice=>B.estimate({...s,roomStyles:{...s.roomStyles,[q.id]:choice}}).rooms[q.id]*60;zoneHTML+='<section class="room-evolution"><h3>Especialización de la sala</h3><small>Se aplica a próximas sesiones. Cambiar: '+fmt(q.changeCost)+' · descanso de 2 min de juego.</small>'+B.ROOM_STYLES.map(o=>'<div class="style-option '+(o.id===q.style?'chosen':'')+'"><div><b>'+o.icon+' '+o.name+'</b><small>'+o.desc+'</small><small>~'+fmt(forecast(o.id))+'/min automático</small></div><button class="tab" data-room-style="'+o.id+'" '+(q.reason||q.cooldown>0||o.id===q.style||s.money<q.changeCost?'disabled':'')+'>'+(o.id===q.style?'Elegida':'Elegir')+'</button></div>').join('')+'<small>'+(q.reason||(q.cooldown>0?'Disponible en '+Math.ceil(Math.max(0,q.cooldown-1e-8))+' s de juego':''))+'</small><h3>Reforma · '+q.tierName+'</h3><p>'+(q.nextName?'Próxima: '+q.nextName+' · '+q.visits+'/'+q.goal+' clientes · +6 % a la tarifa base por etapa. Nuevos acabados, iluminación y decoración.':'Has completado las tres reformas de esta sala.')+'</p><button class="zone-buy" data-renovate="'+q.id+'" '+(q.reformReason||s.money<q.cost?'disabled':'')+'>'+(q.reformReason||'Reformar a '+q.nextName+' · '+fmt(q.cost))+'</button></section>';}}
+    markup('zone-economy',zoneHTML);
     $('zone-buy').disabled=!!reason||max||s.money<cost;$('zone-buy').textContent=max?'✓ Nivel máximo':reason?'Zona bloqueada':`Mejorar · ${fmt(cost)}`;
   }
   function selectZone(id){
     if(!B.UPGRADES.some(u=>u.id===id))return;
+    if($('app').classList.contains('menu-open'))nav('home');
     selectedZone=id;$('zone-panel').hidden=false;$('app').classList.add('zone-open');venueScene?.select(id);renderZone();
   }
   function closeZone(){selectedZone=null;$('zone-panel').hidden=true;$('app').classList.remove('zone-open');}
@@ -79,6 +86,7 @@
     if(board!==campaignMarkup){$('campaign-board').innerHTML=board;campaignMarkup=board;}
   }
   function render() {
+    if(pointerHeld)return;
     renderProgression();
     const sports=B.SPORTS.map(d=>{const c=B.sportConfig(s,d.id),g=s.sportsGroups[d.id],ready=g?.guests.filter(a=>a.stage==='ready').length||0,phase=g?.phase;
       const disabled=!c.capacity||s.sportsCooldown[d.id]>0||phase==='active'||phase==='leaving'||(phase==='boarding'&&(ready<c.minimum||ready!==g.guests.length));
@@ -92,7 +100,7 @@
     $('visits-list').innerHTML=s.visits.map(a=>'<div class="service-row"><div><b>Plan combinado → '+serviceName(a.nextService)+'</b><small>'+(a.path.length?'Caminando a recepción':'En espera · paciencia '+Math.ceil(Math.max(0,a.patience-a.wait))+' s')+'</small></div><button class="tab" data-focus="'+a.nextService+'">Ver zona</button></div>').join('')||'<small class="muted">No hay planes esperando. Los clientes combinan deporte, recuperación y cafetería cuando esas zonas están abiertas.</small>';
     $('premium-status').textContent=s.premiumVisits+' visitas atendidas · '+fmt(s.premiumTips)+' en propinas';
     const p=B.params(s),estimate=B.estimate(s),serving=s.queue.find(o=>o.remaining!==null&&!o.worker),waiting=s.queue.find(o=>o.stage==='waiting'),pilates=B.level(s,'mat')>0,boost=Date.now()<s.boostUntil;
-    $('money').textContent=fmt(s.money);$('income').textContent=fmt(estimate.total*60);$('rep').textContent='⭐ '+(s.reputation/20).toFixed(1);
+    $('money').textContent=hud(s.money);$('money').setAttribute('aria-label',fmt(s.money));$('income').textContent=hud(estimate.total*60);$('income').setAttribute('aria-label',fmt(estimate.total*60)+' por minuto');$('rep').textContent='⭐ '+(s.reputation/20).toFixed(1);
     $('level').textContent='NIVEL '+(1+Math.floor(Math.sqrt(s.earned/120)));
     $('subtitle').textContent=pilates?'Café de especialidad · Pilates y wellness':'Un café, mil posibilidades';
     $('venue-status').textContent=`${p.area} m² · ${s.visits.length+s.queue.length+s.seated.length+s.treatments.length+s.classGuests.length+Object.values(s.sportsGroups).reduce((n,g)=>n+(g?.guests.length||0),0)} clientes`;
@@ -108,7 +116,7 @@
       return `<div class="order ${o.wait>o.patience*.7?'urgent':''}"><span>${product.icon} ${o.premium?'🤵 Premium':o.comboSteps?'Plan combinado':['Habitual','Estudiante','De paso','Wellness'][o.kind]}</span><b>${product.name}</b><small>${o.stage==='arrival'?'Llegando al mostrador':working?(o.remaining===0?'Esperando una silla libre':(o.worker?'Barista · ':'Tú · ')+Math.ceil(o.remaining)+' s'):'Espera '+Math.floor(o.wait)+' s'}</small><div class="bar"><i style="width:${working?Math.max(0,(1-o.remaining/(o.duration||B.orderDuration(s,o.product)))*100):Math.max(0,1-o.wait/o.patience)*100}%"></i></div></div>`;
     }).join('')||'<div class="empty-orders">🌿 Un momento de calma. El próximo cliente está en camino.</div>';
     $('business-strip').innerHTML=`<span>Cafetería <b>${s.seated.length}/${p.seats} plazas</b></span><span>Equipo <b>${p.baristas} baristas</b></span><span>Margen aprox. <b>${fmt(estimate.total*60)}/min</b></span>`;
-    $('studio-description').textContent=!pilates?'Abre tu estudio desde 850 €. Empieza dando clases y contrata después una instructora.':`${p.capacity} plazas · ${fmt(p.classPrice)}/alumno · ${p.classTime} s por clase. ${B.level(s,'coach')?'Instructora contratada: clases automáticas.':'Impartes las clases; sin salario de instructora.'}`;
+    $('studio-description').textContent=!pilates?'Abre tu estudio desde 850 €. Empieza dando clases y contrata después una instructora.':`${p.capacity} plazas · ${fmt(p.classPrice)}/alumno · ${Math.ceil(p.classTime)} s por clase. ${B.level(s,'coach')?'Instructora contratada: clases automáticas.':'Impartes las clases; sin salario de instructora.'}`;
     const ready=s.classGuests.filter(g=>g.stage==='ready').length,boarding=s.classPhase==='boarding';
     if(pilates)$('studio-description').textContent+=boarding?` Llegando ${s.classGuests.length-ready} · en su plaza ${ready}/${p.capacity}.`:s.classPhase==='leaving'?' El grupo está saliendo; después recibiremos al siguiente.':' Cada grupo entra desde la calle y sale al terminar.';
     $('class-start').disabled=pilates&&(s.classPhase==='active'||s.classPhase==='leaving'||s.classCooldown>0||(boarding&&(!ready||ready!==s.classGuests.length)));
@@ -116,7 +124,7 @@
     $('class-progress').style.width=pilates&&s.classRemaining>0?(1-s.classRemaining/(s.classDuration||p.classTime))*100+'%':'0%';
     const nextServiceMarkup=B.SERVICES.map(service=>{
       const c=B.serviceConfig(s,service.id),active=s.treatments.filter(t=>t.service===service.id),arriving=active.filter(t=>t.stage==='arrival').length,occupied=B.serviceOccupancy(s,service.id);
-      return `<div class="service-row"><div><b>${service.icon} ${service.name}</b><small>${c.capacity?`${active.length}/${c.capacity} plazas · ${fmt(c.price)}/sesión · ${c.duration} s`:'Instala el servicio desde Mejoras'}</small><small>${c.capacity?(arriving?`${arriving} clientes en camino · `:'')+(c.automatic?'Atención automática':'Atención manual'):''}</small></div><div class="service-actions"><button class="tab" data-focus="${service.id}" ${!c.capacity?'disabled':''}>Ver sala</button><button class="claim" data-service="${service.id}" ${!c.capacity||occupied>=c.capacity?'disabled':''}>${occupied>=c.capacity&&c.capacity?(occupied>active.length?'Saliendo':'En sesión'):'Recibir'}</button></div></div>`;
+      return `<div class="service-row"><div><b>${service.icon} ${service.name}</b><small>${c.capacity?`${active.length}/${c.capacity} plazas · ${fmt(c.price)}/sesión · ${Math.ceil(c.duration)} s`:'Instala el servicio desde Mejoras'}</small><small>${c.capacity?(arriving?`${arriving} clientes en camino · `:'')+(c.automatic?'Atención automática':'Atención manual'):''}</small></div><div class="service-actions"><button class="tab" data-focus="${service.id}" ${!c.capacity?'disabled':''}>Ver sala</button><button class="claim" data-service="${service.id}" ${!c.capacity||occupied>=c.capacity?'disabled':''}>${occupied>=c.capacity&&c.capacity?(occupied>active.length?'Saliendo':'En sesión'):'Recibir'}</button></div></div>`;
     }).join('');
     if(nextServiceMarkup!==serviceMarkup){$('service-list').innerHTML=nextServiceMarkup;serviceMarkup=nextServiceMarkup;}
     const next=B.GOALS.find(g=>!s.claimed.includes(g.id));
@@ -131,7 +139,7 @@
     $('expenses').textContent=fmt(s.expenses);$('profit').textContent=fmt(s.earned-s.expenses);$('lost').textContent=s.lost;$('students').textContent=s.students;
     $('floor-area').textContent=p.area+' m²';$('services-completed').textContent=Object.values(s.completedServices).reduce((a,b)=>a+b,0);$('sports-completed').textContent=s.sportSessions.crossfit+s.sportSessions.padel;$('sports-attendance').textContent=s.sportVisits.crossfit+s.sportVisits.padel;
     $('tip').textContent=!p.baristas?'Prepara pedidos y ahorra 220 € para un barista. Las ventas descuentan ingredientes; el barista cobra 0,65 € por pedido.':!pilates?'El café tiene demanda y aforo limitados. Invierte en mesas o abre pilates para diversificar.':'Las clases descuentan operación y materiales por alumno, más 3 € si tienes instructora. El beneficio offline se estima al 35 %, hasta 4 horas.';
-    const tutorial=[['Tu primer café','Toca «Preparar» cuando llegue un pedido. Se cobrará al terminar.'],['Hazlo tuyo','Compra una cafetera o una vitrina en Mejoras. El mobiliario aparece en tu local.'],['Tu primer equipo','Contrata un barista para servir sin tocar. Más mesas atraen más visitas.'],['Café y movimiento','Ahorra para abrir el estudio. Puedes dar clases antes de contratar instructora.']];
+    const tutorial=[['Tu primer café','Toca «Atender» cuando llegue un pedido. Se cobrará al terminar.'],['Hazlo tuyo','Compra una cafetera o una vitrina en Mejoras. El mobiliario aparece en tu local.'],['Tu primer equipo','Contrata un barista para servir sin tocar. Más mesas atraen más visitas.'],['Café y movimiento','Ahorra para abrir el estudio. Puedes dar clases antes de contratar instructora.']];
     $('tutorial').hidden=s.tutorial>=4;if(s.tutorial<4){$('tutorial-title').textContent=tutorial[s.tutorial][0];$('tutorial-copy').textContent=tutorial[s.tutorial][1];$('tutorial-next').textContent=s.tutorial===3?'¡A jugar!':'Siguiente';}
     if(dirty)renderLists();
   }
@@ -194,6 +202,7 @@
   },100);
   setInterval(()=>{if(!document.hidden)save();},5000);
   document.addEventListener('visibilitychange',()=>{
+    pointerHeld=false;
     if(document.hidden){save();return;}
     const result=B.offline(s);tick=performance.now();if(result.net>0)toast('Mientras descansabas · +'+fmt(result.net)+' netos');save();dirty=true;render();
   });

@@ -1,0 +1,282 @@
+[
+  {
+    "size": "320 × 568",
+    "panel": "Mapa",
+    "result": {
+      "viewport": [
+        320,
+        568
+      ],
+      "horizontalOverflow": false,
+      "controlsOutside": [],
+      "renderer": "3d",
+      "buttons": 12
+    }
+  },
+  {
+    "size": "320 × 568",
+    "panel": "Mejoras",
+    "result": {
+      "viewport": [
+        320,
+        568
+      ],
+      "horizontalOverflow": false,
+      "controlsOutside": [],
+      "renderer": "3d",
+      "buttons": 116
+    }
+  },
+  {
+    "size": "320 × 568",
+    "panel": "Objetivos",
+    "result": {
+      "viewport": [
+        320,
+        568
+      ],
+      "horizontalOverflow": false,
+      "controlsOutside": [],
+      "renderer": "3d",
+      "buttons": 15
+    }
+  },
+  {
+    "size": "320 × 568",
+    "panel": "Negocio",
+    "result": {
+      "viewport": [
+        320,
+        568
+      ],
+      "horizontalOverflow": false,
+      "controlsOutside": [],
+      "renderer": "3d",
+      "buttons": 9
+    }
+  },
+  {
+    "size": "320 × 568",
+    "panel": "Panel cafetería",
+    "result": {
+      "viewport": [
+        320,
+        568
+      ],
+      "horizontalOverflow": false,
+      "controlsOutside": [],
+      "renderer": "3d",
+      "buttons": 10
+    }
+  },
+  {
+    "size": "390 × 844",
+    "panel": "Mapa",
+    "result": {
+      "viewport": [
+        390,
+        844
+      ],
+      "horizontalOverflow": false,
+      "controlsOutside": [],
+      "renderer": "3d",
+      "buttons": 12
+    }
+  },
+  {
+    "size": "390 × 844",
+    "panel": "Mejoras",
+    "result": {
+      "viewport": [
+        390,
+        844
+      ],
+      "horizontalOverflow": false,
+      "controlsOutside": [],
+      "renderer": "3d",
+      "buttons": 116
+    }
+  },
+  {
+    "size": "390 × 844",
+    "panel": "Objetivos",
+    "result": {
+      "viewport": [
+        390,
+        844
+      ],
+      "horizontalOverflow": false,
+      "controlsOutside": [],
+      "renderer": "3d",
+      "buttons": 15
+    }
+  },
+  {
+    "size": "390 × 844",
+    "panel": "Negocio",
+    "result": {
+      "viewport": [
+        390,
+        844
+      ],
+      "horizontalOverflow": false,
+      "controlsOutside": [],
+      "renderer": "3d",
+      "buttons": 9
+    }
+  },
+  {
+    "size": "390 × 844",
+    "panel": "Panel cafetería",
+    "result": {
+      "viewport": [
+        390,
+        844
+      ],
+      "horizontalOverflow": false,
+      "controlsOutside": [],
+      "renderer": "3d",
+      "buttons": 10
+    }
+  },
+  {
+    "size": "430 × 932",
+    "panel": "Mapa",
+    "result": {
+      "viewport": [
+        430,
+        932
+      ],
+      "horizontalOverflow": false,
+      "controlsOutside": [],
+      "renderer": "3d",
+      "buttons": 12
+    }
+  },
+  {
+    "size": "430 × 932",
+    "panel": "Mejoras",
+    "result": {
+      "viewport": [
+        430,
+        932
+      ],
+      "horizontalOverflow": false,
+      "controlsOutside": [],
+      "renderer": "3d",
+      "buttons": 116
+    }
+  },
+  {
+    "size": "430 × 932",
+    "panel": "Objetivos",
+    "result": {
+      "viewport": [
+        430,
+        932
+      ],
+      "horizontalOverflow": false,
+      "controlsOutside": [],
+      "renderer": "3d",
+      "buttons": 15
+    }
+  },
+  {
+    "size": "430 × 932",
+    "panel": "Negocio",
+    "result": {
+      "viewport": [
+        430,
+        932
+      ],
+      "horizontalOverflow": false,
+      "controlsOutside": [],
+      "renderer": "3d",
+      "buttons": 9
+    }
+  },
+  {
+    "size": "430 × 932",
+    "panel": "Panel cafetería",
+    "result": {
+      "viewport": [
+        430,
+        932
+      ],
+      "horizontalOverflow": false,
+      "controlsOutside": [],
+      "renderer": "3d",
+      "buttons": 10
+    }
+  },
+  {
+    "size": "844 × 390",
+    "panel": "Mapa",
+    "result": {
+      "viewport": [
+        844,
+        390
+      ],
+      "horizontalOverflow": false,
+      "controlsOutside": [],
+      "renderer": "3d",
+      "buttons": 12
+    }
+  },
+  {
+    "size": "844 × 390",
+    "panel": "Mejoras",
+    "result": {
+      "viewport": [
+        844,
+        390
+      ],
+      "horizontalOverflow": false,
+      "controlsOutside": [],
+      "renderer": "3d",
+      "buttons": 116
+    }
+  },
+  {
+    "size": "844 × 390",
+    "panel": "Objetivos",
+    "result": {
+      "viewport": [
+        844,
+        390
+      ],
+      "horizontalOverflow": false,
+      "controlsOutside": [],
+      "renderer": "3d",
+      "buttons": 15
+    }
+  },
+  {
+    "size": "844 × 390",
+    "panel": "Negocio",
+    "result": {
+      "viewport": [
+        844,
+        390
+      ],
+      "horizontalOverflow": false,
+      "controlsOutside": [],
+      "renderer": "3d",
+      "buttons": 9
+    }
+  },
+  {
+    "size": "844 × 390",
+    "panel": "Panel cafetería",
+    "result": {
+      "viewport": [
+        844,
+        390
+      ],
+      "horizontalOverflow": false,
+      "controlsOutside": [],
+      "renderer": "3d",
+      "buttons": 10
+    }
+  }
+]
