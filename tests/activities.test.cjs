@@ -17,7 +17,7 @@ test('every service has real street arrivals, reserved capacity, icon clocks and
   for(const r of R){
     const s=B.fresh(now);s.arrival=1e9;s.treatmentArrival=1e9;s.levels={[r.id+'Wing']:1,[r.id]:1};
     assert.equal(B.startTreatment(s,r.id,()=>.5),true);assert.equal(B.startTreatment(s,r.id,()=>.5),true);assert.equal(B.startTreatment(s,r.id),false);
-    const first=s.treatments[0],c=B.serviceConfig(s,r.id);assert.equal(first.stage,'arrival');assert.ok(first.path.some(p=>Math.abs(p.x)===32));assert.equal(C.iconFor(r.id),r.icon);assert.equal(s.earned,0);
+    const first=s.treatments[0],c=B.serviceConfig(s,r.id);assert.equal(first.stage,'arrival');assert.ok(first.path.some(p=>[-7,3,13].includes(p.x))&&first.path.some(p=>p.x===-15.35));assert.equal(C.iconFor(r.id),r.icon);assert.equal(s.earned,0);
     let active=false,completed=false;
     for(let i=0;i<1800;i++){B.step(s,.1,now+i*100,()=>.99);if(first.stage==='active')active=true;if(s.completedServices[r.id]===2){completed=true;break;}}
     assert.ok(active,r.id+' enters its reserved station');assert.ok(completed,r.id+' completes');assert.equal(s.earned,c.price*2);assert.equal(s.expenses,c.cost*2);
@@ -37,4 +37,4 @@ test('each new room, capacity and visual upgrade adds finite clickable models',a
   batchStaticWorld(world.root);const zones=new Set();world.root.traverse(o=>{for(const v of [...o.position,...o.scale])assert.ok(Number.isFinite(v));if(o.isInstancedMesh)for(let i=0;i<o.count;i++)zones.add(hitZone({object:o,instanceId:i}));});for(const r of R)for(const suffix of ['', 'Quality','Decor','Staff'])assert.ok(zones.has(r.id+suffix),r.id+suffix);
 });
 
-test('measured activity income and room estimates agree within ten percent in the shared maximum venue',()=>{const report=require('../docs/activities-audit-v1.16.json');for(const row of report){assert.ok(row.completed>=30);assert.ok(Math.abs(row.estimated/row.netPerMinute-1)<.1,row.room);}});
+test('measured activity income and room estimates agree within ten percent in the shared maximum venue',()=>{const report=require('../docs/activities-audit-v1.17.json');for(const row of report){assert.ok(row.completed>=30);assert.ok(Math.abs(row.estimated/row.netPerMinute-1)<.1,row.room);}});

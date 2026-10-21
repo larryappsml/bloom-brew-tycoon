@@ -1,3 +1,11 @@
+# v1.17.0
+
+- Dos bloques compactos de actividades conectados al centro por galerías; corredores entre las alas y rutas reales por sus puertas.
+- Siete identidades arquitectónicas y equipamiento más detallado: cycling, nails, beauty, spa, boxeo, frío/calor y coworking.
+- Pedaleo, golpes alternos, manicura, secado, escritura, ondas en agua y desplazamientos del personal. Accesorios activos con recursos compartidos.
+- Se mantienen las ampliaciones continuas de café y pilates, las compras y los datos de guardado v2.
+- Auditoría de ingresos repetida con las nuevas rutas; no se cambian tarifas ni niveles.
+
 # v1.16.0
 
 - Siete alas nuevas de 56 m²: cycling, nail bar, peluquería, spa termal, boxeo, recuperación frío/calor y coworking.

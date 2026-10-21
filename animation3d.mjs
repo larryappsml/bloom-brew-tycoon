@@ -45,23 +45,36 @@ export function animatePose(p,target,time,dt,reduced,previous){
     }
   }
   if(target.treatment?.stage==='active'){
-    if(['cycling','nails','beauty','cowork'].includes(target.service)){
-      p.root.position.y=target.service==='cycling'?.35:.05;p.legs.forEach((l,i)=>l.rotation.x=-1.25+(target.service==='cycling'&&!reduced?Math.sin(time*5+i*Math.PI)*.35:0));p.knees.forEach(k=>{k.rotation.x=1.35;k.scale.y=1.4;});
-      p.arms.forEach((a,i)=>a.rotation.x=target.service==='cycling'?-1.05:-.8+(reduced?0:Math.sin(time*3+i)*.07));
+    const cycle=reduced?0:Math.sin(time*5+id*.2),slow=reduced?0:Math.sin(time*1.3+id);
+    if(target.service==='cycling'){
+      p.root.position.y=.37;p.body.rotation.x=.17;p.body.position.y=.47+Math.abs(cycle)*.012;
+      p.legs.forEach((l,i)=>l.rotation.x=-1.18+(i?-1:1)*cycle*.48);
+      p.knees.forEach((k,i)=>{k.rotation.x=1.25+(i?1:-1)*cycle*.38;k.scale.y=1.35;});
+      p.arms.forEach(a=>a.rotation.x=-1.12);
+    }else if(['nails','beauty','cowork'].includes(target.service)){
+      p.root.position.y=.16;p.legs.forEach(l=>l.rotation.x=-1.4);p.knees.forEach(k=>{k.rotation.x=1.4;k.scale.y=1.35;});
+      if(target.service==='nails'){p.arms[0].rotation.x=-.95;p.arms[1].rotation.x=-.95;p.body.rotation.x=.06;}
+      if(target.service==='beauty'){p.arms.forEach(a=>a.rotation.x=-.3);p.body.rotation.x=.015;p.body.rotation.z=slow*.018;}
+      if(target.service==='cowork'){p.arms.forEach((a,i)=>a.rotation.x=-.94+(reduced?0:Math.sin(time*7+i*Math.PI)*.045));p.body.rotation.x=.09;}
     }else if(target.service==='boxing'){
-      p.arms.forEach((a,i)=>a.rotation.x=-.7-(reduced?.3:Math.pow(Math.max(0,Math.sin(time*4+i*Math.PI)),3))*.9);p.body.rotation.z=wave*.045;p.knees.forEach(k=>k.rotation.x=.15);
+      const jab=reduced?0:Math.pow(Math.max(0,Math.sin(time*4.2+id)),4),cross=reduced?0:Math.pow(Math.max(0,Math.sin(time*4.2+id-1.8)),4);
+      p.arms[0].rotation.x=-.7-jab*1.05;p.arms[1].rotation.x=-.75-cross*.95;
+      p.arms[0].rotation.z=-.18;p.arms[1].rotation.z=.18;p.body.rotation.y=(jab-cross)*.18;p.body.rotation.z=(jab-cross)*.045;
+      p.body.position.y=.47+(reduced?0:Math.abs(Math.sin(time*4.2+id))*.025);p.knees.forEach(k=>k.rotation.x=.2);
     }else if(['thermal','cold'].includes(target.service)){
-      p.root.position.y=-.05;p.legs.forEach(l=>l.rotation.x=-1.2);p.arms.forEach(a=>a.rotation.x=-.3);p.body.rotation.x=.04;
+      p.root.position.y=-.05;p.legs.forEach(l=>l.rotation.x=-1.2);p.arms.forEach((a,i)=>{a.rotation.x=-.25;a.rotation.z=(i?1:-1)*.4;});p.body.rotation.x=.025;
+      if(target.service==='cold')p.body.position.y=.47+(reduced?0:Math.sin(time*2+id)*.008);
     }
   }
-  if(target.sport!=='padel'||target.athlete?.stage!=='playing')p.body.rotation.y=0;
+  if((target.sport!=='padel'||target.athlete?.stage!=='playing')&&!(target.service==='boxing'&&target.treatment?.stage==='active'))p.body.rotation.y=0;
   const joints=[p.root,p.body,...p.legs,...p.knees,...p.arms],blend=reduced?1:1-Math.exp(-Math.min(dt,.15)*12);
   if(previous)joints.forEach((o,i)=>{for(const axis of ['x','y','z'])o.rotation[axis]=turn(previous[i][axis],o.rotation[axis],blend);});
 }
 export function animateStaff(p,role,active,time,reduced){
   if(!p.body)return;
-  const wave=reduced?0:Math.sin(time*(role==='cafe'?3.8:1.5));
+  const wave=reduced?0:Math.sin(time*(role==='cafe'?3.8:role==='nails'?5:role==='beauty'?2.5:1.5));
   p.body.position.y=.47+(reduced?0:Math.sin(time*1.6)*.008);
+  if(p.legs){const walk=reduced||!p.staffMoving?0:Math.sin(time*9)*.3;p.legs[0].rotation.x=walk;p.legs[1].rotation.x=-walk;p.knees?.forEach(k=>k.rotation.x=0);}
   p.body.rotation.x=active?.035:0;p.body.rotation.z=active?wave*.025:0;
-  p.arms.forEach((a,i)=>{a.rotation.x=active?-.5+wave*(i?-.22:.3):-.08;a.rotation.z=active&&role!=='cafe'?(i?1:-1)*(.35+wave*.12):0;});
+  p.arms.forEach((a,i)=>{a.rotation.x=active?-.5+wave*(i?-.22:.3):-.08;a.rotation.z=active&&role!=='cafe'?(i?1:-1)*(.35+wave*.12):0;if(active&&role==='nails'){a.rotation.x=-.95+wave*.04;a.rotation.z=(i?1:-1)*.12;}if(active&&role==='beauty'){a.rotation.x=-1.05+wave*.16;a.rotation.z=(i?1:-1)*.2;}});
 }

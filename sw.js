@@ -1,5 +1,5 @@
 'use strict';
-const CACHE='bloom-brew-v1.16.0';
+const CACHE='bloom-brew-v1.17.0';
 const ASSETS=['./','./index.html','./activities.js','./layout.js','./traffic.js','./progression.js','./sports.js','./clocks.js','./decor3d.mjs','./sports3d.mjs','./art3d.mjs','./animation3d.mjs','./activities3d.mjs','./experience.js','./core.js','./scene.js','./scene2d.js','./scene3d.mjs','./vendor/three.module.min.mjs','./vendor/three.core.min.mjs','./demo.js','./game.js','./styles.css','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png','./apple-touch-icon.png'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS))));
 // Activate after the previous game is closed, so an open game never mixes asset versions.

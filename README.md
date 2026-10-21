@@ -1,6 +1,6 @@
 # Bloom & Brew Tycoon 🌿☕🧘
 
-**v1.16.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
+**v1.17.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
 
 **[Jugar](https://larryappsml.github.io/bloom-brew-tycoon/)**
 
@@ -185,3 +185,11 @@ Las posturas se interpolan sin modificar la simulación: pasos con rodillas y ho
 Cycling boutique, nail bar, peluquería y beauty bar, spa termal, boxeo boutique, recuperación frío/calor y coworking con café. Cada ala añade 56 m² (704 m² totales), hasta seis plazas, tres niveles de calidad y ambiente y personal especializado. Se desbloquean después de pilates y la primera zona deportiva. Los clientes llegan por un paseo exterior, reservan una plaza y pagan al terminar; materiales y salarios se descuentan por sesión. Calidad y ambiente añaden objetos físicos, y las tareas muestran accesorios y relojes con iconos. Las sesiones son individuales, también en cycling y boxeo; no hay aún reservas de clases conjuntas en esas nuevas salas.
 
 [Demo con todas las zonas](https://larryappsml.github.io/bloom-brew-tycoon/?demo=expansion), con almacenamiento separado de la partida normal y de la demo club anterior. Las partidas v2 conservan sus compras y estadísticas y empiezan las nuevas alas sin desbloquear. Auditoría: `node scripts/activities-audit.cjs docs/activities-audit-v1.16.json`.
+
+### v1.17.0 — Salas con identidad y galerías
+
+Las siete actividades se distribuyen en dos bloques compactos junto al centro. Galerías de unos dos metros conectan los accesos y separan las alas; las rutas reales de entrada, salida y planes combinados utilizan esos corredores. Cafetería y pilates mantienen unidas sus ampliaciones. La distribución se calcula al cargar: las compras y estadísticas v2 se conservan.
+
+Cada actividad dispone de una arquitectura propia: caucho oscuro y luz ámbar en cycling, terrazo rosa y latón en manicura, roble y espejos en peluquería, piedra y cedro en spa, ladrillo y cuero en boxeo, tonos hielo en recuperación y biblioteca botánica en coworking. Bicicletas, sacos, bañeras, sillas y estaciones tienen más detalle. Se distinguen pedaleo, golpes, manicura, secado, escritura y ondas del agua; el personal camina entre puestos. Movimiento reducido y modo Canvas siguen disponibles.
+
+Pruebas nuevas: separación entre alas, rutas que no atraviesan otras habitaciones, identidad de las siete salas, presupuesto de dibujo, accesorios que desaparecen al salir y ausencia de cambios económicos causados por el renderizado. Auditoría reproducible de recorridos: `node scripts/activities-audit.cjs docs/activities-audit-v1.17.json`.
