@@ -1,6 +1,6 @@
 # Bloom & Brew Tycoon 🌿☕🧘
 
-**v1.20.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
+**v1.21.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
 
 **[Jugar](https://larryappsml.github.io/bloom-brew-tycoon/)**
 
@@ -215,3 +215,12 @@ Piscina boutique de 252 m² con hasta seis calles; campo exterior de golf de 1.4
 Clientes con ropa y animaciones propias llegan, realizan la sesión y pagan al terminar. Los menús no detienen el juego. Las partidas v2 conservan su progreso; las nuevas zonas empiezan sin comprar.
 
 [Demo avanzada independiente](https://larryappsml.github.io/bloom-brew-tycoon/?demo=leisure). Auditoría económica: docs/activities-audit-v1.20.json. Pruebas de accesos, aforos, cobros únicos, guardado y animaciones.
+
+
+## v1.21.0 — Especializaciones y reformas
+
+Toca una sala para elegir Equilibrada, Ágil (−22 % de duración, −12 % de tarifa) o Experiencia premium (+25 % de tarifa, +30 % de duración). Se desbloquean tras 10 clientes atendidos en esa sala. La primera elección es gratuita; cambiar cuesta el 12 % del precio base de la zona y tiene un descanso de dos minutos de juego activo. El panel compara el neto automático estimado de las tres opciones. La especialidad general del negocio se mantiene independiente.
+
+Cada sala tiene reformas Boutique, Signature y Gran lujo tras 20, 100 y 300 clientes atendidos. Costes: 60 %, 180 % y 540 % del precio base de la sala; cafetería usa base 500 €, pilates 1.800 €, recuperación 3.500 € y yoga 2.200 €. Las etapas añaden pavimentos interiores, remates, jardineras, arte o iluminación exterior y una zona lounge en el último nivel. Las salas deportivas y la piscina conservan sus superficies de actividad. Cada reforma suma seis puntos porcentuales a la tarifa, hasta +18 %. No añade plazas ficticias.
+
+Se conservan precios y relojes de actividades ya iniciadas. Las decisiones, reformas y descanso se exportan y guardan en partidas v2; las partidas antiguas empiezan equilibradas y sin reformas. Las compras se contabilizan como inversión y no como ingresos. Los menús siguen sin pausar el juego. Verificación: 145 pruebas, guardado, aforos, cobros y presupuesto de menos de 140 objetos estáticos de dibujo incluso con todas las reformas.

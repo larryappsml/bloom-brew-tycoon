@@ -5,6 +5,7 @@
 })(typeof globalThis === 'undefined' ? this : globalThis, function (Layout,Traffic,Progression,Sports,Experience) {
   'use strict';
   const VERSION = 2;
+  const Evolution=typeof module==='object'&&module.exports?require('./evolution.js'):globalThis.BloomEvolution;
   const KEY = 'bloom-brew-save-v2', LEGACY_KEY = 'bloom-brew-save-v1';
   const UPGRADES = [
     ['machine','Cafetera de especialidad','Café de más calidad y preparación más rápida','☕','cafe',24,6],
@@ -86,7 +87,7 @@
   ];
   const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
   const level=(s,id)=>s.levels[id]||0;
-  const fresh=(now=Date.now())=>({...Progression.fresh(now),...Sports.fresh(),...Experience.fresh(),version:VERSION,money:20,earned:0,expenses:0,rewards:0,served:0,happy:0,lost:0,sessions:0,students:0,levels:{},claimed:[],last:now,seconds:0,reputation:75,tutorial:0,boostUntil:0,rushReady:0,classRemaining:0,classSeats:0,classPhase:'idle',classGuests:[],classBoardRemaining:0,classRecruitRemaining:0,classCooldown:0,departing:[],seatCursor:0,nextId:1,arrival:0.5,daily:{day:new Date(now).toISOString().slice(0,10),count:0,claimed:false},queue:[],seated:[],satellite:0,treatments:[],treatmentArrival:2,completedServices:Object.fromEntries(['pressotherapy','massage','yoga',...ROOMS.map(r=>r.id)].map(id=>[id,0])),wellnessRevenue:0});
+  const fresh=(now=Date.now())=>({...Progression.fresh(now),...Sports.fresh(),...Experience.fresh(),...Evolution.fresh(),version:VERSION,money:20,earned:0,expenses:0,rewards:0,served:0,happy:0,lost:0,sessions:0,students:0,levels:{},claimed:[],last:now,seconds:0,reputation:75,tutorial:0,boostUntil:0,rushReady:0,classRemaining:0,classSeats:0,classPhase:'idle',classGuests:[],classBoardRemaining:0,classRecruitRemaining:0,classCooldown:0,departing:[],seatCursor:0,nextId:1,arrival:0.5,daily:{day:new Date(now).toISOString().slice(0,10),count:0,claimed:false},queue:[],seated:[],satellite:0,treatments:[],treatmentArrival:2,completedServices:Object.fromEntries(['pressotherapy','massage','yoga',...ROOMS.map(r=>r.id)].map(id=>[id,0])),wellnessRevenue:0});
   function validate(data, now=Date.now()) {
     if (!data || typeof data!=='object' || Array.isArray(data)) throw Error('Partida inválida');
     if (data.version!==undefined && data.version!==1 && data.version!==2) throw Error('Versión de partida incompatible');
@@ -113,7 +114,7 @@
     // Orders and ongoing classes are transient; restoring them must never mint money.
     if(migrating) { s.boostUntil=0; s.rushReady=0; }
     Progression.restore(data,s,now);
-    Sports.restore(data,s);Experience.restore(data,s);
+    Sports.restore(data,s);Experience.restore(data,s);Evolution.restore(data,s);
     return s;
   }
   function params(s) {
@@ -122,8 +123,8 @@
     const arrival=(s.specialty==='brunch'?1/1.15:s.specialty==='balanced'?1:1.12)*Math.max(1.25,6.5-l('seats')*.55-l('terrace')*.95-l('matcha')*.18-l('cafeDecor')*.24)*(1.15-s.reputation/300);
     const speed=1+l('machine')*.18+l('manager')*.15+l('roaster')*.06;
     const capacity=2+l('mat')*2+l('classes')*4;
-    const classPrice=Experience.multiplier(s,'pilates')*(40+l('reformer')*8+l('spa')*4+l('pilatesKit')*3+l('studioAudio')*3+l('pilatesBands')*4);
-    return {seats,arrival,speed,baristas:l('barista'),capacity,classPrice,classTime:Math.max(25,45-l('coach')*4-l('studioMirror')),quality:1+l('machine')*.12+l('pastries')*.05+l('matcha')*.04+l('cafeDecor')*.04+l('roaster')*.08+l('cafeLounge')*.025+(l('pastries')?.08:0)+(l('matcha')?.14:0)+(l('latteBar')?.03:0)+(l('cakeDisplay')?.05:0),manager:l('manager'),branches:l('second'),area:Layout.footprint(s).area};
+    const classPrice=Evolution.modifiers(s,'pilates').price*Experience.multiplier(s,'pilates')*(40+l('reformer')*8+l('spa')*4+l('pilatesKit')*3+l('studioAudio')*3+l('pilatesBands')*4);
+    return {seats,arrival,speed,baristas:l('barista'),capacity,classPrice,classTime:Math.max(25,45-l('coach')*4-l('studioMirror'))*Evolution.modifiers(s,'pilates').duration,quality:1+l('machine')*.12+l('pastries')*.05+l('matcha')*.04+l('cafeDecor')*.04+l('roaster')*.08+l('cafeLounge')*.025+(l('pastries')?.08:0)+(l('matcha')?.14:0)+(l('latteBar')?.03:0)+(l('cakeDisplay')?.05:0),manager:l('manager'),branches:l('second'),area:Layout.footprint(s).area};
   }
   const price=(s,u)=>Math.ceil(u.base*Math.pow(1.65,level(s,u.id)));
   function requirement(s,u) {
@@ -168,7 +169,7 @@
     if(id==='yoga')return {capacity,duration:30-l('yogaCare')*2-l('yogaBolsters')-l('soundRitual'),price:55+l('yogaCare')*5+l('yogaBolsters')*2+l('zenGarden')*3+l('yogaTea')*5+l('soundRitual')*4,cost:4+l('yogaTea')*.5+l('soundRitual')*.5,salary:3,automatic:l('coach')>0,travel:12};
     return {capacity:0,duration:1,price:0,cost:0,automatic:false,travel:0};
   }
-  function serviceConfig(s,id){const c=baseServiceConfig(s,id);return {...c,price:c.price*Experience.multiplier(s,id)};}
+  function serviceConfig(s,id){const c=baseServiceConfig(s,id),m=Evolution.modifiers(s,id);return {...c,price:c.price*Experience.multiplier(s,id)*m.price,duration:c.duration*m.duration};}
   function serviceOccupancy(s,id){return s.treatments.filter(t=>t.service===id).length+[...s.departing,...s.visits].filter(t=>t.reservedService===id).length;}
   function startTreatment(s,id,rng=Math.random){
     if(!SERVICES.some(x=>x.id===id))return false;
@@ -191,11 +192,11 @@
   function startOrder(s) {
     if(s.queue.some(o=>o.remaining!==null&&!o.worker))return false;
     const order=s.queue.find(o=>o.remaining===null&&o.stage==='waiting'); if(!order)return false;
-    order.remaining=orderDuration(s,order.product);order.duration=order.remaining;
+    order.remaining=orderDuration(s,order.product);order.duration=order.remaining;order.styleTerms=Evolution.modifiers(s,'cafe');
     order.worker=false;order.stage='preparing';return true;
   }
   function orderDuration(s,id){const product=PRODUCTS.find(p=>p.id===id),recipe={latte:'latteBar',cake:'cakeDisplay',toast:'toastKitchen'}[id];return product.time/params(s).speed/(1+(recipe?Math.min(3,level(s,recipe))*.06:id==='coffee'?Math.min(3,level(s,'brewBar'))*.08:id==='breakfast'?Math.min(3,level(s,'bakeryOven'))*.1:0));}
-  function orderPrice(s,id){const product=PRODUCTS.find(p=>p.id===id),recipe={latte:'latteBar',cake:'cakeDisplay',toast:'toastKitchen'}[id];return Experience.multiplier(s,'cafe')*(product.price*params(s).quality+(recipe?Math.max(0,Math.min(3,level(s,recipe))-1)*6:id==='coffee'?Math.min(3,level(s,'brewBar'))*.35:id==='breakfast'?Math.min(3,level(s,'bakeryOven'))*.4:0));}
+  function orderPrice(s,id){const product=PRODUCTS.find(p=>p.id===id),recipe={latte:'latteBar',cake:'cakeDisplay',toast:'toastKitchen'}[id];return Evolution.modifiers(s,'cafe').price*Experience.multiplier(s,'cafe')*(product.price*params(s).quality+(recipe?Math.max(0,Math.min(3,level(s,recipe))-1)*6:id==='coffee'?Math.min(3,level(s,'brewBar'))*.35:id==='breakfast'?Math.min(3,level(s,'bakeryOven'))*.4:0));}
   const active=(s,now)=>now<s.boostUntil;
   function rush(s,now=Date.now()) {
     if(now<s.rushReady)return false;
@@ -209,7 +210,7 @@
   }
   function classDemand(s){return (s.specialty==='active'?1/1.2:1)*Math.max(1,4.8-Math.min(4,level(s,'mat'))*.35-Math.min(4,level(s,'reformer'))*.25-Math.min(3,level(s,'studioAudio'))*.2-Math.min(2,level(s,'spa'))*.1-s.reputation/150);}
   function beginClass(s){s.classPhase='active';s.classSeats=s.classGuests.length;s.classDuration=params(s).classTime;s.classRemaining=s.classDuration;s.classAuto=!!level(s,'coach');s.classPrice=params(s).classPrice;s.classGuests.forEach(g=>g.stage='exercising');}
-  function consumptionTime(id,kind=0,s=null){const base=({coffee:26,breakfast:38,matcha:30,smoothie:32,latte:32,cake:40,toast:42}[id]||26)+kind*2;return base*(1-.1*Math.min(3,s?level(s,'tableService'):0));}
+  function consumptionTime(id,kind=0,s=null){const base=({coffee:26,breakfast:38,matcha:30,smoothie:32,latte:32,cake:40,toast:42}[id]||26)+kind*2;return base*(1-.1*Math.min(3,s?level(s,'tableService'):0))*(s?Evolution.modifiers(s,'cafe').duration:1);}
   function freeSeat(s){
     const seats=Layout.cafeSeats(s),busy=new Set([...s.seated.map(g=>g.seat.key),...[...s.departing,...s.visits].map(g=>g.reservedSeat).filter(Boolean)]),available=seats.filter(p=>!busy.has(p.key));
     const tables=Layout.tables(s).length,load=table=>seats.filter(p=>p.table===table&&busy.has(p.key)).length;
@@ -291,17 +292,17 @@
     }
     s.seated=sitting;
     let workers=s.queue.filter(o=>o.worker&&o.remaining!==null).length;
-    for(const o of s.queue)if(workers<p.baristas&&o.remaining===null&&o.stage==='waiting'){o.remaining=orderDuration(s,o.product);o.duration=o.remaining;o.worker=true;o.stage='preparing';workers++;}
+    for(const o of s.queue)if(workers<p.baristas&&o.remaining===null&&o.stage==='waiting'){o.remaining=orderDuration(s,o.product);o.duration=o.remaining;o.worker=true;o.styleTerms=Evolution.modifiers(s,'cafe');o.stage='preparing';workers++;}
     const pending=[];
     for(const o of s.queue) {
       if(o.stage!=='arrival'){o.wait+=dt;o.visitWait=(o.visitWait||0)+dt;}
       if(o.remaining!==null)o.remaining=Math.max(0,o.remaining-dt*(active(s,now)?1.5:1));
       const seat=o.remaining===0?freeSeat(s):null;
       if(o.remaining===0&&seat) {
-        const product=PRODUCTS.find(x=>x.id===o.product),gross=orderPrice(s,o.product);
+        const product=PRODUCTS.find(x=>x.id===o.product),gross=orderPrice(s,o.product)*(o.styleTerms?.price||1)/Evolution.modifiers(s,'cafe').price;
         const cost=(product.cost+(o.worker?.65:0))*(1-p.manager*.08);
         revenue(s,gross,cost);s.served++;s.happy++;s.daily.count++;s.reputation=clamp(s.reputation+.5,20,100);
-        const duration=consumptionTime(o.product,o.kind,s);o.stage='walkingToSeat';o.seat=seat;o.remaining=duration;o.duration=duration;Traffic.send(o,Layout.insideRoute(seat),seat);s.seated.push(o);
+        const duration=consumptionTime(o.product,o.kind,s)*(o.styleTerms?.duration||1)/Evolution.modifiers(s,'cafe').duration;o.stage='walkingToSeat';o.seat=seat;o.remaining=duration;o.duration=duration;Traffic.send(o,Layout.insideRoute(seat),seat);s.seated.push(o);
         events.push({type:'sale',net:gross-cost,product:product.name,productId:product.id});
       } else if(o.wait>o.patience){Experience.rate(s,o,true);s.lost++;s.reputation=clamp(s.reputation-1.5,20,100);Traffic.exit(o);s.departing.push(o);events.push({type:'lost'});}
       else pending.push(o);
@@ -386,5 +387,5 @@
   const journeyMetrics=s=>({served:s.served,sessions:s.sessions,wellness:s.completedServices.pressotherapy+s.completedServices.massage,yoga:s.completedServices.yoga,menu:menu(s).length,crossfit:s.sportSessions.crossfit,padel:s.sportSessions.padel,area:Layout.footprint(s).area});
   const chapterStatus=s=>Progression.status(s,journeyMetrics(s));
   const claimChapter=s=>Progression.claimChapter(s,journeyMetrics(s));
-  return {SPECIALTIES:Experience.SPECIALTIES,specialtyRequirement:Experience.requirement,selectSpecialty:Experience.select,SPORTS:Sports.SPORTS,sportConfig:Sports.config,startSport:Sports.start,CHAPTERS:Progression.CHAPTERS,CAMPAIGNS:Progression.CAMPAIGNS,chapterStatus,claimChapter,campaignStatus:Progression.campaignStatus,campaignRequirement:Progression.requirement,startCampaign:Progression.startCampaign,claimCampaign:Progression.claimCampaign,cancelCampaign:Progression.cancelCampaign,VERSION,KEY,LEGACY_KEY,UPGRADES,GOALS,PRODUCTS,SERVICES,fresh,validate,params,level,price,requirement,unlocked,purchase,menu,spawn,startOrder,orderDuration,orderPrice,consumptionTime,startClass,startTreatment,serviceConfig,serviceOccupancy,rush,step,estimate,roomEconomy,upgradeEconomy,offline,value,claim,claimDaily};
+  return {ROOM_STYLES:Evolution.OPTIONS,evolutionStatus:Evolution.status,selectRoomStyle:Evolution.select,renovateRoom:Evolution.renovate,SPECIALTIES:Experience.SPECIALTIES,specialtyRequirement:Experience.requirement,selectSpecialty:Experience.select,SPORTS:Sports.SPORTS,sportConfig:Sports.config,startSport:Sports.start,CHAPTERS:Progression.CHAPTERS,CAMPAIGNS:Progression.CAMPAIGNS,chapterStatus,claimChapter,campaignStatus:Progression.campaignStatus,campaignRequirement:Progression.requirement,startCampaign:Progression.startCampaign,claimCampaign:Progression.claimCampaign,cancelCampaign:Progression.cancelCampaign,VERSION,KEY,LEGACY_KEY,UPGRADES,GOALS,PRODUCTS,SERVICES,fresh,validate,params,level,price,requirement,unlocked,purchase,menu,spawn,startOrder,orderDuration,orderPrice,consumptionTime,startClass,startTreatment,serviceConfig,serviceOccupancy,rush,step,estimate,roomEconomy,upgradeEconomy,offline,value,claim,claimDaily};
 });

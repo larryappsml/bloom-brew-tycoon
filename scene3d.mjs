@@ -1,4 +1,5 @@
 import {snapshot,animatePose,animateStaff,rally} from './animation3d.mjs';
+import {evolveInteriors} from './evolution3d.mjs';
 import {finishInteriors,finishGalleries} from './finishes3d.mjs';
 import {arrangeCampus,projectActors,restoreActors} from './campus3d.mjs';
 import './campus.js';
@@ -120,7 +121,7 @@ export function buildWorld(state){
   const entrance=group(root,-.4,0,5.95);entrance.name='Acceso antiguo';for(const x of [-1.85,1.85])box(entrance,x,1.1,0,.13,2.2,.13,palette.dark);box(entrance,0,2.32,0,4.2,.22,.8,palette.sage);for(let i=0;i<8;i++)box(entrance,-1.84+i*.52,2.44,0,.48,.06,.83,i%2?palette.cream:palette.sage);
   if(levels.terrace){for(const x of (levels.terrace>1?[-10,-4.8,3.8,10]:[-4.8,3.8])){table(root,x,7.1);cylinder(root,x,1.55,7.1,.035,3.1,palette.wood);mesh(root,geometry('parasol',()=>new THREE.ConeGeometry(1.35,.45,8)),palette.cream,x,3.1,7.1);}plant(root,-6.4,7.25,.8);}
   const kit={box,cylinder,ball,group,plant,label,cup,geometry,mesh,palette};buildSports(root,state,kit);buildActivities(root,state,kit);
-  const detailFeatures=dressWorld(root,state,kit);const artFeatures=polishWorld(root,state,kit);const finishFeatures=finishInteriors(root,state,kit);arrangeCampus(root,state,kit);finishGalleries(root,kit);
+  const detailFeatures=dressWorld(root,state,kit);const artFeatures=polishWorld(root,state,kit);const finishFeatures=finishInteriors(root,state,kit);evolveInteriors(root,state,kit);arrangeCampus(root,state,kit);finishGalleries(root,kit);
   return {root,targets,students,tablePositions,tableCount,bar,studio,serviceSpots,footprint,detailFeatures,artFeatures,finishFeatures};
 }
 function buildExpansions(root,s){const z=Layout.zones(s),l=id=>Math.min(s.levels?.[id]||0,6),spots=[];
@@ -195,7 +196,7 @@ export function walkPath(position,route,budget){
   return {moving:route.length>0,heading};
 }
 
-export const worldStamp=s=>JSON.stringify({levels:s.levels,chapters:s.chapters||[],campaign:s.campaign&&s.campaign.remaining>0?s.campaign.id:null});
+export const worldStamp=s=>JSON.stringify({roomStyles:s.roomStyles,renovations:s.renovations,levels:s.levels,chapters:s.chapters||[],campaign:s.campaign&&s.campaign.remaining>0?s.campaign.id:null});
 export class Venue3D {
   constructor(canvas,getState,onSelect=()=>{}){
     this.canvas=canvas;this.getState=getState;this.onSelect=onSelect;this.people=new Map();this.time=0;this.last=0;this.fingerprint='';this.target=new THREE.Vector3(0,.1,1.8);this.look=this.target.clone();this.zoom=.46;this.selected='';this.reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;

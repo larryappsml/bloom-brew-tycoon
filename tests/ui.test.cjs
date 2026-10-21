@@ -132,3 +132,9 @@ test('tapping a room shows its net estimate and closes without stopping gameplay
 });
 
 test('leisure demo opens all three new venues while keeping normal and earlier demo saves untouched',()=>{const normal=JSON.stringify(B.fresh()),oldDemo='earlier-demo';const ui=boot({[B.KEY]:normal,'bloom-brew-demo-v2':oldDemo},'?demo=leisure');const state=JSON.parse(ui.store.get('bloom-brew-leisure-v1'));for(const id of ['pool','golf','dance']){assert.equal(state.levels[id+'Wing'],1);assert.equal(state.levels[id],2);}assert.equal(ui.store.get(B.KEY),normal);assert.equal(ui.store.get('bloom-brew-demo-v2'),oldDemo);});
+
+test('room style and reform controls persist their choices while live services continue',()=>{
+ const s=B.validate(JSON.parse(fs.readFileSync('tests/fixtures/detailed-v2.json','utf8')));s.money=100000;s.served=400;const ui=boot({[B.KEY]:JSON.stringify(s)});ui.elements.get('cafe-zone').onclick();assert.match(ui.elements.get('zone-economy').innerHTML,/Especialización de la sala/);
+ ui.elements.get('zone-economy').onclick({target:{closest:selector=>selector==='[data-room-style]'?{dataset:{roomStyle:'premium'}}:null}});assert.equal(JSON.parse(ui.store.get(B.KEY)).roomStyles.cafe,'premium');
+ ui.elements.get('zone-economy').onclick({target:{closest:selector=>selector==='[data-renovate]'?{dataset:{renovate:'cafe'}}:null}});assert.equal(JSON.parse(ui.store.get(B.KEY)).renovations.cafe,1);assert.match(ui.elements.get('zone-economy').innerHTML,/Reforma · Boutique/);ui.advance(15);assert.ok(JSON.parse(ui.store.get(B.KEY)).served>400);
+});
