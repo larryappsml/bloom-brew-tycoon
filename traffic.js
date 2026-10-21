@@ -9,7 +9,7 @@
     return {id,type,kind:Math.max(0,Math.min(3,Math.floor(rng()*4))),position,previousPosition:{...position},path:Layout.entryRoute(target),destination:{...target},moving:true,stage:'arrival'};
   }
   function send(agent,path,target){agent.path=path;agent.detour=[];agent.navAge=0;agent.navDistance=Infinity;agent.destination={...target};agent.moving=path.length>0;}
-  function exit(agent){agent.stage='exiting';agent.exitOrigin={...agent.position};const path=Layout.exitRoute({...agent.position,sport:agent.sport},agent.id%2?1:-1);send(agent,path,path.at(-1));}
+  function exit(agent){agent.stage='exiting';agent.exitOrigin={...agent.position};const path=Layout.exitRoute({...agent.position,sport:agent.sport,activity:agent.destination?.activity||agent.service&&Layout.ROOMS.some(r=>r.id===agent.service)&&agent.service},agent.id%2?1:-1);send(agent,path,path.at(-1));}
   // A short local search lets visitors go around a stationary queue or a seated
   // guest instead of oscillating forever on the same side of the obstacle.
   function detour(agent,goal,list){const origin=agent.position,spacing=.3,limit=14,queue=[{x:0,z:0,parent:-1}],seen=new Set(['0,0']);let best=0,bestDistance=distance(origin,goal);

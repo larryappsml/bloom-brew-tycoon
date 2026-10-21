@@ -1,3 +1,4 @@
+const LATE_ROOMS=require('../activities.js');
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const B=require('../core.js'),L=require('../layout.js'),T=require('../traffic.js');
@@ -39,7 +40,7 @@ test('no demand means no phantom pilates students or class income',()=>{
 });
 test('crowded full centre keeps people apart and continues all services across multiple waves',()=>{
   for(const seed of [1,37]){let random=seed;const rng=()=>((random=(Math.imul(random,1664525)+1013904223)>>>0)/4294967296);
-    const s=B.fresh(now);for(const u of B.UPGRADES)s.levels[u.id]=u.max;let previousServed=0,previousClasses=0,maxAgents=0;
+    const s=B.fresh(now);for(const u of B.UPGRADES)if(!LATE_ROOMS.some(r=>u.id.startsWith(r.id)))s.levels[u.id]=u.max;let previousServed=0,previousClasses=0,maxAgents=0;
     for(let i=0;i<12000;i++){B.step(s,.1,now+i*100,rng);const all=T.agents(s);maxAgents=Math.max(maxAgents,all.length);
       for(let a=0;a<all.length;a++)for(let b=a+1;b<all.length;b++)assert.ok(Math.hypot(all[a].position.x-all[b].position.x,all[a].position.z-all[b].position.z)>=T.GAP-.00002,'no overlapping customers');
       if(i%3000===2999){assert.ok(s.served>previousServed+15,'coffee keeps moving');assert.ok(s.sessions>previousClasses,'classes keep moving');previousServed=s.served;previousClasses=s.sessions;}

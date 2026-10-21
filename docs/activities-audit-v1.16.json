@@ -1,0 +1,51 @@
+[
+  {
+    "room": "Cycling boutique",
+    "netPerMinute": 2239,
+    "estimated": 2269,
+    "completed": 53,
+    "capacity": 6
+  },
+  {
+    "room": "Nail bar",
+    "netPerMinute": 2233,
+    "estimated": 2215,
+    "completed": 48,
+    "capacity": 6
+  },
+  {
+    "room": "Peluquería y beauty bar",
+    "netPerMinute": 2147,
+    "estimated": 2156,
+    "completed": 42,
+    "capacity": 6
+  },
+  {
+    "room": "Spa termal",
+    "netPerMinute": 2419,
+    "estimated": 2429,
+    "completed": 41,
+    "capacity": 6
+  },
+  {
+    "room": "Boxeo boutique",
+    "netPerMinute": 3114,
+    "estimated": 3122,
+    "completed": 46,
+    "capacity": 6
+  },
+  {
+    "room": "Recuperación frío y calor",
+    "netPerMinute": 2851,
+    "estimated": 2863,
+    "completed": 41,
+    "capacity": 6
+  },
+  {
+    "room": "Coworking y café",
+    "netPerMinute": 2999,
+    "estimated": 2973,
+    "completed": 38,
+    "capacity": 6
+  }
+]

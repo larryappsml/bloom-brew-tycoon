@@ -1,6 +1,6 @@
 # Bloom & Brew Tycoon 🌿☕🧘
 
-**v1.14.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
+**v1.16.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
 
 **[Jugar](https://larryappsml.github.io/bloom-brew-tycoon/)**
 
@@ -175,3 +175,13 @@ Los personajes conservan sus articulaciones, pero las piezas iguales se dibujan 
 ### v1.14.0 — Economía y rentabilidad
 
 Reequilibradas las tarifas y mejoras de pilates, yoga, recuperación, crossfit y pádel. Se revisan los costes de mejoras poco rentables, el margen del latte y las sedes satélite. Los paneles usan estimaciones calibradas y muestran el incremento previsto de cada mejora y su amortización. La partida conserva dinero, niveles y estadísticas. [Resultados, escenarios y criterios](docs/economy-v1.14.md).
+
+### v1.15.0 — Animación de actividades
+
+Las posturas se interpolan sin modificar la simulación: pasos con rodillas y hombros, giros por el camino más corto, gestos al consumir, yoga con respiración, pilates coordinado, levantamientos de crossfit y un recorrido de pelota de pádel entre ambas mitades. El personal distingue trabajo y descanso según la actividad real. Se mantienen las mallas compartidas y el ajuste de movimiento reducido. El modo Canvas incluye pasos y gestos simplificados. No se han modificado ingresos, duración de servicios ni partidas guardadas.
+
+### v1.16.0 — Siete nuevas actividades
+
+Cycling boutique, nail bar, peluquería y beauty bar, spa termal, boxeo boutique, recuperación frío/calor y coworking con café. Cada ala añade 56 m² (704 m² totales), hasta seis plazas, tres niveles de calidad y ambiente y personal especializado. Se desbloquean después de pilates y la primera zona deportiva. Los clientes llegan por un paseo exterior, reservan una plaza y pagan al terminar; materiales y salarios se descuentan por sesión. Calidad y ambiente añaden objetos físicos, y las tareas muestran accesorios y relojes con iconos. Las sesiones son individuales, también en cycling y boxeo; no hay aún reservas de clases conjuntas en esas nuevas salas.
+
+[Demo con todas las zonas](https://larryappsml.github.io/bloom-brew-tycoon/?demo=expansion), con almacenamiento separado de la partida normal y de la demo club anterior. Las partidas v2 conservan sus compras y estadísticas y empiezan las nuevas alas sin desbloquear. Auditoría: `node scripts/activities-audit.cjs docs/activities-audit-v1.16.json`.

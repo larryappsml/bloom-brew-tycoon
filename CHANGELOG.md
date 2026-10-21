@@ -1,3 +1,19 @@
+# v1.16.0
+
+- Siete alas nuevas de 56 m²: cycling, nail bar, peluquería, spa termal, boxeo, recuperación frío/calor y coworking.
+- 35 mejoras: construcción, puestos, calidad premium, ambiente y personal. Hasta seis plazas por actividad.
+- Paseo exterior, rutas reales, ocupación reservada, salarios y cobro al terminar. Tarifas y estimaciones por sala.
+- Modelos propios, accesorios durante las tareas, vestimenta y animaciones; reloj con icono por actividad.
+- Nueva demo aislada ?demo=expansion y compatibilidad con partidas v2.
+
+# v1.15.0
+
+- Pasos articulados, giros cortos y transiciones suaves entre posturas.
+- Gestos de consumo, estiramientos de yoga, ejercicios coordinados de pilates y sentadillas de crossfit.
+- Intercambios de pádel y personal que trabaja cuando su actividad está en curso.
+- Vapor y efectos suaves; movimiento reducido también en pelota y personal. Canvas 2D con pasos y gestos.
+- Se conservan economía, tiempos, tráfico real, guardados y funcionamiento detrás de menús.
+
 # v1.14.0
 
 - Auditoría reproducible con escenarios de apertura y máximo, dos semillas y resultados antes/después.

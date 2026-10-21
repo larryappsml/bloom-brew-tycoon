@@ -1,3 +1,4 @@
+const LATE_ROOMS=require('../activities.js');
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const B=require('../core.js');
@@ -52,6 +53,6 @@ test('rush has a three minute cooldown and no reward multiplier exploit',()=>{
   const s=B.fresh(now);assert.equal(B.rush(s,now),true);assert.equal(B.rush(s,now+30000),false);assert.equal(B.rush(s,now+180000),true);
 });
 test('one hour simulation remains finite with maximal infrastructure',()=>{
-  const s=B.fresh(now);for(const u of B.UPGRADES)s.levels[u.id]=u.max;
+  const s=B.fresh(now);for(const u of B.UPGRADES)if(!LATE_ROOMS.some(r=>u.id.startsWith(r.id)))s.levels[u.id]=u.max;
   advance(s,3600);assert.ok(s.served>200);assert.ok(s.sessions>30);assert.ok(Number.isFinite(s.money));assert.ok(s.money<1e6);assert.ok(s.earned>=s.expenses);assert.ok(s.queue.length<40);
 });

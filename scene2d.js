@@ -25,16 +25,17 @@
       c.strokeStyle='#547d57';c.lineWidth=2;c.beginPath();c.moveTo(px,py-7*size);c.lineTo(px,py-24*size);c.stroke();
       this.ellipse(px-5*size,py-19*size,6*size,3*size,'#789f72');this.ellipse(px+5*size,py-24*size,6*size,3*size,'#527c59');
     }
-    person(x,y,kind,working=false,t=0,role='cafe') {
-      const [px,py]=this.point(x,y),c=this.ctx,bob=this.reduced?0:Math.sin(t*5+kind)*.7;
+    person(x,y,kind,working=false,t=0,role='cafe',activity=null) {
+      const [px,py]=this.point(x,y),c=this.ctx,bob=this.reduced?0:Math.sin(t*(activity?.moving?9:1.65)+kind)*(activity?.moving?1.1:.25);
       this.ellipse(px,py,6,2.5,'#3d473723');
-      c.strokeStyle='#5c594f';c.lineWidth=2.5;c.lineCap='round';c.beginPath();c.moveTo(px-2,py-6);c.lineTo(px-3,py);c.moveTo(px+2,py-6);c.lineTo(px+3,py);c.stroke();
+      c.strokeStyle='#5c594f';c.lineWidth=2.5;c.lineCap='round';c.beginPath();c.moveTo(px-2,py-6);c.lineTo(px-3+(this.reduced||!activity?.moving?0:Math.sin(t*9+kind)*3),py);c.moveTo(px+2,py-6);c.lineTo(px+3-(this.reduced||!activity?.moving?0:Math.sin(t*9+kind)*3),py);c.stroke();
       c.fillStyle=role==='premium'?'#293847':role==='padel'?'#fff3db':role==='crossfit'?'#47624e':role==='wellness'?'#f4e9d4':role==='pilates'?'#b898b2':role==='yoga'?'#9dafa0':working?'#527b61':['#c18c79','#8da0b0','#b1a178','#a79bb4'][kind%4];
       c.beginPath();c.roundRect(px-5,py-17+bob,10,12,4);c.fill();
       this.ellipse(px,py-22+bob,4.5,5,colors[kind%4]);
       c.fillStyle='#524339';c.beginPath();c.arc(px,py-24+bob,4.5,Math.PI,Math.PI*2);c.fill();
       c.fillStyle='#344b55';for(const side of [-1,1]){c.fillRect(px+side*2-1,py-22+bob,1.5,1.5);}
       if(role==='premium'){c.fillStyle='#fff8e6';c.fillRect(px-2,py-16,4,7);c.fillStyle='#9d5261';c.fillRect(px-.6,py-15,1.2,6);}
+      const gesture=this.reduced?0:Math.sin(t*2+kind);c.strokeStyle=c.fillStyle;c.lineWidth=3;c.beginPath();for(const side of [-1,1]){c.moveTo(px+side*4,py-14+bob);const raised=activity?.stage==='active'&&role==='yoga';c.lineTo(px+side*(raised?8:6),py+(raised?-22-gesture*2:activity?.stage==='consuming'?-15-gesture*2:working?-12+gesture*2:-8+bob));}c.stroke();
       if(working){c.fillStyle='#f4e9d6';c.fillRect(px-3,py-13,6,7);}
     }
     text(text,x,y,color='#68725c',size=9) {const c=this.ctx;c.fillStyle=color;c.font=`600 ${size}px system-ui`;c.textAlign='center';c.fillText(text,x,y);}
@@ -42,8 +43,10 @@
       const c=this.ctx,B=window.Bloom,l=id=>B.level(s,id),p=B.params(s),clocks=[];
       c.clearRect(0,0,360,270);
       const gradient=c.createLinearGradient(0,0,0,270);gradient.addColorStop(0,'#e4e8dc');gradient.addColorStop(1,'#f2e6d1');c.fillStyle=gradient;c.fillRect(0,0,360,270);
-      c.save();c.translate(180,135);c.scale(.68,.68);c.translate(-180,-135);
+      c.save();const expanded=window.BloomLayout.ROOMS.some(r=>l(r.id+'Wing'));if(expanded){const f=window.BloomLayout.footprint(s),points=[[f.left,f.back],[f.right,f.back],[f.left,10],[f.right,10]].map(([x,z])=>this.point((x+7.35)/2.1,(z+6.2)/1.77)),xs=points.map(p=>p[0]),ys=points.map(p=>p[1]),scale=Math.min(.68,320/(Math.max(...xs)-Math.min(...xs)),220/(Math.max(...ys)-Math.min(...ys)));c.translate(180,140);c.scale(scale,scale);c.translate(-(Math.min(...xs)+Math.max(...xs))/2,-(Math.min(...ys)+Math.max(...ys))/2);}else{c.translate(180,135);c.scale(.68,.68);c.translate(-180,-135);}
       const zones=window.BloomLayout.zones(s);
+      for(const r of window.BloomLayout.ROOMS)if(l(r.id+'Wing')){const q={x:(r.x+7.35)/2.1,y:(r.z+6.2)/1.77};this.box(q.x-1.8,q.y-2.4,3.6,4.8,5,'#d8e5d6');for(const spot of window.BloomLayout.serviceSlots(s,r.id)){const x=(spot.x+7.35)/2.1,y=(spot.z+6.2)/1.77;this.box(x-.3,y-.35,.6,.7,8,'#a7c9bd');this.text(r.icon,...this.point(x,y,14),'#345e54',9);}}
+
       this.tile(-5,8.8,17,2.1,0,'#78868a');this.tile(-5,7.5,17,1.3,1,'#e3dfd0');
       for(let i=-4;i<11;i+=3)this.tile(i,9.75,1.3,.08,1,'#fff4cf');
       if(zones.cafe)this.box(-3.3,0,3.3,7,5,'#edcda7');
@@ -99,8 +102,8 @@
       if(!p.baristas&&s.queue.some(o=>o.remaining!==null))this.person(1.8,.8,0,true,t);
       const actors=window.BloomTraffic.agents(s).filter(a=>a.position).sort((a,b)=>(a.position.x+a.position.z)-(b.position.x+b.position.z));
       for(const agent of actors){const q=map(agent.position);let activity=null,kind=null;
-        if(agent.type==='treatment'&&agent.stage==='active'&&agent.service!=='yoga') {const [px,py]=this.point(q.x,q.y,16);this.ellipse(px,py,4,4,colors[agent.kind]);c.fillStyle='#54765e';c.fillRect(px-3,py+3,6,12);if(agent.service==='pressotherapy'){c.fillStyle='#a1d4be';c.fillRect(px-6,py+12,5,10);c.fillRect(px+1,py+12,5,10);}}
-        else this.person(q.x,q.y,agent.kind,false,t,agent.outfit||agent.sport||(agent.type==='pilates'?'pilates':agent.service==='yoga'?'yoga':agent.type==='treatment'?'wellness':'cafe'));
+        if(agent.type==='treatment'&&agent.stage==='active'&&['pressotherapy','massage'].includes(agent.service)) {const [px,py]=this.point(q.x,q.y,16);this.ellipse(px,py,4,4,colors[agent.kind]);c.fillStyle='#54765e';c.fillRect(px-3,py+3,6,12);if(agent.service==='pressotherapy'){c.fillStyle='#a1d4be';c.fillRect(px-6,py+12,5,10);c.fillRect(px+1,py+12,5,10);}}
+        else this.person(q.x,q.y,agent.kind,false,t,agent.outfit||agent.sport||(agent.type==='pilates'?'pilates':agent.service==='yoga'?'yoga':agent.type==='treatment'?'wellness':'cafe'),agent);
         if(agent.type==='sport'&&agent.stage==='playing'){const g=s.sportsGroups[agent.sport];activity={remaining:g.remaining,duration:g.duration};kind=agent.sport;if(agent.sport==='padel')this.text('🎾',...this.point(q.x+.25,q.y,15),'#567c58',10);else{const [px,py]=this.point(q.x,q.y,12);c.fillStyle='#344c48';c.fillRect(px-8,py,16,3);}}
 
         if(agent.type==='cafe'&&agent.stage==='preparing'&&agent.remaining>0){activity=agent;kind='prepare';}

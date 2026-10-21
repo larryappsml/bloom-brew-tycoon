@@ -1,7 +1,7 @@
 (() => {
   'use strict';
-  const demo=/(?:[?&])demo=club(?:&|$)/.test(location.search||'');
-  const B=demo?{...window.Bloom,KEY:'bloom-brew-demo-v2',LEGACY_KEY:'bloom-brew-demo-v1',fresh:()=>window.Bloom.validate(window.BloomDemo)}:window.Bloom;
+  const demo=/(?:[?&])demo=(?:club|expansion)(?:&|$)/.test(location.search||'');
+  const B=demo?{...window.Bloom,KEY:(location.search||'').includes('demo=expansion')?'bloom-brew-expansion-v1':'bloom-brew-demo-v2',LEGACY_KEY:'bloom-brew-demo-v1',fresh:()=>window.Bloom.validate(window.BloomDemo)}:window.Bloom;
   const $=id=>document.getElementById(id),fmt=n=>new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:n>=100?0:2}).format(n);
   let s=B.fresh(),filter='all',toastTimer,dirty=true,loadWarning='',readOnly=false,selectedZone=null,venueScene,serviceMarkup='';
   function toast(text){$('toast').textContent=text;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3200);}
@@ -56,6 +56,7 @@
     const economy=B.roomEconomy(s,u.id);
     $('zone-economy').innerHTML=economy?'<small>'+economy.name+' · neto automático aprox.</small><strong>'+fmt(economy.perMinute)+'/min</strong><p>'+(economy.rank?'Puesto '+economy.rank+' en beneficio/min · '+Math.round(economy.share)+' % del centro':'Sin producción automática')+'</p>'+(economy.breakdown.length?'<p>'+economy.breakdown.map(d=>d.name+' '+fmt(d.perMinute)+'/min').join(' · ')+'</p>':'')+'<small>'+economy.note+' No incluye propinas ni premios.</small>':'';
     const investment=B.upgradeEconomy(s,u.id);
+    const room=window.BloomLayout?.ROOMS.find(r=>u.id.startsWith(r.id));if(room)$('zone-economy').innerHTML+='<div class=service-actions>'+B.UPGRADES.filter(v=>v.id.startsWith(room.id)).map(v=>'<button class=tab data-zone="'+v.id+'">'+v.name+' · Nv. '+B.level(s,v.id)+'</button>').join('')+'</div>';
     if(investment)$('zone-economy').innerHTML+='<p class="highlight">'+(investment.paybackMinutes!==null?'Mejora: +'+fmt(investment.deltaPerMinute)+'/min al centro · recupera su coste en ~'+Math.ceil(investment.paybackMinutes)+' min':'La demanda o el equipo limitan el ingreso: esta mejora no aumenta ahora el neto automático estimado.')+'</p>';
     $('zone-buy').disabled=!!reason||max||s.money<cost;$('zone-buy').textContent=max?'✓ Nivel máximo':reason?'Zona bloqueada':`Mejorar · ${fmt(cost)}`;
   }
@@ -142,12 +143,12 @@
   document.querySelectorAll('.nav-btn').forEach(x=>x.onclick=()=>nav(x.dataset.view));$('all-upgrades').onclick=()=>nav('shop');
   document.querySelectorAll('#filter-tabs button').forEach(x=>x.onclick=()=>{filter=x.dataset.filter;document.querySelectorAll('#filter-tabs button').forEach(y=>y.classList.toggle('active',x===y));dirty=true;render();});
   document.addEventListener('click',e=>{
-    const button=e.target.closest('[data-buy],[data-claim],[data-service],[data-focus],[data-chapter],[data-campaign],[data-campaign-action],[data-sport]');if(!button)return;
+    const button=e.target.closest('[data-zone],[data-buy],[data-claim],[data-service],[data-focus],[data-chapter],[data-campaign],[data-campaign-action],[data-sport]');if(!button)return;
     if(button.dataset.chapter){if(B.chapterStatus(s).id!==button.dataset.chapter)return;const reward=B.claimChapter(s);if(reward){toast('¡Capítulo completado! Trofeo nuevo · +'+fmt(reward));chime();celebrate();save();dirty=true;render();}return;}
     if(button.dataset.campaign){if(B.startCampaign(s,button.dataset.campaign)){toast('Reto iniciado · cinco minutos de juego, sin riesgo para tu dinero');save();dirty=true;render();}return;}
     if(button.dataset.campaignAction){if(button.dataset.campaignAction==='watch'){nav('home');return;}if(button.dataset.campaignAction==='claim'){const reward=B.claimCampaign(s);if(reward){toast('Reto conseguido · +'+fmt(reward));chime();celebrate();}}else B.cancelCampaign(s);save();dirty=true;render();return;}
     if(button.dataset.sport){if(B.startSport(s,button.dataset.sport)){toast('Grupo deportivo convocado · los clientes llegan desde la calle');save();render();}return;}
-    if(button.dataset.focus){nav('home');venueScene?.focus(button.dataset.focus);return;}
+    if(button.dataset.zone){selectZone(button.dataset.zone);return;}if(button.dataset.focus){nav('home');venueScene?.focus(button.dataset.focus);return;}
     if(button.dataset.service){if(B.startTreatment(s,button.dataset.service)){save();render();toast('Cliente en camino desde la calle');}return;}
     if(button.dataset.buy){if(B.purchase(s,button.dataset.buy)){toast('Tu local crece ✨');save();dirty=true;render();}return;}
     const reward=B.claim(s,button.dataset.claim);if(reward){toast('Objetivo completado · +'+fmt(reward));save();dirty=true;render();}
