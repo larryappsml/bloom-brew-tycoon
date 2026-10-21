@@ -1,3 +1,9 @@
+# v1.19.0
+
+- Acabados propios para todas las salas: textiles, cestas, cuadros, faroles, accesorios de actividad, almacenaje y productos.
+- Detalles diferenciados en las siete alas nuevas, más bancos y jardineras en fachada y remates en galerías.
+- Recursos compartidos y decoración según desbloqueos; se conservan pasillos, partidas, tiempos e ingresos.
+
 # v1.18.0
 
 - Distribución general con paseo central, galería lateral, corredor transversal y acceso renovado.

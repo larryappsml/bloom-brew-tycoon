@@ -1,4 +1,5 @@
 import {snapshot,animatePose,animateStaff,rally} from './animation3d.mjs';
+import {finishInteriors,finishGalleries} from './finishes3d.mjs';
 import {arrangeCampus,projectActors,restoreActors} from './campus3d.mjs';
 import './campus.js';
 import * as THREE from './vendor/three.module.min.mjs';
@@ -119,8 +120,8 @@ export function buildWorld(state){
   const entrance=group(root,-.4,0,5.95);entrance.name='Acceso antiguo';for(const x of [-1.85,1.85])box(entrance,x,1.1,0,.13,2.2,.13,palette.dark);box(entrance,0,2.32,0,4.2,.22,.8,palette.sage);for(let i=0;i<8;i++)box(entrance,-1.84+i*.52,2.44,0,.48,.06,.83,i%2?palette.cream:palette.sage);
   if(levels.terrace){for(const x of (levels.terrace>1?[-10,-4.8,3.8,10]:[-4.8,3.8])){table(root,x,7.1);cylinder(root,x,1.55,7.1,.035,3.1,palette.wood);mesh(root,geometry('parasol',()=>new THREE.ConeGeometry(1.35,.45,8)),palette.cream,x,3.1,7.1);}plant(root,-6.4,7.25,.8);}
   const kit={box,cylinder,ball,group,plant,label,cup,geometry,mesh,palette};buildSports(root,state,kit);buildActivities(root,state,kit);
-  const detailFeatures=dressWorld(root,state,kit);const artFeatures=polishWorld(root,state,kit);arrangeCampus(root,state,kit);
-  return {root,targets,students,tablePositions,tableCount,bar,studio,serviceSpots,footprint,detailFeatures,artFeatures};
+  const detailFeatures=dressWorld(root,state,kit);const artFeatures=polishWorld(root,state,kit);const finishFeatures=finishInteriors(root,state,kit);arrangeCampus(root,state,kit);finishGalleries(root,kit);
+  return {root,targets,students,tablePositions,tableCount,bar,studio,serviceSpots,footprint,detailFeatures,artFeatures,finishFeatures};
 }
 function buildExpansions(root,s){const z=Layout.zones(s),l=id=>Math.min(s.levels?.[id]||0,6),spots=[];
   function room(x,back,w,d,color,title,zone){const g=group(root,x,0,back+d/2,zone);box(g,0,-.25,0,w,.55,d,0xa4b39c);box(g,0,.04,0,w-.1,.1,d-.1,color);box(g,0,1.15,-d/2,w,2.4,.15,palette.cream);if(zone==='wellnessWing'){box(g,-w/2,1.15,-3.3,.15,2.4,5.1,palette.cream);box(g,-w/2,1.15,4.7,.15,2.4,2.1,palette.cream);}else box(g,-w/2,1.15,0,.15,2.4,d,palette.cream);return g;}
