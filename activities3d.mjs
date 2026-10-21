@@ -29,7 +29,13 @@ export function buildActivities(root,s,kit){
    for(const x of [-2.65,0,2.65]){box(g,x,1.35,-4.38,1.8,1.3,.04,P.ink);box(g,x,2.08,-4.3,1.9,.04,.06,P.gold);}
    box(g,0,1.45,-4.28,2.1,1.05,.06,P.sky);for(const x of [-3.2,3.2]){box(g,x,.75,-3.8,.45,1.5,.4,P.ink);for(const y of [.35,1.05])ball(g,x,y,-3.56,.14,P.gold,1,1,.2);}
    for(const x of [-2.8,2.8])box(g,x,.135,0,.04,.02,7.8,P.gold);
-  }else if(id==='dance'){for(const x of [-2.6,0,2.6]){box(g,x,1.35,-4.35,2.3,1.8,.08,P.gold);box(g,x,1.35,-4.28,2.15,1.65,.025,P.sky);}box(g,0,.85,-4.05,7.5,.06,.06,P.oak);for(const x of [-3.3,3.3]){box(g,x,.7,-3.65,.4,1.4,.4,P.ink);ball(g,x,.75,-3.42,.13,P.gold,1,1,.2);}
+  }else if(id==='dance'){for(const x of [-2.6,0,2.6]){box(g,x,1.35,-4.35,2.3,1.8,.08,P.gold);box(g,x,1.35,-4.28,2.15,1.65,.025,P.sky);box(g,x,2.28,-4.23,2.2,.04,.08,P.cream);for(const side of [-1,1])box(g,x+side*.9,.85,-4.05,.045,.4,.18,P.gold);}box(g,0,.85,-4.05,7.5,.06,.06,P.oak);for(const x of [-3.3,3.3]){box(g,x,.7,-3.65,.4,1.4,.4,P.ink);for(const y of [.35,.75,1.1])ball(g,x,y,-3.42,.13,P.gold,1,1,.2);}
+   const craft=group(g,0,0,0,'danceDecor');craft.name='Baile · parquet, vestuario y escenario';
+   for(let i=0;i<12;i++)for(let j=0;j<8;j++){const plank=box(craft,-3.65+i*.65,.145,-3.5+j*.95,.61,.015,.9,(i+j)%2?P.oak:P.cream);if(j%2)plank.rotation.y=.025;}
+   box(craft,-3.5,1,1.1,.6,1.8,2,P.rose);for(let i=0;i<3;i++){box(craft,-3.16,1,.5+i*.6,.025,1.6,.02,P.gold);box(craft,-3.13,1.1,.7+i*.6,.035,.12,.12,P.gold);}
+   box(craft,3.45,.42,2.5,.5,.18,2,P.oak);for(let j=0;j<4;j++)box(craft,3.45,.56,1.8+j*.45,.35,.08,.3,P.white);
+   box(craft,0,.22,-3.1,2.2,.16,1.1,P.sage);for(const side of [-1,1]){cylinder(craft,side*2.8,2.65,0,.13,.25,P.gold,12);box(craft,side*2.8,2.4,0,.25,.05,.35,P.cream);}
+   for(const x of [-3.6,3.6]){box(craft,x,2.1,-2.8,.3,.8,.15,P.rose);plant(craft,x,3.6,.6);}
   }else if(id==='nails'){
    for(const x of [-2.6,0,2.6]){box(g,x,1.3,-4.35,1.8,1.5,.06,P.cream);ball(g,x,2.02,-4.3,.9,P.cream,1,.65,.08);for(let j=0;j<5;j++)cylinder(g,x-.5+j*.25,1.1,-4.2,.045,.14,[P.rose,P.sage,P.gold][j%3]);}
   }else if(id==='beauty'){

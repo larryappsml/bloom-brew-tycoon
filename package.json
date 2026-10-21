@@ -1,6 +1,6 @@
 {
   "name": "bloom-brew-tycoon",
-  "version": "1.21.0",
+  "version": "1.22.0",
   "private": true,
   "scripts": {
     "test": "node --test tests/*.test.cjs",

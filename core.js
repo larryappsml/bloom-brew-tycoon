@@ -324,8 +324,9 @@
     const ongoing=[];
     for(const treatment of s.treatments){
       if(treatment.stage==='arrival'){if(!treatment.path.length)treatment.stage='active';ongoing.push(treatment);continue;}
+      if(treatment.service==='golf'&&!treatment.path.length){const progress=1-treatment.remaining/treatment.duration,next=progress>=.67?2:progress>=.33?1:0;if(next>(treatment.golfStop||0)){const origin=Layout.serviceSlots(s,'golf')[treatment.slot],point={x:origin.x+(next===1?1.5:2.5),z:origin.z+(next===1?1:-1.3),activity:'golf'};treatment.golfStop=next;Traffic.send(treatment,[point],point);}}
       treatment.remaining=Math.max(0,treatment.remaining-activityDt);
-      if(treatment.remaining>0){ongoing.push(treatment);continue;}
+      if(treatment.remaining>0||treatment.path.length){ongoing.push(treatment);continue;}
       const config=serviceConfig(s,treatment.service),cost=(treatment.cost??config.cost)+(treatment.salary??(treatment.automatic?config.salary:0));
       revenue(s,treatment.price??config.price,cost);s.wellnessRevenue+=treatment.price??config.price;s.completedServices[treatment.service]=(s.completedServices[treatment.service]||0)+1;s.happy++;s.reputation=clamp(s.reputation+.3,20,100);
       events.push({type:'service',service:treatment.service,net:(treatment.price??config.price)-cost,first:s.completedServices[treatment.service]===1});

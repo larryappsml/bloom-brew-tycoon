@@ -44,16 +44,16 @@ export function animatePose(p,target,time,dt,reduced,previous){
       p.body.rotation.y=hit*.22;p.knees.forEach(k=>k.rotation.x=.12+hit*.15);
     }
   }
-  if(target.treatment?.stage==='active'){
+  if(target.treatment?.stage==='active'&&!target.agent.moving){
     const cycle=reduced?0:Math.sin(time*5+id*.2),slow=reduced?0:Math.sin(time*1.3+id);
     if(target.service==='pool'){
-      const wave=reduced?0:Math.sin(time*1.2+id),direction=reduced?1:Math.cos(time*1.2+id);p.root.rotation.set(-Math.PI/2,0,direction>0?Math.PI:0);p.root.position.y=.55;
+      const wave=reduced?0:Math.sin(time*.8+id),direction=reduced?1:Math.cos(time*.8+id);p.root.rotation.set(-Math.PI/2,0,turn(previous?.[0]?.z||0,direction>0?Math.PI:0,reduced?1:Math.min(1,dt*7)));p.root.position.y=.55+(reduced?0:Math.sin(time*4+id)*.025);
       const desired=target.z-5.65+wave*2.8;const elapsed=(target.treatment.duration||68)-target.treatment.remaining;p.root.position.z=target.z+(desired-target.z)*(reduced?1:Math.min(1,elapsed/2));
-      p.body.rotation.x=0;p.arms.forEach((a,i)=>{a.rotation.x=reduced?-.4:Math.sin(time*4+i*Math.PI)*1.2;a.rotation.z=(i?1:-1)*.3;});p.legs.forEach((l,i)=>l.rotation.x=reduced?0:Math.sin(time*6+i*Math.PI)*.16);
+      p.body.rotation.x=0;p.body.rotation.z=reduced?0:Math.sin(time*4+id)*.1;p.arms.forEach((a,i)=>{a.rotation.x=reduced?-.4:Math.sin(time*4+id+i*Math.PI)*1.35;a.rotation.z=(i?1:-1)*.3;});p.legs.forEach((l,i)=>l.rotation.x=reduced?0:Math.sin(time*6+id+i*Math.PI)*.22);p.knees.forEach((k,i)=>k.rotation.x=reduced?0:Math.max(0,Math.sin(time*6+id+i*Math.PI))*.25);
     }else if(target.service==='golf'){
-      const shot=reduced?0:(time*.2+id*.17)%1,backswing=shot<.15?shot/.15:Math.max(0,1-(shot-.15)/.3);p.body.rotation.y=backswing*.5;p.arms.forEach(a=>a.rotation.x=-.2-backswing*1.1);p.arms[1].rotation.z=-backswing*.6;p.knees.forEach(k=>k.rotation.x=.12);
+      const shot=reduced?0:(time*.2+id*.17)%1,backswing=shot<.15?shot/.15:Math.max(0,1-(shot-.15)/.3),follow=shot>.15&&shot<.5?Math.sin((shot-.15)/.35*Math.PI):0;p.root.rotation.y=Math.PI/2;p.body.rotation.y=backswing*.7-follow*.5;p.body.rotation.x=.12;p.arms.forEach(a=>a.rotation.x=-.3-backswing*1.5+follow*.6);p.arms[1].rotation.z=-backswing*.65;p.knees.forEach((k,i)=>k.rotation.x=.16+(i?follow:backswing)*.12);
     }else if(target.service==='dance'){
-      const beat=reduced?0:Math.sin(time*6.2);p.root.position.x=target.x+beat*.17;p.body.rotation.z=beat*.055;p.arms.forEach((a,i)=>{a.rotation.z=(i?1:-1)*(.6+beat*.35);a.rotation.x=-.15;});p.legs.forEach((l,i)=>l.rotation.x=(i?1:-1)*beat*.2);p.knees.forEach(k=>k.rotation.x=.12+Math.abs(beat)*.12);
+      const beat=reduced?0:Math.sin(time*4.8),phrase=reduced?0:Math.floor(time/4)%4;p.root.position.x=target.x+beat*.24;p.root.position.z=target.z+(phrase===1?Math.cos(time*2.4)*.18:0);p.root.rotation.y=phrase===2?(time%4)*Math.PI/2:phrase===3?beat*.3:0;p.body.rotation.z=beat*.09;p.body.position.y=.47+Math.abs(beat)*.035;p.arms.forEach((a,i)=>{a.rotation.z=(i?1:-1)*(phrase===1?1.7+beat*.35:.65+beat*.45);a.rotation.x=phrase===3?-.8+beat*.4:-.15;});p.legs.forEach((l,i)=>l.rotation.x=(i?1:-1)*beat*.3);p.knees.forEach((k,i)=>k.rotation.x=.12+Math.max(0,(i?1:-1)*beat)*.3);
     }else if(target.service==='cycling'){
 
       p.root.position.y=.37;p.body.rotation.x=.17;p.body.position.y=.47+Math.abs(cycle)*.012;

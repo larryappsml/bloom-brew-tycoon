@@ -1,6 +1,6 @@
 # Bloom & Brew Tycoon 🌿☕🧘
 
-**v1.21.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
+**v1.22.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
 
 **[Jugar](https://larryappsml.github.io/bloom-brew-tycoon/)**
 
@@ -224,3 +224,12 @@ Toca una sala para elegir Equilibrada, Ágil (−22 % de duración, −12 % de t
 Cada sala tiene reformas Boutique, Signature y Gran lujo tras 20, 100 y 300 clientes atendidos. Costes: 60 %, 180 % y 540 % del precio base de la sala; cafetería usa base 500 €, pilates 1.800 €, recuperación 3.500 € y yoga 2.200 €. Las etapas añaden pavimentos interiores, remates, jardineras, arte o iluminación exterior y una zona lounge en el último nivel. Las salas deportivas y la piscina conservan sus superficies de actividad. Cada reforma suma seis puntos porcentuales a la tarifa, hasta +18 %. No añade plazas ficticias.
 
 Se conservan precios y relojes de actividades ya iniciadas. Las decisiones, reformas y descanso se exportan y guardan en partidas v2; las partidas antiguas empiezan equilibradas y sin reformas. Las compras se contabilizan como inversión y no como ingresos. Los menús siguen sin pausar el juego. Verificación: 145 pruebas, guardado, aforos, cobros y presupuesto de menos de 140 objetos estáticos de dibujo incluso con todas las reformas.
+
+
+## v1.22.0 — Detalle y movimiento en piscina, golf y baile
+
+Golf reparte seis posiciones por el recorrido continuo; cada jugador se desplaza a dos puntos adicionales durante su sesión, se detiene para golpear y sale al terminar. Un carrito con conductor y bolsas recorre el sendero perimetral. La casa club pasa a 13 × 6 m con recepción, terraza y pérgola. Se añaden rocalla, vallado, jardinería y señalización.
+
+Piscina incorpora mosaicos, duchas, tumbonas, toallas, reflejos y una estela de natación más detallada. Los nadadores alternan brazos y piernas y suavizan los giros. Baile recibe parquet, vestuario, bancos, altavoces y zona de instructor; sus animaciones alternan pasos laterales, brazos elevados y giros. Movimiento reducido mantiene poses estables.
+
+Se amplía la acera y se añade recuperación de ruta para salidas exteriores que no avanzan, incluidos clientes que oscilaban alrededor de un obstáculo. Caminan por un tramo alternativo y desaparecen al completar la salida; no se eliminan dentro de una sala ni se vuelven a cobrar servicios. Se conservan partidas, reformas y especializaciones. Verificación: 148 pruebas, acera con 48 salidas simultáneas y obstáculos, varias oleadas, aforos, pago único, modelos finitos y presupuesto estático para móvil.
