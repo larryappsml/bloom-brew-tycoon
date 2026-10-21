@@ -1,7 +1,7 @@
 (() => {
   'use strict';
-  const demo=/(?:[?&])demo=(?:club|expansion)(?:&|$)/.test(location.search||'');
-  const B=demo?{...window.Bloom,KEY:(location.search||'').includes('demo=expansion')?'bloom-brew-expansion-v1':'bloom-brew-demo-v2',LEGACY_KEY:'bloom-brew-demo-v1',fresh:()=>window.Bloom.validate(window.BloomDemo)}:window.Bloom;
+  const demo=/(?:[?&])demo=(?:club|expansion|leisure)(?:&|$)/.test(location.search||'');
+  const B=demo?{...window.Bloom,KEY:(location.search||'').includes('demo=leisure')?'bloom-brew-leisure-v1':(location.search||'').includes('demo=expansion')?'bloom-brew-expansion-v1':'bloom-brew-demo-v2',LEGACY_KEY:'bloom-brew-demo-v1',fresh:()=>window.Bloom.validate(window.BloomDemo)}:window.Bloom;
   const $=id=>document.getElementById(id),fmt=n=>new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',maximumFractionDigits:n>=100?0:2}).format(n);
   let s=B.fresh(),filter='all',toastTimer,dirty=true,loadWarning='',readOnly=false,selectedZone=null,venueScene,serviceMarkup='';
   function toast(text){$('toast').textContent=text;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3200);}

@@ -1,6 +1,6 @@
 # Bloom & Brew Tycoon 🌿☕🧘
 
-**v1.19.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
+**v1.20.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
 
 **[Jugar](https://larryappsml.github.io/bloom-brew-tycoon/)**
 
@@ -207,3 +207,11 @@ Se prueban continuidad, separación, restauración de coordenadas, zonas táctil
 Una nueva capa de acabados añade tarros etiquetados y servilleteros al café, cuadros al salón, textiles doblados y almacenaje de accesorios en pilates, cestas, faroles y piedras en bienestar y yoga, y material auxiliar en las zonas deportivas. Las siete actividades nuevas incorporan detalles propios: hidratación en cycling, expositores de esmaltes en nails, textiles y productos en peluquería, faroles y piedras en spa, guantes y láminas en boxeo, armarios de toallas en recuperación y libros y lámparas en coworking. La fachada recibe jardineras y bancos, y las galerías más remates.
 
 Los detalles siguen los desbloqueos existentes; no se cobran de nuevo ni cambian precios, tiempos o guardados. Los platos y bebidas de los clientes siguen apareciendo durante sus pedidos reales. Se comparten primitivas y materiales y se mantiene el presupuesto de menos de 140 objetos estáticos de dibujo para el centro desarrollado.
+
+## v1.20.0 — Piscina, golf y baile
+
+Piscina boutique de 252 m² con hasta seis calles; campo exterior de golf de 1.428 m² con un único recorrido alargado, green, bunkers, estanque y hasta seis salidas; estudio de baile con espejos, barra y seis plazas. El centro completo alcanza 2.440 m². Cada zona permite mejorar equipamiento, calidad, decoración y contratar personal.
+
+Clientes con ropa y animaciones propias llegan, realizan la sesión y pagan al terminar. Los menús no detienen el juego. Las partidas v2 conservan su progreso; las nuevas zonas empiezan sin comprar.
+
+[Demo avanzada independiente](https://larryappsml.github.io/bloom-brew-tycoon/?demo=leisure). Auditoría económica: docs/activities-audit-v1.20.json. Pruebas de accesos, aforos, cobros únicos, guardado y animaciones.

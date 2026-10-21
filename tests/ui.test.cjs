@@ -12,7 +12,7 @@ function boot(initial={},search='') {
   const navButtons=views.map(view=>{const button=make();button.dataset.view=view.id;return button;});
   const filters=['all','cafe','pilates','yoga','team','zones','wellness'].map(filter=>{const button=make();button.dataset.filter=filter;return button;});
   const document={getElementById(id){assert.ok(elements.has(id),'Missing UI element: '+id);return elements.get(id);},querySelectorAll(selector){return selector==='.view'?views:selector==='.nav-btn'?navButtons:selector==='#filter-tabs button'?filters:[];},createElement:make,addEventListener(name,fn){events[name]=fn;},hidden:false};
-  const ctx={window:{Bloom:B,VenueScene:function(){this.select=()=>{};},addEventListener(){},scrollTo(){}},document,localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},Date,Intl,console,URL,Blob,performance:{now:()=>now},setInterval(fn,ms){timers.push({fn,ms});},setTimeout(){},clearTimeout(){},navigator:{},location:{hostname:'127.0.0.1',search},confirm:()=>true};
+  const ctx={window:{Bloom:B,BloomLayout:require('../layout.js'),VenueScene:function(){this.select=()=>{};},addEventListener(){},scrollTo(){}},document,localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},Date,Intl,console,URL,Blob,performance:{now:()=>now},setInterval(fn,ms){timers.push({fn,ms});},setTimeout(){},clearTimeout(){},navigator:{},location:{hostname:'127.0.0.1',search},confirm:()=>true};
   vm.runInNewContext(fs.readFileSync('demo.js','utf8'),ctx);
   vm.runInNewContext(fs.readFileSync('game.js','utf8'),ctx);
   return {store,elements,events,timers,document,navButtons,advance(seconds){for(let i=0;i<seconds*10;i++){now+=100;timers.find(t=>t.ms===100).fn();}timers.find(t=>t.ms===5000).fn();}};
@@ -130,3 +130,5 @@ test('tapping a room shows its net estimate and closes without stopping gameplay
  ui.elements.get('cafe-zone').onclick();assert.equal(ui.elements.get('zone-panel').hidden,false);assert.match(ui.elements.get('zone-economy').innerHTML,/Cafetería/);assert.match(ui.elements.get('zone-economy').innerHTML,/\/min/);assert.match(ui.elements.get('zone-economy').innerHTML,/No incluye propinas/);assert.match(ui.elements.get('zone-economy').innerHTML,/recupera su coste/);
  ui.advance(15);assert.ok(JSON.parse(ui.store.get(B.KEY)).served>180);ui.elements.get('zone-close').onclick();assert.equal(ui.elements.get('zone-panel').hidden,true);
 });
+
+test('leisure demo opens all three new venues while keeping normal and earlier demo saves untouched',()=>{const normal=JSON.stringify(B.fresh()),oldDemo='earlier-demo';const ui=boot({[B.KEY]:normal,'bloom-brew-demo-v2':oldDemo},'?demo=leisure');const state=JSON.parse(ui.store.get('bloom-brew-leisure-v1'));for(const id of ['pool','golf','dance']){assert.equal(state.levels[id+'Wing'],1);assert.equal(state.levels[id],2);}assert.equal(ui.store.get(B.KEY),normal);assert.equal(ui.store.get('bloom-brew-demo-v2'),oldDemo);});

@@ -31,9 +31,10 @@ export function finishInteriors(root,s,K){
  if(L.zones(s).wellness){const spa=detail('wellness-library',10.7,-5.8,'recoveryComfort');for(const x of [-1.3,1.3]){frame(spa,x,1.5,0,x<0?P.mint:P.rose);lantern(spa,x,.07,.6);}pendant(spa,0,.1,P.cream);}
  if(L.zones(s).crossfit){const gym=detail('gym-accessories',-8,-13.9,'gymAtmosphere');box(gym,0,.5,0,.45,.9,.45,P.dark);linen(gym,0,1,0);cylinder(gym,0,1.2,0,.07,.3,P.sky,12);for(let j=0;j<3;j++)box(gym,-.55,.25+j*.13,0,.4,.1,.5,P.oak);}
  if(own('padelCourt')){const club=detail('padel-club-lounge',15.05,-8.8,'padelKit');basket(club,0,.05,0);for(let j=0;j<4;j++)ball(club,(j%2)*.13-.06,.28,Math.floor(j/2)*.13-.06,.06,P.gold);linen(club,0,.6,.55,P.mint);box(club,0,.52,.55,.42,.1,.45,P.oak);}
- for(const r of L.ROOMS){if(!own(r.id+'Wing'))continue;const id=r.id,g=detail(id+'-signature',r.x,r.z,id+'Decor'),tier=Math.min(3,s.levels[id+'Decor']||0);
+ for(const r of L.ROOMS){if(!own(r.id+'Wing'))continue;const id=r.id;if(['pool','golf'].includes(id)){features.push(id+'-signature');continue;}const g=detail(id+'-signature',r.x,r.z,id+'Decor'),tier=Math.min(3,s.levels[id+'Decor']||0);
   // Back corners and wall shelves leave the central and door aisles clear.
-  if(id==='cycling'){
+  if(id==='dance'){for(const side of [-1,1]){box(g,side*3.2,.3,3.6,.6,.5,.5,P.oak);linen(g,side*3.2,.6,3.6,P.rose);}frame(g,0,2.1,-4.15,P.rose);
+  }else if(id==='cycling'){
    for(const side of [-1,1]){box(g,side*3.1,1.7,-4.2,.55,.6,.045,P.ink);for(let i=0;i<3;i++)box(g,side*3.1-.16+i*.16,1.7,-4.16,.04,.1+i*.11,.015,P.gold);}
    bench(g,2.9,-3.55,1.2,P.dark);linen(g,2.9,.49,-3.55);for(let i=0;i<2+tier;i++)cylinder(g,-3.2+i*.15,.35,-3.6,.045,.23,P.sky,12);
   }else if(id==='nails'){

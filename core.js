@@ -64,7 +64,7 @@
     ,['padelCoach','Monitor de pádel','Organiza partidos de cuatro automáticamente','🧑‍🏫','team',2100,1]
   ].map(([id,name,desc,emoji,cat,base,max])=>({id,name,desc,emoji,cat,base,max}));
   const ROOMS=Layout.ROOMS;
-  for(const r of ROOMS)UPGRADES.push(...[[r.id+'Wing',r.name,'Construye 56 m² con acceso desde el paseo',r.icon,'zones',r.base,1],[r.id,'Puestos de '+r.name,'Dos plazas equipadas por nivel',r.icon,'activities',Math.round(r.base*.22),3],[r.id+'Quality','Servicio premium · '+r.name,'Mejora tarifa y rapidez; añade equipamiento', '✨','activities',Math.round(r.base*.12),3],[r.id+'Decor','Ambiente · '+r.name,'Más confort y tarifa; nueva decoración','🪴','activities',Math.round(r.base*.08),3],[r.id+'Staff','Especialista · '+r.name,'Atención automática con salario por sesión','🧑‍🏫','team',Math.round(r.base*.18),1]].map(([id,name,desc,emoji,cat,base,max])=>({id,name,desc,emoji,cat,base,max})));
+  for(const r of ROOMS)UPGRADES.push(...[[r.id+'Wing',r.name,'Construye '+(r.area||56)+' m² con acceso desde el paseo',r.icon,'zones',r.base,1],[r.id,r.equipment||'Puestos de '+r.name,r.equipmentDesc||'Dos plazas equipadas por nivel',r.icon,'activities',Math.round(r.base*.22),3],[r.id+'Quality','Servicio premium · '+r.name,'Mejora tarifa y rapidez; añade equipamiento', '✨','activities',Math.round(r.base*.12),3],[r.id+'Decor','Ambiente · '+r.name,'Más confort y tarifa; nueva decoración','🪴','activities',Math.round(r.base*.08),3],[r.id+'Staff','Especialista · '+r.name,'Atención automática con salario por sesión','🧑‍🏫','team',Math.round(r.base*.18),1]].map(([id,name,desc,emoji,cat,base,max])=>({id,name,desc,emoji,cat,base,max})));
   const GOALS = [
     ['first','Tu primer turno','Sirve 10 pedidos',10,'served',45,'☕'],
     ['earn','Un rincón con futuro','Factura 500 € en ventas',500,'earned',100,'🌱'],
@@ -127,7 +127,7 @@
   }
   const price=(s,u)=>Math.ceil(u.base*Math.pow(1.65,level(s,u.id)));
   function requirement(s,u) {
-    const room=ROOMS.find(r=>u.id===r.id||u.id.startsWith(r.id));if(room){if(u.id===room.id+'Wing')return !level(s,'mat')?'Abre primero el estudio de pilates':!level(s,'padelWing')&&!level(s,'crossfitWing')?'Abre primero una zona deportiva':'';if(!level(s,room.id+'Wing'))return 'Construye '+room.name;if(u.id!==room.id&&!level(s,room.id))return 'Instala los primeros puestos';return '';}
+    const room=ROOMS.find(r=>u.id===r.id||u.id.startsWith(r.id));if(room){if(u.id===room.id+'Wing'&&room.prerequisite&&!level(s,room.prerequisite))return 'Abre primero '+UPGRADES.find(u=>u.id===room.prerequisite).name;if(u.id===room.id+'Wing')return !level(s,'mat')?'Abre primero el estudio de pilates':!level(s,'padelWing')&&!level(s,'crossfitWing')?'Abre primero una zona deportiva':'';if(!level(s,room.id+'Wing'))return 'Construye '+room.name;if(u.id!==room.id&&!level(s,room.id))return 'Instala los primeros puestos';return '';}
     if(u.id==='crossfitWing'&&s.sessions<6)return 'Completa 6 clases de pilates';
     if(u.id==='padelWing'&&s.sessions<10)return 'Completa 10 clases de pilates';
     if(u.id==='functionalStations'&&!Layout.zones(s).crossfit)return 'Construye el box de entrenamiento';
@@ -162,7 +162,7 @@
   const unlocked=(s,u)=>!requirement(s,u);
   const SERVICES=[{id:'pressotherapy',name:'Presoterapia',icon:'🦵'},{id:'massage',name:'Masaje',icon:'💆'},{id:'yoga',name:'Yoga',icon:'🧘'},...ROOMS.map(({id,name,icon})=>({id,name,icon}))];
   function baseServiceConfig(s,id){const l=x=>Math.min(level(s,x),UPGRADES.find(u=>u.id===x).max),capacity=Layout.serviceSlots(s,id).length,comfort=l('recoveryComfort');
-    const room=ROOMS.find(r=>r.id===id);if(room)return {capacity,duration:room.duration-l(id+'Quality')*3,price:room.price+l(id+'Quality')*40+l(id+'Decor')*22,cost:room.cost+l(id+'Quality')*3,salary:22,automatic:l(id+'Staff')>0,travel:room.travel};
+    const room=ROOMS.find(r=>r.id===id);if(room)return {capacity,duration:room.duration-l(id+'Quality')*3,price:room.price+l(id+'Quality')*(room.qualityBonus||40)+l(id+'Decor')*(room.decorBonus||22),cost:room.cost+l(id+'Quality')*3,salary:22,automatic:l(id+'Staff')>0,travel:room.travel};
     if(id==='pressotherapy')return {capacity,duration:36-l('pressureCare')*3-Math.max(0,l('therapist')-1)*2-l('pressurePump')*2,price:90+l('pressureCare')*9+comfort*4+l('pressurePump')*6+l('wellnessLinen')*3,cost:12,salary:8,automatic:l('therapist')>0,travel:6};
     if(id==='massage')return {capacity,duration:42-l('massageCare')*3-Math.max(0,l('therapist')-1)*2,price:120+l('massageCare')*12+comfort*4+l('massageStones')*8+l('wellnessLinen')*3+l('aromaMassage')*12,cost:18+l('massageStones')+l('aromaMassage'),salary:8,automatic:l('therapist')>0,travel:6};
     if(id==='yoga')return {capacity,duration:30-l('yogaCare')*2-l('yogaBolsters')-l('soundRitual'),price:55+l('yogaCare')*5+l('yogaBolsters')*2+l('zenGarden')*3+l('yogaTea')*5+l('soundRitual')*4,cost:4+l('yogaTea')*.5+l('soundRitual')*.5,salary:3,automatic:l('coach')>0,travel:12};

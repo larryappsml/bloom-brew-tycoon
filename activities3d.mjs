@@ -1,7 +1,8 @@
 import './activities.js';
+import {buildLeisure} from './leisure3d.mjs';
 import './layout.js';
 // Each activity has its own architectural palette and equipment silhouettes.
-export const ROOM_THEMES={
+export const ROOM_THEMES={pool:{floor:0xb1deea,wall:0xfffdf2,accent:0xf4c45f,seat:0x6fbc99,name:'Piscina · agua y luz'},golf:{floor:0x86bd7d,wall:0x638653,accent:0xf4c45f,seat:0x24564d,name:'Golf · paisaje y jardines'},dance:{floor:0xe9b77a,wall:0xe9a998,accent:0xf4c45f,seat:0x344b55,name:'Baile · parquet y espejos'},
  cycling:{floor:0x344b55,wall:0x24564d,accent:0xf4c45f,seat:0x344b55,name:'Club de cycling · caucho y luz ámbar'},
  nails:{floor:0xf5dfd9,wall:0xe9a998,accent:0xf4c45f,seat:0xd39aaa,name:'Nail bar · terrazo rosa y latón'},
  beauty:{floor:0xe9b77a,wall:0xf2d7ba,accent:0x24564d,seat:0x344b55,name:'Beauty bar · roble y espejos'},
@@ -14,7 +15,7 @@ export function buildActivities(root,s,kit){
  const {group,box,cylinder,ball,plant,palette:P}=kit,L=globalThis.BloomLayout;
  for(const room of L.ROOMS){
   const id=room.id,n=s.levels[id]||0,q=s.levels[id+'Quality']||0,d=s.levels[id+'Decor']||0,T=ROOM_THEMES[id];
-  if(!s.levels[id+'Wing'])continue;
+  if(!s.levels[id+'Wing']||['pool','golf'].includes(id))continue;
   const g=group(root,room.x,0,room.z,id+'Wing');g.name=room.name;g.userData.theme=T.name;
   box(g,0,-.18,0,8,.45,9,P.oak);box(g,0,.07,0,7.9,.08,8.9,T.floor);
   box(g,0,1.15,-4.5,8,2.3,.15,T.wall);box(g,-4,.55,0,.13,1.1,9,T.wall);
@@ -28,6 +29,7 @@ export function buildActivities(root,s,kit){
    for(const x of [-2.65,0,2.65]){box(g,x,1.35,-4.38,1.8,1.3,.04,P.ink);box(g,x,2.08,-4.3,1.9,.04,.06,P.gold);}
    box(g,0,1.45,-4.28,2.1,1.05,.06,P.sky);for(const x of [-3.2,3.2]){box(g,x,.75,-3.8,.45,1.5,.4,P.ink);for(const y of [.35,1.05])ball(g,x,y,-3.56,.14,P.gold,1,1,.2);}
    for(const x of [-2.8,2.8])box(g,x,.135,0,.04,.02,7.8,P.gold);
+  }else if(id==='dance'){for(const x of [-2.6,0,2.6]){box(g,x,1.35,-4.35,2.3,1.8,.08,P.gold);box(g,x,1.35,-4.28,2.15,1.65,.025,P.sky);}box(g,0,.85,-4.05,7.5,.06,.06,P.oak);for(const x of [-3.3,3.3]){box(g,x,.7,-3.65,.4,1.4,.4,P.ink);ball(g,x,.75,-3.42,.13,P.gold,1,1,.2);}
   }else if(id==='nails'){
    for(const x of [-2.6,0,2.6]){box(g,x,1.3,-4.35,1.8,1.5,.06,P.cream);ball(g,x,2.02,-4.3,.9,P.cream,1,.65,.08);for(let j=0;j<5;j++)cylinder(g,x-.5+j*.25,1.1,-4.2,.045,.14,[P.rose,P.sage,P.gold][j%3]);}
   }else if(id==='beauty'){
@@ -56,6 +58,7 @@ export function buildActivities(root,s,kit){
    }else if(id==='boxing'){
     box(a,0,.13,0,1.65,.07,1.9,P.dark);for(const side of [-1,1])box(a,side*.65,.18,0,.03,.02,1.6,P.rose);
     const bag=group(a,0,0,.8);bag.name='Saco de cuero';cylinder(bag,0,.85,0,.29,1.25,P.rose,16);for(const y of [.32,.47,1.28])cylinder(bag,0,y,0,.3,.035,P.ink,16);box(bag,0,1.54,0,.04,.22,.04,P.gold);cylinder(bag,0,.16,0,.43,.1,P.ink);
+   }else if(id==='dance'){box(a,0,.145,0,1.5,.025,1.6,P.oak);for(const side of [-1,1])box(a,side*.3,.165,0,.14,.015,.35,P.gold);
    }else if(id==='thermal'){
     // Cedar tubs with a stone lip, headrest and brass taps.
     cylinder(a,0,.4,0,.88,.6,P.wood,16);cylinder(a,0,.72,0,.83,.09,P.cream,16);cylinder(a,0,.775,0,.71,.025,0x82caca,16);
@@ -80,7 +83,7 @@ export function buildActivities(root,s,kit){
    }
    if(q){const u=group(a,1.02,0,-.45,id+'Quality');box(u,0,.4,0,.3,.7,.4,T.seat);for(let j=0;j<q;j++)box(u,0,.83+j*.1,0,.28,.06,.28,j%2?P.cream:T.accent);}
   }
-  const premium=group(g,0,0,-3.4,id+'Quality');
+  const premium=group(g,0,0,-3.4,id+'Quality');if(id==='dance')for(let j=0;j<q;j++){box(premium,-.65+j*.65,1.65,-.7,.42,.28,.04,P.dark);box(premium,-.65+j*.65,1.65,-.66,.25,.025,.015,P.gold);}
   if(id==='thermal'&&q){box(premium,2.5,.85,0,1.65,1.7,1.5,P.wood);for(let j=0;j<7;j++)box(premium,1.8+j*.22,1.6,.78,.08,1.4,.05,P.oak);box(premium,2.5,.5,.8,1.4,.15,.35,P.oak);}
   if(id==='cold'&&q){box(premium,0,.8,0,.8,1.5,.6,P.rose);for(let j=0;j<q;j++)box(premium,-.25+j*.25,1.2,-.33,.08,.4,.03,P.gold);}
   if(id==='beauty'&&q){box(premium,2.6,.5,0,.8,1,.9,P.dark);ball(premium,2.6,1,0,.4,P.cream,1,.35,1);ball(premium,2.6,1.07,0,.28,P.ink,1,.2,1);}
@@ -97,6 +100,7 @@ export function buildActivities(root,s,kit){
   }
   if(s.levels[id+'Staff']){const desk=group(g,0,0,-3,id+'Staff');box(desk,0,.48,0,id==='cowork'?1.5:1,.9,.5,T.seat);box(desk,0,.98,0,1.2,.09,.6,id==='thermal'?P.wood:P.oak);}
  }
+ buildLeisure(root,s,kit,ROOM_THEMES);
  // Connected, two metre galleries. The spine occupies the gap between wings.
  if(L.ROOMS.some(r=>s.levels[r.id+'Wing'])){
   const hall=group(root);hall.name='Galerías del centro';

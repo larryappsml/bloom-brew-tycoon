@@ -46,7 +46,16 @@ export function animatePose(p,target,time,dt,reduced,previous){
   }
   if(target.treatment?.stage==='active'){
     const cycle=reduced?0:Math.sin(time*5+id*.2),slow=reduced?0:Math.sin(time*1.3+id);
-    if(target.service==='cycling'){
+    if(target.service==='pool'){
+      const wave=reduced?0:Math.sin(time*1.2+id),direction=reduced?1:Math.cos(time*1.2+id);p.root.rotation.set(-Math.PI/2,0,direction>0?Math.PI:0);p.root.position.y=.55;
+      const desired=target.z-5.65+wave*2.8;const elapsed=(target.treatment.duration||68)-target.treatment.remaining;p.root.position.z=target.z+(desired-target.z)*(reduced?1:Math.min(1,elapsed/2));
+      p.body.rotation.x=0;p.arms.forEach((a,i)=>{a.rotation.x=reduced?-.4:Math.sin(time*4+i*Math.PI)*1.2;a.rotation.z=(i?1:-1)*.3;});p.legs.forEach((l,i)=>l.rotation.x=reduced?0:Math.sin(time*6+i*Math.PI)*.16);
+    }else if(target.service==='golf'){
+      const shot=reduced?0:(time*.2+id*.17)%1,backswing=shot<.15?shot/.15:Math.max(0,1-(shot-.15)/.3);p.body.rotation.y=backswing*.5;p.arms.forEach(a=>a.rotation.x=-.2-backswing*1.1);p.arms[1].rotation.z=-backswing*.6;p.knees.forEach(k=>k.rotation.x=.12);
+    }else if(target.service==='dance'){
+      const beat=reduced?0:Math.sin(time*6.2);p.root.position.x=target.x+beat*.17;p.body.rotation.z=beat*.055;p.arms.forEach((a,i)=>{a.rotation.z=(i?1:-1)*(.6+beat*.35);a.rotation.x=-.15;});p.legs.forEach((l,i)=>l.rotation.x=(i?1:-1)*beat*.2);p.knees.forEach(k=>k.rotation.x=.12+Math.abs(beat)*.12);
+    }else if(target.service==='cycling'){
+
       p.root.position.y=.37;p.body.rotation.x=.17;p.body.position.y=.47+Math.abs(cycle)*.012;
       p.legs.forEach((l,i)=>l.rotation.x=-1.18+(i?-1:1)*cycle*.48);
       p.knees.forEach((k,i)=>{k.rotation.x=1.25+(i?1:-1)*cycle*.38;k.scale.y=1.35;});
@@ -66,7 +75,7 @@ export function animatePose(p,target,time,dt,reduced,previous){
       if(target.service==='cold')p.body.position.y=.47+(reduced?0:Math.sin(time*2+id)*.008);
     }
   }
-  if((target.sport!=='padel'||target.athlete?.stage!=='playing')&&!(target.service==='boxing'&&target.treatment?.stage==='active'))p.body.rotation.y=0;
+  if((target.sport!=='padel'||target.athlete?.stage!=='playing')&&!(['boxing','golf'].includes(target.service)&&target.treatment?.stage==='active'))p.body.rotation.y=0;
   const joints=[p.root,p.body,...p.legs,...p.knees,...p.arms],blend=reduced?1:1-Math.exp(-Math.min(dt,.15)*12);
   if(previous)joints.forEach((o,i)=>{for(const axis of ['x','y','z'])o.rotation[axis]=turn(previous[i][axis],o.rotation[axis],blend);});
 }

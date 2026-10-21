@@ -1,0 +1,72 @@
+[
+  {
+    "room": "Cycling boutique",
+    "netPerMinute": 2191,
+    "estimated": 2269,
+    "completed": 52,
+    "capacity": 6
+  },
+  {
+    "room": "Nail bar",
+    "netPerMinute": 2286,
+    "estimated": 2215,
+    "completed": 49,
+    "capacity": 6
+  },
+  {
+    "room": "Peluquería y beauty bar",
+    "netPerMinute": 2266,
+    "estimated": 2156,
+    "completed": 43,
+    "capacity": 6
+  },
+  {
+    "room": "Spa termal",
+    "netPerMinute": 2352,
+    "estimated": 2429,
+    "completed": 41,
+    "capacity": 6
+  },
+  {
+    "room": "Boxeo boutique",
+    "netPerMinute": 3114,
+    "estimated": 3122,
+    "completed": 47,
+    "capacity": 6
+  },
+  {
+    "room": "Recuperación frío y calor",
+    "netPerMinute": 2851,
+    "estimated": 2863,
+    "completed": 42,
+    "capacity": 6
+  },
+  {
+    "room": "Coworking y café",
+    "netPerMinute": 2911,
+    "estimated": 2973,
+    "completed": 36,
+    "capacity": 6
+  },
+  {
+    "room": "Piscina boutique",
+    "netPerMinute": 3676,
+    "estimated": 3910,
+    "completed": 33,
+    "capacity": 6
+  },
+  {
+    "room": "Campo de golf",
+    "netPerMinute": 6522,
+    "estimated": 5866,
+    "completed": 29,
+    "capacity": 6
+  },
+  {
+    "room": "Estudio de baile",
+    "netPerMinute": 4065,
+    "estimated": 4033,
+    "completed": 42,
+    "capacity": 6
+  }
+]

@@ -1,5 +1,5 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
-const B=require('../core.js'),L=require('../layout.js'),T=require('../traffic.js'),R=require('../activities.js');
+const B=require('../core.js'),L=require('../layout.js'),T=require('../traffic.js'),R=require('../activities.js').filter(r=>!['pool','golf','dance'].includes(r.id));
 const now=1800000000000;
 test('seven wings require progression and equipment, grow the centre, preserve old saves and bounded investments',()=>{
   const s=B.fresh(now);s.money=1e8;

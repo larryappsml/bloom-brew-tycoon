@@ -1,8 +1,8 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
-const B=require('../core.js'),L=require('../layout.js'),R=require('../activities.js');
+const B=require('../core.js'),L=require('../layout.js'),R=require('../activities.js').filter(r=>!['pool','golf','dance'].includes(r.id));
 const full=()=>{const s=B.fresh();for(const u of B.UPGRADES)s.levels[u.id]=u.max;return s;};
 test('compact wings have two metre separation and all entry and exit paths avoid unrelated rooms',()=>{
- const s=full(),f=L.footprint(s);assert.ok(f.right-f.left<42);
+ const s=full(),f=L.footprint(s);assert.ok(f.right-f.left<75);
  for(let i=0;i<R.length;i++)for(let j=i+1;j<R.length;j++){
   const a=R[i],b=R[j];assert.ok(Math.abs(a.x-b.x)>=10||Math.abs(a.z-b.z)>=11);
  }
@@ -16,10 +16,10 @@ test('compact wings have two metre separation and all entry and exit paths avoid
 });
 test('seven architectural identities and the galleries survive rendering and static batching',async()=>{
  const {ROOM_THEMES}=await import('../activities3d.mjs'),{buildWorld,batchStaticWorld,hitZone}=await import('../scene3d.mjs');
- assert.equal(new Set(Object.values(ROOM_THEMES).map(t=>t.name)).size,7);
+ assert.equal(new Set(Object.values(ROOM_THEMES).map(t=>t.name)).size,10);
  const w=buildWorld(full()),found=new Set();let hall;
  w.root.traverse(o=>{if(o.userData.theme)found.add(o.userData.theme);if(o.name==='Galerías del centro')hall=o;});
- assert.equal(found.size,7);assert.ok(hall);assert.ok(hall.children.length>10);
+ assert.equal(found.size,10);assert.ok(hall);assert.ok(hall.children.length>10);
  batchStaticWorld(w.root);const zones=new Set();let draws=0;w.root.traverse(o=>{if(o.isMesh)draws++;if(o.isInstancedMesh)for(let i=0;i<o.count;i++)zones.add(hitZone({object:o,instanceId:i}));});
  for(const r of R)assert.ok(zones.has(r.id));assert.ok(draws<140,'mobile static draw budget');
 });

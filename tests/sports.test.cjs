@@ -8,7 +8,7 @@ test('new zones require real progression, add physical area and unlock equipment
   const s=B.fresh(now);s.money=100000;for(const id of ['crossfitWing','padelWing','functionalStations','padelCourt','functionalCoach','padelCoach'])assert.equal(B.purchase(s,id),false,id);
   s.sessions=6;assert.equal(B.purchase(s,'crossfitWing'),true);assert.equal(B.params(s).area,120);assert.equal(B.purchase(s,'functionalStations'),true);assert.equal(B.purchase(s,'functionalCoach'),true);assert.equal(B.sportConfig(s,'crossfit').capacity,2);
   s.sessions=10;assert.equal(B.purchase(s,'padelWing'),true);assert.equal(B.params(s).area,200);assert.equal(B.purchase(s,'padelCourt'),true);assert.equal(B.purchase(s,'padelCoach'),true);assert.equal(B.sportConfig(s,'padel').capacity,4);assert.equal(B.purchase(s,'padelCourt'),false);
-  for(const u of B.UPGRADES)s.levels[u.id]=u.max;assert.equal(B.params(s).area,704);assert.equal(L.footprint(s).back,-38.7);assert.equal(L.sportSlots(s,'crossfit').length,6);assert.equal(L.footprint(s).right,22);
+  for(const u of B.UPGRADES)s.levels[u.id]=u.max;assert.equal(B.params(s).area,2440);assert.equal(L.footprint(s).back,-70);assert.equal(L.sportSlots(s,'crossfit').length,6);assert.equal(L.footprint(s).right,55);
 });
 test('padel recruits four real players, waits for their arrival, pays once and empties the court',()=>{
   const s=sporty();assert.equal(B.startSport(s,'padel'),true);assert.equal(s.sportsGroups.padel.guests.length,0);assert.equal(s.sportsGroups.padel.remaining,0);assert.equal(B.startSport(s,'padel'),false);
