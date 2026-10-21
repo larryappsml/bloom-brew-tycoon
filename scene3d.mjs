@@ -219,7 +219,7 @@ export class Venue3D {
   }
   worldWidth(){const f=this.world?.footprint;return f?(f.right-f.left)*.83+(14-f.back)*.57+6:30;}
   rebuild(){const s=this.getState(),previous=this.world?.footprint;if(this.world)disposeGroup(this.world.root);this.world=buildWorld(s);batchStaticWorld(this.world.root);this.scene.add(this.world.root);this.fingerprint=worldStamp(s);this.staff=[];
-    this.fitZoom=Math.min(1,(this.camera.right-this.camera.left)/this.worldWidth());if(previous&&previous.area!==this.world.footprint.area)this.focus('all');
+    this.fitZoom=Math.min(1,(this.camera.right-this.camera.left)/this.worldWidth(),(this.camera.top-this.camera.bottom)/((this.world.footprint.right-this.world.footprint.left)*.4+(14-this.world.footprint.back)*.6+6));if(previous&&previous.area!==this.world.footprint.area)this.focus('all');
     this.steam=[];for(let i=0;i<5;i++){const puff=ball(this.world.root,-4.6,2.7,-2.5,.08,palette.white);puff.castShadow=false;puff.receiveShadow=false;this.steam.push(puff);}
     for(let i=0;i<Math.min(3,s.levels.barista||0);i++){const staff=character(i,true);staff.workRole='cafe';staff.root.position.set(-4.7+i*1.3,0,-4.2);this.world.root.add(staff.root);this.staff.push(staff);}
     if(s.levels.coach){const staff=character(2,true,'pilates');staff.workRole='pilates';staff.root.position.set(5.9,0,-3.7);this.world.root.add(staff.root);this.staff.push(staff);}
