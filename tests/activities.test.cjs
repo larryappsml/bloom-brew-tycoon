@@ -37,4 +37,4 @@ test('each new room, capacity and visual upgrade adds finite clickable models',a
   batchStaticWorld(world.root);const zones=new Set();world.root.traverse(o=>{for(const v of [...o.position,...o.scale])assert.ok(Number.isFinite(v));if(o.isInstancedMesh)for(let i=0;i<o.count;i++)zones.add(hitZone({object:o,instanceId:i}));});for(const r of R)for(const suffix of ['', 'Quality','Decor','Staff'])assert.ok(zones.has(r.id+suffix),r.id+suffix);
 });
 
-test('measured activity income and room estimates agree within ten percent in the shared maximum venue',()=>{const report=require('../docs/activities-audit-v1.17.json');for(const row of report){assert.ok(row.completed>=30);assert.ok(Math.abs(row.estimated/row.netPerMinute-1)<.1,row.room);}});
+test('measured activity income and room estimates agree within ten percent in the shared maximum venue',()=>{const report=require('../docs/activities-audit-v1.18.json');for(const row of report){assert.ok(row.completed>=30);assert.ok(Math.abs(row.estimated/row.netPerMinute-1)<.1,row.room);}});

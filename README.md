@@ -1,6 +1,6 @@
 # Bloom & Brew Tycoon 🌿☕🧘
 
-**v1.17.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
+**v1.18.0** · Tycoon de cafetería y pilates con mapa 3D a pantalla completa, en español, pensado para móvil.
 
 **[Jugar](https://larryappsml.github.io/bloom-brew-tycoon/)**
 
@@ -193,3 +193,11 @@ Las siete actividades se distribuyen en dos bloques compactos junto al centro. G
 Cada actividad dispone de una arquitectura propia: caucho oscuro y luz ámbar en cycling, terrazo rosa y latón en manicura, roble y espejos en peluquería, piedra y cedro en spa, ladrillo y cuero en boxeo, tonos hielo en recuperación y biblioteca botánica en coworking. Bicicletas, sacos, bañeras, sillas y estaciones tienen más detalle. Se distinguen pedaleo, golpes, manicura, secado, escritura y ondas del agua; el personal camina entre puestos. Movimiento reducido y modo Canvas siguen disponibles.
 
 Pruebas nuevas: separación entre alas, rutas que no atraviesan otras habitaciones, identidad de las siete salas, presupuesto de dibujo, accesorios que desaparecen al salir y ausencia de cambios económicos causados por el renderizado. Auditoría reproducible de recorridos: `node scripts/activities-audit.cjs docs/activities-audit-v1.17.json`.
+
+### v1.18.0 — Distribución de todo el centro
+
+El paseo central separa cafetería y pilates; una galería lateral distribuye los accesos de bienestar y pádel, y un corredor transversal conecta yoga y crossfit. Presoterapia y masaje tienen su propio pasillo, suelos diferenciados y divisiones bajas. Bancos, jardines, luces y el nuevo acceso refuerzan la circulación. La cafetería con su salón y pilates con su ampliación conservan una superficie continua.
+
+`campus.js` define una transformación continua compartida por los modelos, clientes, objetos de actividad, relojes, cámara y Canvas. La transformación ensancha los pasos sin comprimir la separación entre personajes. `campus3d.mjs` organiza arquitectura y pavimento y aplica la proyección durante el dibujo, restaurando después las coordenadas internas. Se conservan las claves y estadísticas del guardado v2, las compras, capacidades y tarifas; no se reinicia la partida. Se recolocan algunos puestos de las alas nuevas para liberar espacio alrededor de sus mesas y equipos.
+
+Se prueban continuidad, separación, restauración de coordenadas, zonas táctiles y presupuesto de dibujo. Auditoría de las siete actividades: `node scripts/activities-audit.cjs docs/activities-audit-v1.18.json`.

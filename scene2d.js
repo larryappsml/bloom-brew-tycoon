@@ -9,7 +9,7 @@
       this.resize=()=>{const dpr=Math.min(devicePixelRatio||1,2);canvas.width=360*dpr;canvas.height=270*dpr;this.ctx.setTransform(dpr,0,0,dpr,0,0);};
       this.resize();this.frame=this.frame.bind(this);requestAnimationFrame(this.frame);
     }
-    point(x,y,z=0){return [180+(x-y)*21,42+(x+y)*13-z];}
+    point(x,y,z=0){const c=window.BloomCampus;if(c){x=(c.x(x*2.1-7.35)+7.35)/2.1;y=(c.z(y*1.77-6.2)+6.2)/1.77;}return [180+(x-y)*21,42+(x+y)*13-z];}
     poly(points,fill,stroke) {const c=this.ctx;c.beginPath();points.forEach((p,i)=>i?c.lineTo(...p):c.moveTo(...p));c.closePath();c.fillStyle=fill;c.fill();if(stroke){c.strokeStyle=stroke;c.lineWidth=1;c.stroke();}}
     tile(x,y,w,d,z,color) {this.poly([this.point(x,y,z),this.point(x+w,y,z),this.point(x+w,y+d,z),this.point(x,y+d,z)],color);}
     box(x,y,w,d,h,top='#dbb18c',side='#b48663') {

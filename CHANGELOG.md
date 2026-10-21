@@ -1,3 +1,11 @@
+# v1.18.0
+
+- Distribución general con paseo central, galería lateral, corredor transversal y acceso renovado.
+- Separaciones también entre las salas originales; presoterapia y masaje se organizan alrededor de un pasillo propio.
+- Café y salón mantienen su continuidad, al igual que pilates y su ampliación.
+- Una transformación continua alinea modelos, clientes, accesorios, relojes, cámara y Canvas sin cambiar los datos económicos guardados.
+- Puestos nuevos recolocados, más bancos y luces y pruebas de separación y coordenadas.
+
 # v1.17.0
 
 - Dos bloques compactos de actividades conectados al centro por galerías; corredores entre las alas y rutas reales por sus puertas.
